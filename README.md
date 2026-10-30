@@ -138,9 +138,10 @@ pressure bleeds off → town status reaches **catastrophic**.
 ```
 simlab/
   app.py          FastAPI: REST + WebSocket + static hosting + Modbus startup
-  engine.py       tick engine, technique application, cascade + scoring
+  engine.py       tick engine, technique application, cascade + scoring + report data
   town.py         facilities, simulated devices, city layout
   modbus.py       dependency-free simulated Modbus/TCP server + register map
+  report.py       standalone printable assessment-report renderer
   data/
     techniques.json   MITRE ATT&CK technique library (data-driven)
 web/
@@ -158,12 +159,20 @@ Config via env vars: `ANANKOS_HOST` (default `0.0.0.0`),
 
 ---
 
+## Assessment report
+
+Click **📄 Report** in the dashboard (or open `/api/report.html`) to generate a
+standalone, printable **assessment report** from the current run: executive
+summary (worst severity, peak lives-at-risk, action counts), a critical
+service-loss timeline, the full ATT&CK-tagged attack narrative, a MITRE ATT&CK
+coverage matrix grouped by tactic, and a facility posture + findings table.
+It prints cleanly to PDF from the browser, so a run becomes a client
+deliverable. `/api/report` returns the same data as JSON.
+
 ## Roadmap (discussed, not yet built)
 
 - **Blue team / MITRE D3FEND** — detections, mitigations, and red/blue scoring.
 - **Deepen more districts** — promote airport, government, and manufacturing to
   fully-modeled facilities with their own devices (Fort Marin already done).
-- **Assessment report export** — one-click after-action report (timeline,
-  ATT&CK coverage, findings, consequence summary) from a run.
 - **More protocols** — DNP3 / IEC-104 alongside the Modbus surface.
 - **Multi-user exercises** with roles.

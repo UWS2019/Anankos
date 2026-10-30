@@ -12,11 +12,12 @@ import os
 from pathlib import Path
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
 from .engine import SimEngine
 from .modbus import ModbusServer
+from .report import render_html
 
 WEB = Path(__file__).parent.parent / "web"
 
@@ -164,6 +165,16 @@ def protocol_info():
         "note": "Unauthenticated OT protocol surface for external tooling. Simulation only.",
         "map": modbus_server.regs.describe(),
     }
+
+
+@app.get("/api/report")
+def report_json():
+    return engine.build_report()
+
+
+@app.get("/api/report.html", response_class=HTMLResponse)
+def report_html():
+    return render_html(engine.build_report())
 
 
 @app.get("/api/scenario")

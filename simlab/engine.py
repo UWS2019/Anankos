@@ -23,6 +23,18 @@ from .town import fresh_town
 
 DATA = Path(__file__).parent / "data"
 
+SEV_RANK = {"nominal": 0, "degraded": 1, "severe": 2, "catastrophic": 3}
+MILESTONES = {
+    "blackout": "Grid-wide power loss",
+    "hospital_dark": "Hospital lost all power",
+    "water_loss": "Public water supply lost",
+    "water_unsafe": "Public water contaminated",
+    "base_dark": "Fort Marin lost all power",
+    "base_breach": "Fort Marin perimeter breached",
+    "base_comms": "Fort Marin C2/radar down",
+    "airport_down": "Airport radar/ATC down",
+}
+
 TOWN_BASE_DEMAND_MW = 90.0
 WATER_DEMAND_MW = 8.0
 HOSPITAL_DEMAND_MW = 5.0
@@ -50,6 +62,12 @@ class SimEngine:
         self.events = []
         self.water_pressure = PRESSURE_NOMINAL
         self._last_severity = "nominal"
+        self.derived = {}
+        # --- run tracking for assessment reporting ---
+        self.started_at = time.time()
+        self.peak_lives = 0
+        self.worst_sev = "nominal"
+        self.milestones = {}   # milestone key -> first tick observed
         self.derived = {}
         self._log("system", "SIM", "Simulation reset. Town nominal.", "info")
         self._recompute()
@@ -265,8 +283,29 @@ class SimEngine:
             "severity": severity, "consequence_notes": notes,
             "base": base, "districts": districts,
         }
+        self._track()
         if advance:
             self._log_consequences()
+
+    def _track(self):
+        d = self.derived
+        self.peak_lives = max(self.peak_lives, d["lives_at_risk"])
+        if SEV_RANK[d["severity"]] > SEV_RANK[self.worst_sev]:
+            self.worst_sev = d["severity"]
+        airport = next((x for x in d["districts"] if x["id"] == "airport"), {})
+        conds = {
+            "blackout": not d["grid_ok"],
+            "hospital_dark": not d["hospital_powered"],
+            "water_loss": not d["water_flowing"],
+            "water_unsafe": d["water_quality"] != "safe",
+            "base_dark": d["base"]["readiness"] == "dark",
+            "base_breach": d["base"]["breach"],
+            "base_comms": not d["base"]["comms"],
+            "airport_down": not airport.get("powered", True),
+        }
+        for k, on in conds.items():
+            if on and k not in self.milestones:
+                self.milestones[k] = self.tick
 
     def _recompute_base(self, d, grid_ok, advance):
         sub, fuel, c2, perim = d["fb_sub"], d["fb_fuel"], d["fb_c2"], d["fb_perim"]
@@ -415,6 +454,60 @@ class SimEngine:
         self._log("assessor", "SCENARIO", "Scenario imported (mirrors assessment findings).", "warn")
         self._recompute()
         return {"ok": True}
+
+    # -- assessment report ---------------------------------------------------
+    def build_report(self):
+        d = self.derived
+        # attack narrative: ordered attacker + protocol actions
+        narrative = [e for e in self.events if e["source"] in ("attacker", "protocol")]
+        # ATT&CK coverage (console techniques only carry an id)
+        coverage = {}
+        for e in narrative:
+            tid = e.get("technique")
+            if not tid:
+                continue
+            t = self.techniques.get(tid, {})
+            coverage.setdefault(tid, {"id": tid, "name": t.get("name", tid),
+                                      "tactic": t.get("tactic", "—"), "domain": t.get("domain", "—"),
+                                      "count": 0})
+            coverage[tid]["count"] += 1
+        protocol_writes = sum(1 for e in narrative if e["source"] == "protocol")
+        severity_timeline = [{"tick": e["tick"], "message": e["message"]}
+                             for e in self.events if e["tag"] == "CONSEQUENCE"]
+        facilities = []
+        for fid, f in self.town["facilities"].items():
+            active = [k.replace("_", " ") for k, v in f["findings"].items() if v]
+            facilities.append({
+                "id": fid, "name": f["name"], "kind": f["kind"],
+                "it_compromised": f["it_compromised"], "compromised": f["compromised"],
+                "findings": active,
+            })
+        milestones = [{"key": k, "label": MILESTONES[k], "tick": self.milestones[k]}
+                      for k in sorted(self.milestones, key=lambda x: self.milestones[x])]
+        return {
+            "generated_at": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+            "town": "Marin",
+            "duration_min": self.tick,
+            "worst_severity": self.worst_sev,
+            "peak_lives_at_risk": self.peak_lives,
+            "current": {
+                "severity": d["severity"], "lives_at_risk": d["lives_at_risk"],
+                "grid_ok": d["grid_ok"], "generation_mw": d["generation_mw"],
+                "demand_mw": d["demand_mw"], "water_pressure": d["water_pressure"],
+                "water_quality": d["water_quality"], "hospital_powered": d["hospital_powered"],
+                "population_without_power_pct": d["population_without_power_pct"],
+                "base_readiness": d["base"]["readiness"],
+                "consequence_notes": d["consequence_notes"] + d["base"]["notes"],
+            },
+            "milestones": milestones,
+            "narrative": [{"tick": e["tick"], "source": e["source"], "technique": e.get("technique"),
+                           "tag": e["tag"], "message": e["message"]} for e in narrative],
+            "attack_count": len(narrative),
+            "protocol_writes": protocol_writes,
+            "coverage": sorted(coverage.values(), key=lambda x: x["id"]),
+            "facilities": facilities,
+            "severity_timeline": severity_timeline,
+        }
 
     # -- serialization -------------------------------------------------------
     def snapshot(self):

@@ -282,6 +282,7 @@ function render(snap) {
 $("btn-start").onclick = () => post("/api/sim/start");
 $("btn-pause").onclick = () => post("/api/sim/pause");
 $("btn-reset").onclick = () => post("/api/sim/reset");
+$("btn-report").onclick = () => window.open("/api/report.html", "_blank");
 $("btn-exec").onclick = execute;
 $("btn-export").onclick = exportScenario;
 $("btn-import").onclick = () => $("import-file").click();
