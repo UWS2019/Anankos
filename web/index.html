@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anankos Sim Lab</title>
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<header>
+  <div class="brand">ANANKOS&nbsp;SIM&nbsp;LAB <small>&nbsp;· critical-infrastructure consequence simulator</small></div>
+  <div class="clock">T+<span id="clock">000</span> min</div>
+  <div class="btns">
+    <button id="btn-start" class="primary">▶ Start</button>
+    <button id="btn-pause">⏸ Pause</button>
+    <button id="btn-reset" class="danger">⟳ Reset</button>
+  </div>
+  <div id="sev" class="sev nominal">Nominal</div>
+</header>
+
+<main>
+  <!-- LEFT: the sand-table city + live stats -->
+  <section>
+    <div class="card">
+      <h2>Marin — Sand Table</h2>
+      <svg id="sandtable" viewBox="0 0 1040 560" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="stat-row">
+        <div class="stat"><div class="k">Lives at risk</div><div class="v" id="s-lives">0</div></div>
+        <div class="stat"><div class="k">Grid gen / demand</div><div class="v" id="s-grid">— / —</div></div>
+        <div class="stat"><div class="k">Water pressure</div><div class="v" id="s-water">— psi</div></div>
+        <div class="stat"><div class="k">Hospital power</div><div class="v" id="s-hosp">—</div></div>
+        <div class="stat"><div class="k">City w/o power</div><div class="v" id="s-pop">0%</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Facilities &amp; Simulated Devices</h2>
+      <div id="facilities"></div>
+    </div>
+  </section>
+
+  <!-- RIGHT: attack console + event log -->
+  <section>
+    <div class="card">
+      <h2>ATT&amp;CK Console — Red / Consequence</h2>
+      <div class="field">
+        <label>Technique (MITRE ATT&amp;CK for ICS)</label>
+        <select id="tech"></select>
+        <div class="tech-desc" id="tech-desc"></div>
+      </div>
+      <div class="field">
+        <label>Target device</label>
+        <select id="target"></select>
+      </div>
+      <div class="field" id="param-wrap" style="display:none">
+        <label id="param-label">Parameter / value</label>
+        <select id="param" style="margin-bottom:6px"></select>
+        <input type="text" id="value" placeholder="value">
+      </div>
+      <button id="btn-exec" class="primary" style="width:100%">Execute Technique</button>
+      <div class="notice" style="padding-left:0;padding-bottom:0">
+        Simulation only. Techniques mutate in-memory device models and never touch real systems.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Event Log &amp; Consequences</h2>
+      <div id="log"></div>
+    </div>
+  </section>
+</main>
+
+<div id="toast" class="toast" style="display:none"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+{
+  "comment": "Anankos Sim Lab v1 - focused MITRE ATT&CK for ICS technique library. SIMULATION ONLY: every effect mutates in-memory simulated device state. No real protocols, devices, or networks are touched.",
+  "techniques": [
+    {
+      "id": "T0812",
+      "name": "Default Credentials",
+      "tactic": "Initial Access / Lateral Movement",
+      "kill_chain": "access",
+      "description": "Authenticate to an engineering/management interface using factory-default credentials to gain control of a facility's control network.",
+      "applies_to": ["PLC", "RTU", "HMI", "VFD", "ATS"],
+      "effect": "compromise",
+      "requires_compromise": false
+    },
+    {
+      "id": "T0866",
+      "name": "Exploitation of Remote Services",
+      "tactic": "Initial Access / Lateral Movement",
+      "kill_chain": "access",
+      "description": "Exploit an exposed remote service (e.g. an internet-reachable VPN or RDP jump host) to pivot onto the OT network of a facility.",
+      "applies_to": ["PLC", "RTU", "HMI", "VFD", "ATS"],
+      "effect": "compromise",
+      "requires_compromise": false
+    },
+    {
+      "id": "T0836",
+      "name": "Modify Parameter",
+      "tactic": "Impair Process Control",
+      "kill_chain": "impact",
+      "description": "Change a device setpoint or configuration parameter (e.g. turbine output setpoint, chemical dose, pump speed) to drive the process out of its safe band.",
+      "applies_to": ["PLC", "VFD"],
+      "effect": "set_param",
+      "requires_compromise": true
+    },
+    {
+      "id": "T0855",
+      "name": "Unauthorized Command Message",
+      "tactic": "Impair Process Control",
+      "kill_chain": "impact",
+      "description": "Issue an unauthorized control command to an actuator (e.g. open a breaker, stop a pump, force a transfer switch).",
+      "applies_to": ["RTU", "PLC", "ATS"],
+      "effect": "command",
+      "requires_compromise": true
+    },
+    {
+      "id": "T0831",
+      "name": "Manipulation of Control",
+      "tactic": "Impair Process Control",
+      "kill_chain": "impact",
+      "description": "Take direct control of a process actuator, overriding normal automatic regulation.",
+      "applies_to": ["PLC", "VFD", "RTU"],
+      "effect": "set_param",
+      "requires_compromise": true
+    },
+    {
+      "id": "T0835",
+      "name": "Manipulate I/O Image",
+      "tactic": "Impair Process Control",
+      "kill_chain": "impact",
+      "description": "Alter the I/O image the controller reads so logic acts on falsified field values while the physical process diverges.",
+      "applies_to": ["PLC", "VFD"],
+      "effect": "set_param",
+      "requires_compromise": true
+    },
+    {
+      "id": "T0856",
+      "name": "Spoof Reporting Message",
+      "tactic": "Impair Process Control",
+      "kill_chain": "impact",
+      "description": "Falsify the value reported to the operator HMI so the control room sees normal readings while the real process value is different.",
+      "applies_to": ["HMI", "PLC", "RTU"],
+      "effect": "spoof",
+      "requires_compromise": true
+    },
+    {
+      "id": "T0814",
+      "name": "Denial of Service",
+      "tactic": "Inhibit Response Function",
+      "kill_chain": "impact",
+      "description": "Flood or crash a device's communications so it can no longer respond to commands or protective logic (e.g. blind a transfer switch or safety controller).",
+      "applies_to": ["PLC", "RTU", "HMI", "VFD", "ATS"],
+      "effect": "dos",
+      "requires_compromise": true
+    },
+    {
+      "id": "T0816",
+      "name": "Device Restart/Shutdown",
+      "tactic": "Inhibit Response Function",
+      "kill_chain": "impact",
+      "description": "Force a controller or actuator to restart or shut down, dropping the process it governs.",
+      "applies_to": ["PLC", "RTU", "VFD", "ATS"],
+      "effect": "shutdown",
+      "requires_compromise": true
+    },
+    {
+      "id": "T0880",
+      "name": "Loss of Safety",
+      "tactic": "Impact",
+      "kill_chain": "impact",
+      "description": "Defeat or disable a safety instrumented function so the process can reach an unsafe state without protective intervention.",
+      "applies_to": ["PLC", "RTU"],
+      "effect": "disable_safety",
+      "requires_compromise": true
+    }
+  ]
+}
