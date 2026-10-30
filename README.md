@@ -84,6 +84,35 @@ nothing is exposed to the public internet.
 
 > Keep this on a private tailnet. Do not port-forward 47811 to the internet.
 
+## Drive it with real OT tooling (simulated Modbus/TCP)
+
+The lab also exposes a **simulated, dependency-free Modbus/TCP endpoint** on
+**port 15020**, backed by the same device models. Trainees can point standard
+OT tooling (pymodbus, modpoll, Metasploit `auxiliary/scanner/scada/modbusclient`)
+at the sandbox and watch the city react live. Modbus has no authentication, so
+writes are accepted as-is and logged as `MODBUS` events — mirroring the real
+risk of an exposed control network. **It never touches real equipment.**
+
+Register map (16-bit; floats scaled ×10). Unit ID selects the facility:
+`1` Power · `2` Water · `3` Hospital · `4` Fort Marin. The dashboard's
+**OT Protocol Endpoint** card shows the full map and live examples, e.g.:
+
+```bash
+# poison the water (chlorine dose 15.0 ppm): unit 2, holding reg 1, value 150
+python -c "from pymodbus.client import ModbusTcpClient as C; \
+  c=C('127.0.0.1',port=15020); c.write_register(1,150,slave=2)"
+
+# open the power plant main breaker: unit 1, coil 0 OFF
+python -c "from pymodbus.client import ModbusTcpClient as C; \
+  c=C('127.0.0.1',port=15020); c.write_coil(0,False,slave=1)"
+
+# read Fort Marin status (unit 4 input registers)
+modpoll -m tcp -t 3 -r 1 -c 4 -0 127.0.0.1:15020 -a 4
+```
+
+Set `ANANKOS_MODBUS=0` to disable the endpoint, or `ANANKOS_MODBUS_PORT` to
+change the port.
+
 ---
 
 ## How a scenario works
@@ -108,21 +137,24 @@ pressure bleeds off → town status reaches **catastrophic**.
 
 ```
 simlab/
-  app.py          FastAPI: REST + WebSocket + static hosting
+  app.py          FastAPI: REST + WebSocket + static hosting + Modbus startup
   engine.py       tick engine, technique application, cascade + scoring
   town.py         facilities, simulated devices, city layout
+  modbus.py       dependency-free simulated Modbus/TCP server + register map
   data/
-    techniques.json   MITRE ATT&CK for ICS technique library (data-driven)
+    techniques.json   MITRE ATT&CK technique library (data-driven)
 web/
   index.html      sand-table dashboard
-  app.js          WebSocket client + data-driven SVG city
+  city.js         sand-table renderer (buildings, roads, responders, zoom/pan)
+  app.js          WebSocket client, ATT&CK console, findings authoring
   styles.css
 start.bat         one-click Windows launcher
 start.sh          Linux/macOS launcher
 ```
 
 Config via env vars: `ANANKOS_HOST` (default `0.0.0.0`),
-`ANANKOS_PORT` (default `47811`), `ANANKOS_TICK_SECONDS` (default `1.0`).
+`ANANKOS_PORT` (default `47811`), `ANANKOS_TICK_SECONDS` (default `1.0`),
+`ANANKOS_MODBUS` (`1`/`0`), `ANANKOS_MODBUS_PORT` (default `15020`).
 
 ---
 
@@ -131,8 +163,7 @@ Config via env vars: `ANANKOS_HOST` (default `0.0.0.0`),
 - **Blue team / MITRE D3FEND** — detections, mitigations, and red/blue scoring.
 - **Deepen more districts** — promote airport, government, and manufacturing to
   fully-modeled facilities with their own devices (Fort Marin already done).
-- **Simulated protocol endpoints** — let trainees drive the sandbox with
-  external tooling instead of only the UI.
 - **Assessment report export** — one-click after-action report (timeline,
   ATT&CK coverage, findings, consequence summary) from a run.
+- **More protocols** — DNP3 / IEC-104 alongside the Modbus surface.
 - **Multi-user exercises** with roles.

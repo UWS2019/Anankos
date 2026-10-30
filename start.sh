@@ -23,8 +23,10 @@ else
   source .venv/bin/activate
 fi
 
+export ANANKOS_MODBUS_PORT="${ANANKOS_MODBUS_PORT:-15020}"
 echo ""
-echo " Local:     http://127.0.0.1:${ANANKOS_PORT}"
+echo " Dashboard: http://127.0.0.1:${ANANKOS_PORT}"
+echo " Modbus/TCP (sim OT protocol): port ${ANANKOS_MODBUS_PORT}"
 if command -v tailscale >/dev/null 2>&1; then
   TSIP="$(tailscale ip -4 2>/dev/null | head -n1 || true)"
   [ -n "${TSIP}" ] && echo " Tailscale: http://${TSIP}:${ANANKOS_PORT}   (open this on your phone)"

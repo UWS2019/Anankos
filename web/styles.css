@@ -68,12 +68,17 @@ main {
   letter-spacing: 1.2px; color: var(--muted); font-weight: 700; }
 
 /* --- sand table --- */
+.map-wrap { position: relative; }
 #sandtable { width: 100%; height: auto; display: block; border-radius: 10px;
-  background:
-    linear-gradient(#0c1420, #0b1018),
-    repeating-linear-gradient(0deg, transparent 0 39px, #0e1826 39px 40px),
-    repeating-linear-gradient(90deg, transparent 0 39px, #0e1826 39px 40px);
+  background: #0b1119; touch-action: none; cursor: grab; }
+#sandtable:active { cursor: grabbing; }
+.map-ctrl { position: absolute; right: 8px; bottom: 8px; display: flex; flex-direction: column; gap: 5px; }
+.map-ctrl button {
+  width: 34px; height: 34px; padding: 0; font-size: 1.1rem; line-height: 1;
+  background: rgba(18,24,35,.9); border: 1px solid var(--line); border-radius: 8px;
+  backdrop-filter: blur(3px);
 }
+.map-ctrl button:hover { border-color: var(--accent); }
 .stat-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .stat {
   flex: 1 1 130px; background: var(--panel-2); border: 1px solid var(--line);
@@ -146,6 +151,20 @@ select, input[type=text], input[type=number] {
 .auth-dev button.set { padding: 5px 10px; }
 .v.compromised { color: var(--alert); }
 .v.degraded { color: var(--warn); }
+
+/* --- protocol card --- */
+.mono { font-family: ui-monospace, monospace; font-size: .76rem; }
+.hint { color: var(--muted); font-size: .76rem; }
+.proto-head { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.dot-live { width: 9px; height: 9px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 8px var(--ok); animation: pulse 1.4s infinite; }
+table.proto { width: 100%; border-collapse: collapse; font-size: .78rem; }
+table.proto th { text-align: left; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--line); padding: 4px 6px; }
+table.proto td { border-bottom: 1px solid var(--line); padding: 5px 6px; vertical-align: top; }
+pre.snip {
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px;
+  padding: 9px 10px; font-size: .72rem; overflow-x: auto; color: #b9c6db; margin: 6px 0 0;
+  white-space: pre-wrap; word-break: break-word;
+}
 
 .notice { font-size: .74rem; color: var(--muted); padding: 8px 14px; border-top: 1px solid var(--line); }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .55; } }

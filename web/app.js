@@ -3,13 +3,9 @@
 // red/consequence console (Enterprise IT -> OT pivot -> ICS impact), and the
 // assessment/findings authoring panel. All state comes from the sim server.
 
-const SVGNS = "http://www.w3.org/2000/svg";
+// NOTE: SVG drawing lives in city.js; this file avoids redeclaring its globals.
 let STATE = null, TECHS = [], DOMAIN = "all", AUTH_FAC = null;
 
-const ICON = {
-  power: "⚡", water: "💧", hospital: "🏥", base: "🪖",
-  downtown: "🏛️", airport: "✈️", stadium: "🏟️", mfg: "🏭", residential: "🏘️",
-};
 const PARAM_BLOCK = new Set(["safe_min", "safe_max", "max_mw", "closed", "mode", "on_generator"]);
 const COMMANDS = {
   pp_bkr: [["open_breaker", "Open main breaker (island plant)"]],
@@ -26,12 +22,6 @@ const FINDING_HINT = {
 };
 
 const $ = (id) => document.getElementById(id);
-function el(tag, attrs = {}, text) {
-  const e = document.createElementNS(SVGNS, tag);
-  for (const k in attrs) e.setAttribute(k, attrs[k]);
-  if (text != null) e.textContent = text;
-  return e;
-}
 function toast(msg, isErr) {
   const t = $("toast");
   t.textContent = msg; t.className = "toast" + (isErr ? " err" : ""); t.style.display = "block";
@@ -54,95 +44,11 @@ async function post(url, body) {
   return r.json();
 }
 
-// ---- sand table ------------------------------------------------------------
-function facilityPoint(fid) { const f = STATE.facilities[fid]; return { x: f.map.x, y: f.map.y }; }
-
-function drawEdge(svg, a, b, color, flowing, width) {
-  const line = el("line", {
-    x1: a.x, y1: a.y, x2: b.x, y2: b.y, stroke: color,
-    "stroke-width": width || 3, "stroke-linecap": "round", opacity: flowing ? 0.95 : 0.4,
-  });
-  if (flowing) {
-    line.setAttribute("stroke-dasharray", "2 10");
-    line.appendChild(el("animate", { attributeName: "stroke-dashoffset", from: "24", to: "0", dur: "0.8s", repeatCount: "indefinite" }));
-  }
-  svg.appendChild(line);
-}
-function drawNode(svg, pt, kind, label, opts = {}) {
-  const g = el("g", { transform: `translate(${pt.x},${pt.y})` });
-  const w = opts.big ? 58 : 42, h = opts.big ? 58 : 42;
-  if (opts.pulse) {
-    const ring = el("circle", { r: w / 2 + 10, fill: "none", stroke: "#ef4444", "stroke-width": 3 });
-    ring.appendChild(el("animate", { attributeName: "opacity", values: "0.9;0.1;0.9", dur: "1s", repeatCount: "indefinite" }));
-    ring.appendChild(el("animate", { attributeName: "r", values: `${w/2+6};${w/2+16};${w/2+6}`, dur: "1s", repeatCount: "indefinite" }));
-    g.appendChild(ring);
-  }
-  g.appendChild(el("rect", {
-    x: -w / 2, y: -h / 2, width: w, height: h, rx: 9,
-    fill: opts.fill || "#1a2436",
-    stroke: opts.stroke || (opts.critical ? "#3b5074" : "#2b3a4a"),
-    "stroke-width": opts.critical ? 3 : 1.5,
-  }));
-  if (!opts.noWindows) {
-    for (let i = 0; i < 4; i++) {
-      const wx = -w / 2 + 8 + (i % 2) * (w - 22);
-      const wy = -h / 2 + 9 + Math.floor(i / 2) * (h - 22);
-      g.appendChild(el("rect", { x: wx, y: wy, width: 7, height: 7, rx: 1.5,
-        fill: opts.powered ? "#ffd27a" : "#1c2535", opacity: opts.powered ? 0.95 : 0.6 }));
-    }
-  }
-  g.appendChild(el("text", { x: 0, y: opts.big ? 6 : 5, "text-anchor": "middle", "font-size": opts.big ? 26 : 18 }, ICON[kind] || "■"));
-  if (opts.water !== undefined) {
-    g.appendChild(el("circle", { cx: w / 2 - 6, cy: -h / 2 + 6, r: 4, fill: opts.water ? "#38bdf8" : "#334155" }));
-  }
-  g.appendChild(el("text", { x: 0, y: h / 2 + 15, "text-anchor": "middle", "font-size": 11, fill: "#9fb0c8", "font-weight": "600" }, label));
-  let ly = h / 2 + 28;
-  (opts.badges || []).forEach((b) => {
-    g.appendChild(el("text", { x: 0, y: ly, "text-anchor": "middle", "font-size": 9,
-      fill: b.ok ? "#4ade80" : "#f87171" }, b.t));
-    ly += 11;
-  });
-  if (opts.sub) { g.appendChild(el("text", { x: 0, y: ly, "text-anchor": "middle", "font-size": 9, fill: "#f59e0b" }, opts.sub)); }
-  svg.appendChild(g);
-}
-
-const READY_COLOR = { full: ["#2b5a3a", "#0d1f14"], degraded: ["#5a4310", "#1b1407"], compromised: ["#7f1d1d", "#1a0d0d"], dark: ["#7f1d1d", "#120808"] };
-
+// ---- sand table (delegated to City renderer in city.js) --------------------
+let CITY_READY = false;
 function renderSandTable() {
-  const svg = $("sandtable"); svg.innerHTML = "";
-  const d = STATE.derived;
-  const pp = facilityPoint("power"), wt = facilityPoint("water"), hp = facilityPoint("hospital"), fb = facilityPoint("base");
-
-  const pColor = d.grid_ok ? "#fbbf24" : "#7f1d1d";
-  const dmap = Object.fromEntries(d.districts.map((x) => [x.id, x]));
-  [wt, hp, fb, ...d.districts.map((x) => ({ x: x.x, y: x.y }))].forEach((t) => drawEdge(svg, pp, t, pColor, d.grid_ok, 2.5));
-
-  const wColor = !d.water_flowing ? "#334155" : (d.water_quality !== "safe" ? "#ef4444" : "#38bdf8");
-  [hp, dmap.downtown, dmap.residential].forEach((t) => { if (t) drawEdge(svg, wt, { x: t.x, y: t.y }, wColor, d.water_flowing, 4); });
-
-  d.districts.forEach((dist) => drawNode(svg, { x: dist.x, y: dist.y }, dist.id, dist.name, { powered: dist.powered, water: dist.water, critical: dist.critical }));
-
-  drawNode(svg, pp, "power", STATE.facilities.power.name, {
-    big: true, powered: d.grid_ok, compromised: STATE.facilities.power.compromised,
-    stroke: d.grid_ok ? "#6b5410" : "#7f1d1d", fill: d.grid_ok ? "#241f0e" : "#1a0d0d" });
-  drawNode(svg, wt, "water", STATE.facilities.water.name, {
-    big: true, powered: d.grid_ok, water: d.water_flowing,
-    stroke: d.water_quality !== "safe" ? "#7f1d1d" : "#0c4a6e", fill: d.water_quality !== "safe" ? "#1a0d0d" : "#0b2230" });
-  if (d.water_quality !== "safe") {
-    const plume = el("circle", { cx: wt.x, cy: wt.y, r: 44, fill: "#ef4444", opacity: 0.18 });
-    plume.appendChild(el("animate", { attributeName: "r", values: "40;52;40", dur: "1.6s", repeatCount: "indefinite" }));
-    svg.appendChild(plume);
-  }
-  drawNode(svg, hp, "hospital", STATE.facilities.hospital.name, {
-    big: true, powered: d.hospital_powered, water: d.hospital_water, pulse: d.lives_at_risk > 0,
-    stroke: d.hospital_powered ? "#2b5a3a" : "#7f1d1d", fill: d.hospital_powered ? "#0d1f14" : "#1a0d0d",
-    sub: d.hospital_on_generator ? `GEN · ${d.hospital_gen_fuel_min}min` : null });
-
-  const b = d.base, rc = READY_COLOR[b.readiness] || READY_COLOR.full;
-  drawNode(svg, fb, "base", STATE.facilities.base.name, {
-    big: true, powered: b.powered, pulse: b.breach, stroke: rc[0], fill: rc[1],
-    badges: [{ t: b.comms ? "C2 ✓" : "C2 DOWN", ok: b.comms }, { t: b.perimeter_secure ? "PERIM ✓" : "PERIM ✗", ok: b.perimeter_secure }],
-    sub: b.on_generator ? `GEN · fuel ${b.fuel_level_pct}%` : null });
+  if (!CITY_READY) { window.City.init($("sandtable")); CITY_READY = true; }
+  window.City.render(STATE);
 }
 
 // ---- stats + facilities + log ---------------------------------------------
@@ -335,6 +241,33 @@ function importScenario(file) {
   reader.readAsText(file);
 }
 
+// ---- protocol endpoint card ------------------------------------------------
+async function renderProtocol() {
+  let p;
+  try { p = await (await fetch("/api/protocol")).json(); } catch { return; }
+  const host = location.hostname; // reachable address (incl. Tailscale IP)
+  if (!p.enabled) { $("protocol").innerHTML = `<div class="hint">Modbus endpoint disabled.</div>`; return; }
+  const units = p.map.units.map((u) =>
+    `<tr><td>${u.unit}</td><td>${u.facility}</td>
+      <td class="mono">${Object.entries({ ...u.holding, ...u.coils }).map(([k, v]) => `${k}:${v}`).join("<br>")}</td>
+      <td class="mono">${Object.entries(u.input).map(([k, v]) => `${k}:${v}`).join("<br>")}</td></tr>`).join("");
+  $("protocol").innerHTML = `
+    <div class="proto-head"><span class="dot-live"></span>
+      <b>${p.protocol}</b> &nbsp;<span class="mono">${host}:${p.port}</span>
+      <span class="hint">· unauthenticated · simulation only</span></div>
+    <table class="proto"><thead><tr><th>Unit</th><th>Facility</th><th>Writable (HR/coil)</th><th>Read (IR)</th></tr></thead>
+      <tbody>${units}</tbody></table>
+    <div class="hint" style="margin-top:8px">Point real OT tooling at it. Writes appear in the log tagged <span class="attid">MODBUS</span> and drive the city. Examples:</div>
+    <pre class="snip"># poison the water (chlorine dose 15.0 ppm) — unit 2, HR1, x10
+python -c "from pymodbus.client import ModbusTcpClient as C; c=C('${host}',port=${p.port}); c.write_register(1,150,slave=2)"
+
+# open the power plant main breaker — unit 1, coil 0 OFF
+python -c "from pymodbus.client import ModbusTcpClient as C; c=C('${host}',port=${p.port}); c.write_coil(0,False,slave=1)"
+
+# modpoll: read Fort Marin status (unit 4 input regs)
+modpoll -m tcp -t 3 -r 1 -c 4 -0 ${host}:${p.port} -a 4</pre>`;
+}
+
 // ---- main render -----------------------------------------------------------
 function render(snap) {
   const first = STATE === null;
@@ -352,6 +285,9 @@ $("btn-reset").onclick = () => post("/api/sim/reset");
 $("btn-exec").onclick = execute;
 $("btn-export").onclick = exportScenario;
 $("btn-import").onclick = () => $("import-file").click();
+$("zin").onclick = () => window.City.zoomBy(1.25);
+$("zout").onclick = () => window.City.zoomBy(0.8);
+$("zreset").onclick = () => window.City.reset();
 $("import-file").onchange = (e) => { if (e.target.files[0]) importScenario(e.target.files[0]); e.target.value = ""; };
 $("domain-seg").querySelectorAll("[data-dom]").forEach((b) => {
   b.onclick = () => {
@@ -364,5 +300,5 @@ $("domain-seg").querySelectorAll("[data-dom]").forEach((b) => {
 (async function init() {
   const snap = await (await fetch("/api/state")).json();
   TECHS = (await (await fetch("/api/techniques")).json()).techniques;
-  render(snap); populateTechniques(); connect();
+  render(snap); populateTechniques(); renderProtocol(); connect();
 })();

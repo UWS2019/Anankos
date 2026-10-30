@@ -23,7 +23,14 @@
   <section>
     <div class="card">
       <h2>Marin — Sand Table</h2>
-      <svg id="sandtable" viewBox="0 0 1040 560" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="map-wrap">
+        <svg id="sandtable" viewBox="0 0 1040 560" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="map-ctrl">
+          <button id="zin" title="Zoom in">＋</button>
+          <button id="zout" title="Zoom out">－</button>
+          <button id="zreset" title="Reset view">⤢</button>
+        </div>
+      </div>
       <div class="stat-row">
         <div class="stat"><div class="k">Lives at risk</div><div class="v" id="s-lives">0</div></div>
         <div class="stat"><div class="k">Grid gen / demand</div><div class="v" id="s-grid">— / —</div></div>
@@ -97,6 +104,11 @@
     </div>
 
     <div class="card">
+      <h2>OT Protocol Endpoint — drive it with real tooling</h2>
+      <div id="protocol"></div>
+    </div>
+
+    <div class="card">
       <h2>Event Log &amp; Consequences</h2>
       <div id="log"></div>
     </div>
@@ -104,6 +116,7 @@
 </main>
 
 <div id="toast" class="toast" style="display:none"></div>
+<script src="/static/city.js"></script>
 <script src="/static/app.js"></script>
 </body>
 </html>

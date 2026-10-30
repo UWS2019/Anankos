@@ -8,6 +8,7 @@ setlocal
 
 set ANANKOS_HOST=0.0.0.0
 set ANANKOS_PORT=47811
+set ANANKOS_MODBUS_PORT=15020
 
 cd /d "%~dp0"
 
@@ -34,7 +35,8 @@ if not exist ".venv\" (
 
 REM --- show how to reach it ---
 echo(
-echo  Local:     http://127.0.0.1:%ANANKOS_PORT%
+echo  Dashboard: http://127.0.0.1:%ANANKOS_PORT%
+echo  Modbus/TCP ^(sim OT protocol^): port %ANANKOS_MODBUS_PORT%
 for /f "tokens=2 delims=:" %%a in ('"tailscale ip -4 2>nul"') do set TSIP=%%a
 tailscale ip -4 >nul 2>nul && (
     for /f %%i in ('tailscale ip -4 2^>nul') do echo  Tailscale: http://%%i:%ANANKOS_PORT%   ^(open this on your phone^)

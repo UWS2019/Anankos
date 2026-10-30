@@ -16,14 +16,19 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from .engine import SimEngine
+from .modbus import ModbusServer
 
 WEB = Path(__file__).parent.parent / "web"
 
-app = FastAPI(title="Anankos Sim Lab", version="0.1.0")
+app = FastAPI(title="Anankos Sim Lab", version="0.2.0")
 engine = SimEngine()
 
 # Tick rate: how often (seconds) one simulated minute passes while running.
 TICK_SECONDS = float(os.environ.get("ANANKOS_TICK_SECONDS", "1.0"))
+# Simulated OT protocol surface (Modbus/TCP) for external tooling.
+MODBUS_HOST = os.environ.get("ANANKOS_MODBUS_HOST", "0.0.0.0")
+MODBUS_PORT = int(os.environ.get("ANANKOS_MODBUS_PORT", "15020"))
+MODBUS_ENABLED = os.environ.get("ANANKOS_MODBUS", "1") != "0"
 
 
 class Hub:
@@ -53,9 +58,19 @@ class Hub:
 hub = Hub()
 
 
+modbus_server = ModbusServer(engine, MODBUS_HOST, MODBUS_PORT,
+                             on_change=lambda: hub.broadcast(engine.snapshot()))
+
+
 @app.on_event("startup")
 async def _start_loop():
     asyncio.create_task(_sim_loop())
+    if MODBUS_ENABLED:
+        try:
+            await modbus_server.start()
+            print(f"[modbus] simulated Modbus/TCP endpoint on {MODBUS_HOST}:{MODBUS_PORT}")
+        except Exception as e:  # noqa: BLE001
+            print(f"[modbus] disabled - could not bind {MODBUS_PORT}: {e}")
 
 
 async def _sim_loop():
@@ -137,6 +152,18 @@ async def device_flag(payload: dict):
         payload.get("device_id"), payload.get("flag"), payload.get("value"))
     await hub.broadcast(engine.snapshot())
     return res
+
+
+@app.get("/api/protocol")
+def protocol_info():
+    return {
+        "enabled": MODBUS_ENABLED,
+        "protocol": "Modbus/TCP",
+        "host": MODBUS_HOST,
+        "port": MODBUS_PORT,
+        "note": "Unauthenticated OT protocol surface for external tooling. Simulation only.",
+        "map": modbus_server.regs.describe(),
+    }
 
 
 @app.get("/api/scenario")
