@@ -31,8 +31,9 @@ from __future__ import annotations
 import asyncio
 import struct
 
-UNIT_FACILITY = {1: "power", 2: "water", 3: "hospital", 4: "base"}
+UNIT_FACILITY = {1: "power", 2: "water", 3: "hospital", 4: "base", 5: "airport", 6: "telecom"}
 _READINESS = {"full": 0, "degraded": 1, "compromised": 2, "dark": 3}
+_AIRSPACE = {"normal": 0, "degraded": 1, "closed": 2}
 
 
 def _u16(v):
@@ -74,6 +75,12 @@ class RegisterMap:
             (3, 2): _u16(g["hospital_gen_fuel_min"]),
             (4, 0): 1 if b.get("powered") else 0, (4, 1): 1 if b.get("comms") else 0,
             (4, 2): 1 if b.get("perimeter_secure") else 0, (4, 3): _READINESS.get(b.get("readiness"), 0),
+            (5, 0): 1 if g.get("airport", {}).get("powered") else 0,
+            (5, 1): 1 if g.get("airport", {}).get("radar_up") else 0,
+            (5, 2): _AIRSPACE.get(g.get("airport", {}).get("status"), 0),
+            (6, 0): 1 if g.get("telecom", {}).get("up") else 0,
+            (6, 1): 1 if g.get("telecom", {}).get("fiber_up") else 0,
+            (6, 2): 1 if g.get("telecom", {}).get("mw_up") else 0,
         }
         return m.get((unit, addr))
 
@@ -85,6 +92,12 @@ class RegisterMap:
             (3, 0): d["hp_ats"]["state"]["mode"] == "auto",
             (4, 0): d["fb_perim"]["state"]["gates_locked"] in (1, 1.0, True),
             (4, 1): d["fb_c2"]["state"]["link_up"] in (1, 1.0, True),
+            (5, 0): d["ap_radar"]["state"]["sweep"] in (1, 1.0, True),
+            (5, 1): d["ap_nav"]["state"]["ils_on"] in (1, 1.0, True),
+            (5, 2): d["ap_tower"]["state"]["freq_active"] in (1, 1.0, True),
+            (6, 0): d["tc_fiber"]["state"]["link_up"] in (1, 1.0, True),
+            (6, 1): d["tc_mw"]["state"]["link_up"] in (1, 1.0, True),
+            (6, 2): d["tc_core"]["state"]["routing"] in (1, 1.0, True),
         }
         return m.get((unit, addr))
 
@@ -126,6 +139,24 @@ class RegisterMap:
         elif key == (4, 1):
             d["fb_c2"]["state"]["link_up"] = 1 if on else 0
             self._log(f"base C2/radar link {'UP' if on else 'DOWN'} (coil)")
+        elif key == (5, 0):
+            d["ap_radar"]["state"]["sweep"] = 1 if on else 0
+            self._log(f"airport surveillance radar {'ON' if on else 'STOPPED'} (coil)")
+        elif key == (5, 1):
+            d["ap_nav"]["state"]["ils_on"] = 1 if on else 0
+            self._log(f"airport ILS/navaids {'ON' if on else 'OFF'} (coil)")
+        elif key == (5, 2):
+            d["ap_tower"]["state"]["freq_active"] = 1 if on else 0
+            self._log(f"airport tower ATC comms {'ON' if on else 'OFF'} (coil)")
+        elif key == (6, 0):
+            d["tc_fiber"]["state"]["link_up"] = 1 if on else 0
+            self._log(f"telecom fiber path {'UP' if on else 'CUT'} (coil)")
+        elif key == (6, 1):
+            d["tc_mw"]["state"]["link_up"] = 1 if on else 0
+            self._log(f"telecom microwave path {'UP' if on else 'JAMMED'} (coil)")
+        elif key == (6, 2):
+            d["tc_core"]["state"]["routing"] = 1 if on else 0
+            self._log(f"telecom core routing {'UP' if on else 'DOWN'} (coil)")
         else:
             return False
         return True
@@ -152,6 +183,14 @@ class RegisterMap:
                  "holding": {"HR0": "fuel farm level % (x10)"},
                  "coils": {"C0": "perimeter gates locked", "C1": "C2/radar link up"},
                  "input": {"IR0": "powered", "IR1": "comms up", "IR2": "perimeter secure", "IR3": "readiness 0-3"}},
+                {"unit": 5, "facility": "Airport",
+                 "holding": {},
+                 "coils": {"C0": "radar sweep", "C1": "ILS/navaids", "C2": "tower ATC comms"},
+                 "input": {"IR0": "powered", "IR1": "radar up", "IR2": "airspace 0/1/2"}},
+                {"unit": 6, "facility": "Telecom",
+                 "holding": {},
+                 "coils": {"C0": "fiber path up", "C1": "microwave path up", "C2": "core routing"},
+                 "input": {"IR0": "telecom up", "IR1": "fiber up", "IR2": "microwave up"}},
             ],
         }
 

@@ -13,6 +13,10 @@ const COMMANDS = {
   hp_ats: [["force_utility", "Lock transfer switch to utility (inhibit generator)"]],
   fb_sub: [["force_utility", "Lock base transfer switch to utility (inhibit generator)"]],
   fb_perim: [["unlock_gates", "Unlock perimeter gates"]],
+  ap_radar: [["radar_stop", "Stop surveillance radar sweep"]],
+  ap_tower: [["comms_off", "Disable tower ATC comms"]],
+  tc_fiber: [["cut_fiber", "Cut fiber backbone path"]],
+  tc_mw: [["jam_microwave", "Jam microwave relay path"]],
 };
 const FINDING_HINT = {
   internet_exposed: "device reachable from the internet — enables direct OT access (T0883)",
@@ -63,6 +67,11 @@ function renderStats() {
   const H = $("s-hosp"); H.textContent = d.hospital_powered ? (d.hospital_on_generator ? "GENERATOR" : "Utility") : "DARK"; H.className = cls(!d.hospital_powered, d.hospital_on_generator);
   const P = $("s-pop"); P.textContent = `${d.population_without_power_pct}%`; P.className = cls(d.population_without_power_pct >= 50, d.population_without_power_pct > 0);
   const B = $("s-base"); B.textContent = d.base.readiness.toUpperCase(); B.className = "v " + d.base.readiness;
+  const A = $("s-air"); A.textContent = d.airport.status.toUpperCase();
+  A.className = cls(d.airport.status === "closed", d.airport.status === "degraded");
+  const T = $("s-tel");
+  T.textContent = d.telecom.up ? (d.telecom.fiber_up && d.telecom.mw_up ? "UP" : "BACKUP") : "DOWN";
+  T.className = cls(!d.telecom.up, d.telecom.up && !(d.telecom.fiber_up && d.telecom.mw_up));
 }
 
 function deviceBadges(dev) {

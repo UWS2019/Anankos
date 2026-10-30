@@ -138,12 +138,55 @@ function buildingDistrict(kind, st) {
   return g;
 }
 
+function buildingAirport(st) {
+  const g = E("g"); const lit = st.powered;
+  const stroke = st.status === "closed" ? "#7f1d1d" : st.status === "degraded" ? "#5a4310" : "#2b5a6a";
+  const col = st.powered ? (st.status === "normal" ? "#0c1f26" : "#201a0c") : "#1a0f10";
+  // runway + centerline
+  g.appendChild(E("rect", { x: -34, y: 16, width: 64, height: 8, rx: 2, fill: "#20283a" }));
+  g.appendChild(E("line", { x1: -30, y1: 20, x2: 26, y2: 20, stroke: "#3a4a63", "stroke-width": 1, "stroke-dasharray": "5 5" }));
+  // terminal
+  g.appendChild(body(32, 16, col, stroke));
+  g.appendChild(winRow(0, 1, 4, lit, 7));
+  // control tower
+  const tw = E("g", { transform: "translate(20,-5)" });
+  tw.appendChild(E("rect", { x: -5, y: -18, width: 10, height: 26, rx: 2, fill: col, stroke }));
+  tw.appendChild(E("rect", { x: -6, y: -22, width: 12, height: 7, rx: 2, fill: lit ? "#9be7ff" : "#223049", stroke }));
+  g.appendChild(tw);
+  // rotating surveillance radar
+  const dish = E("g", { transform: "translate(-22,-10)" });
+  dish.appendChild(E("line", { x1: 0, y1: 0, x2: 0, y2: 16, stroke, "stroke-width": 2 }));
+  const arm = E("g");
+  arm.appendChild(E("path", { d: "M-8,-3 A 8 8 0 0 1 8,-3 Z", fill: st.radar_up ? "#2dd4bf" : "#55606f" }));
+  if (st.radar_up) arm.appendChild(E("animateTransform", { attributeName: "transform", type: "rotate", from: "0 0 0", to: "360 0 0", dur: "3s", repeatCount: "indefinite" }));
+  dish.appendChild(arm); g.appendChild(dish);
+  return g;
+}
+function buildingTelecom(st) {
+  const g = E("g"); const lit = st.powered;
+  const stroke = st.up ? "#2b5a6a" : "#7f1d1d";
+  g.appendChild(body(30, 26, lit ? "#10202a" : "#1a0f10", stroke));
+  g.appendChild(winRow(0, -3, 3, lit, 7));
+  g.appendChild(winRow(0, 6, 3, lit, 7));
+  // lattice microwave tower with drums
+  const tw = E("g", { transform: "translate(21,-2)" });
+  tw.appendChild(E("path", { d: "M-6,16 L-2,-26 L2,-26 L6,16", fill: "none", stroke, "stroke-width": 1.4 }));
+  tw.appendChild(E("path", { d: "M-5,6 L5,-8 M5,6 L-5,-8 M-4,-8 L4,-18", fill: "none", stroke, "stroke-width": 0.8, opacity: 0.8 }));
+  tw.appendChild(E("circle", { cx: 0, cy: -20, r: 4, fill: st.mw_up ? "#22d3ee" : "#55606f" }));
+  tw.appendChild(E("circle", { cx: 0, cy: -11, r: 3, fill: st.mw_up ? "#22d3ee" : "#55606f" }));
+  g.appendChild(tw);
+  // fiber node
+  g.appendChild(E("circle", { cx: -15, cy: -14, r: 3.5, fill: st.fiber_up ? "#34d399" : "#55606f" }));
+  return g;
+}
 function buildingFor(kind, st) {
   switch (kind) {
     case "power": return buildingPower(st);
     case "water": return buildingWater(st);
     case "hospital": return buildingHospital(st);
     case "base": return buildingBase(st);
+    case "airport": return buildingAirport(st);
+    case "telecom": return buildingTelecom(st);
     default: return buildingDistrict(kind, st);
   }
 }
@@ -224,10 +267,10 @@ const City = {
     const d = state.derived, f = state.facilities;
     const facs = Object.values(f).map((x) => `${x.compromised ? 1 : 0}${x.it_compromised ? 1 : 0}`).join("");
     const dist = d.districts.map((x) => (x.powered ? 1 : 0) + (x.water ? 1 : 0)).join("");
-    const b = d.base;
+    const b = d.base, a = d.airport, t = d.telecom;
     return [d.grid_ok, d.water_flowing, d.water_quality, d.hospital_powered, d.hospital_on_generator,
       d.lives_at_risk, Math.round(d.water_pressure / 6), b.readiness, b.comms, b.perimeter_secure, b.breach,
-      facs, dist].join("|");
+      a.status, a.radar_up, t.up, t.fiber_up, t.mw_up, facs, dist].join("|");
   },
 
   _pt(state, fid) { const m = state.facilities[fid].map; return { x: m.x, y: m.y }; },
@@ -236,15 +279,33 @@ const City = {
     const g = this.layers.edges; g.innerHTML = "";
     const d = state.derived;
     const pp = this._pt(state, "power"), wt = this._pt(state, "water"),
-      hp = this._pt(state, "hospital"), fb = this._pt(state, "base");
+      hp = this._pt(state, "hospital"), fb = this._pt(state, "base"),
+      ap = this._pt(state, "airport"), tc = this._pt(state, "telecom");
     const dmap = Object.fromEntries(d.districts.map((x) => [x.id, x]));
-    const edge = (a, b, color, flow, wdt) => {
-      const ln = E("line", { x1: a.x, y1: a.y, x2: b.x, y2: b.y, stroke: color, "stroke-width": wdt, "stroke-linecap": "round", opacity: flow ? 0.95 : 0.4 });
-      if (flow) { ln.setAttribute("stroke-dasharray", "2 10"); ln.appendChild(E("animate", { attributeName: "stroke-dashoffset", from: "24", to: "0", dur: "0.8s", repeatCount: "indefinite" })); }
+    const edge = (a, b, color, flow, wdt, opacity, dash) => {
+      const ln = E("line", { x1: a.x, y1: a.y, x2: b.x, y2: b.y, stroke: color, "stroke-width": wdt, "stroke-linecap": "round", opacity: opacity != null ? opacity : (flow ? 0.95 : 0.4) });
+      if (flow) { ln.setAttribute("stroke-dasharray", dash || "2 10"); ln.appendChild(E("animate", { attributeName: "stroke-dashoffset", from: "24", to: "0", dur: "1.1s", repeatCount: "indefinite" })); }
       g.appendChild(ln);
     };
+    const arc = (a, b, color, flow) => {
+      const mx = (a.x + b.x) / 2, my = Math.min(a.y, b.y) - 55;
+      const p = E("path", { d: `M${a.x},${a.y} Q ${mx},${my} ${b.x},${b.y}`, fill: "none", stroke: color, "stroke-width": 1.6, opacity: flow ? 0.8 : 0.3, "stroke-dasharray": "1 7", "stroke-linecap": "round" });
+      if (flow) p.appendChild(E("animate", { attributeName: "stroke-dashoffset", from: "16", to: "0", dur: "0.9s", repeatCount: "indefinite" }));
+      g.appendChild(p);
+    };
+
+    // --- telecom transport (drawn first, underneath) ---
+    const tel = d.telecom;
+    const allSectors = [pp, wt, hp, fb, ap, ...d.districts.map((x) => ({ x: x.x, y: x.y }))];
+    const fColor = tel.fiber_up ? "#34d399" : "#52607a";
+    allSectors.forEach((t) => edge(tc, t, fColor, tel.fiber_up, 1.3, tel.fiber_up ? 0.55 : 0.28, "1 7"));
+    const mColor = tel.mw_up ? "#22d3ee" : "#52607a";
+    [fb, ap, pp].forEach((t) => arc(tc, t, mColor, tel.mw_up));  // microwave hops to far sectors
+
+    // --- power grid ---
     const pColor = d.grid_ok ? "#fbbf24" : "#7f1d1d";
-    [wt, hp, fb, ...d.districts.map((x) => ({ x: x.x, y: x.y }))].forEach((t) => edge(pp, t, pColor, d.grid_ok, 2.5));
+    [wt, hp, fb, ap, tc, ...d.districts.map((x) => ({ x: x.x, y: x.y }))].forEach((t) => edge(pp, t, pColor, d.grid_ok, 2.5));
+    // --- water ---
     const wColor = !d.water_flowing ? "#334155" : (d.water_quality !== "safe" ? "#ef4444" : "#38bdf8");
     [hp, dmap.downtown, dmap.residential].forEach((t) => t && edge(wt, { x: t.x, y: t.y }, wColor, d.water_flowing, 4));
   },
@@ -287,6 +348,12 @@ const City = {
     const b = d.base;
     place("base", "base", { powered: b.powered, readiness: b.readiness, comms: b.comms, breach: b.breach }, f.base.name,
       { pulse: b.breach, badges: [{ t: b.comms ? "C2 ✓" : "C2 DOWN", ok: b.comms }, { t: b.perimeter_secure ? "PERIM ✓" : "PERIM ✗", ok: b.perimeter_secure }] });
+    const a = d.airport;
+    place("airport", "airport", { powered: a.powered, radar_up: a.radar_up, status: a.status }, f.airport.name,
+      { badges: [{ t: a.radar_up ? "RADAR ✓" : "RADAR ✗", ok: a.radar_up }, { t: "ATC " + a.status.toUpperCase(), ok: a.status === "normal" }] });
+    const tel = d.telecom;
+    place("telecom", "telecom", { powered: tel.powered, up: tel.up, fiber_up: tel.fiber_up, mw_up: tel.mw_up }, f.telecom.name,
+      { pulse: !tel.up, badges: [{ t: tel.fiber_up ? "FIBER ✓" : "FIBER ✗", ok: tel.fiber_up }, { t: tel.mw_up ? "MW ✓" : "MW ✗", ok: tel.mw_up }] });
   },
 
   // ---- zoom / pan ----------------------------------------------------------

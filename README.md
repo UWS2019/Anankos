@@ -18,11 +18,15 @@ training, tabletop exercises, and resilience assessment.
   pulses when lives are at risk. The wider city (Downtown/Government, Airport,
   Sports Arena, Industrial Park, **Fort Marin military base**, Residential)
   reacts to grid and water status.
-- **Four deeply-modeled facilities**, wired through a dependency cascade:
+- **Six deeply-modeled facilities**, wired through a dependency cascade:
   **Riverside Power Plant → Northgate Water Treatment → St. Marin General
-  Hospital**, and **Fort Marin (military base)** — power, fuel farm, C2/radar,
-  and perimeter security, with readiness scoring and a knock-on to airport
-  radar/ATC.
+  Hospital**; **Fort Marin (military base)** — power, fuel farm, C2/radar,
+  perimeter security, with readiness scoring; **Marin Regional Airport** —
+  surveillance radar, ILS/navaids, and tower ATC, with airspace status
+  (normal/degraded/closed); and **Marin Telecom Central Office** — redundant
+  **fiber + microwave** transport that carries SCADA/comms to every sector, so
+  losing both paths blinds operators town-wide and knocks down base C2 and
+  airport radar coordination.
 - **MITRE ATT&CK console** — a 19-technique library spanning the **Enterprise
   IT chain and the ATT&CK for ICS chain**. Actions follow a realistic kill
   chain: **IT Initial Access → IT→OT Pivot → OT Access → Impact**, gated by
@@ -98,8 +102,9 @@ writes are accepted as-is and logged as `MODBUS` events — mirroring the real
 risk of an exposed control network. **It never touches real equipment.**
 
 Register map (16-bit; floats scaled ×10). Unit ID selects the facility:
-`1` Power · `2` Water · `3` Hospital · `4` Fort Marin. The dashboard's
-**OT Protocol Endpoint** card shows the full map and live examples, e.g.:
+`1` Power · `2` Water · `3` Hospital · `4` Fort Marin · `5` Airport ·
+`6` Telecom. The dashboard's **OT Protocol Endpoint** card shows the full map
+and live examples, e.g.:
 
 ```bash
 # poison the water (chlorine dose 15.0 ppm): unit 2, holding reg 1, value 150

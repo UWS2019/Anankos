@@ -47,7 +47,7 @@ def build_town():
         # --- Power Plant -----------------------------------------------------
         "pp_it":  _device("pp_it",  "Plant Business Network", "IT",  "power", {}),
         "pp_gov": _device("pp_gov", "Turbine Governor PLC", "PLC", "power",
-                          {"setpoint_mw": 110.0, "max_mw": 120.0}),
+                          {"setpoint_mw": 125.0, "max_mw": 140.0}),
         "pp_bkr": _device("pp_bkr", "Main Breaker RTU", "RTU", "power", {"closed": True}),
         "pp_hmi": _device("pp_hmi", "Generation Control HMI", "HMI", "power", {}),
         # --- Water Treatment -------------------------------------------------
@@ -73,6 +73,22 @@ def build_town():
                             {"link_up": 1.0}),
         "fb_perim": _device("fb_perim", "Perimeter Security PLC", "PLC", "base",
                             {"gates_locked": 1.0, "lighting": 1.0}),
+        # --- Marin Regional Airport ------------------------------------------
+        "ap_it":    _device("ap_it",    "Airport IT Network", "IT", "airport", {}),
+        "ap_radar": _device("ap_radar", "Surveillance Radar RTU", "RTU", "airport",
+                            {"sweep": 1.0}),
+        "ap_nav":   _device("ap_nav",   "ILS / Navaids PLC", "PLC", "airport",
+                            {"ils_on": 1.0}),
+        "ap_tower": _device("ap_tower", "Tower ATC Comms RTU", "RTU", "airport",
+                            {"freq_active": 1.0, "lighting": 1.0}),
+        # --- Marin Telecom (fiber + microwave transport) ---------------------
+        "tc_it":    _device("tc_it",    "Telecom OSS/BSS Network", "IT", "telecom", {}),
+        "tc_core":  _device("tc_core",  "Core Switch/Router PLC", "PLC", "telecom",
+                            {"routing": 1.0}),
+        "tc_fiber": _device("tc_fiber", "Fiber Backbone RTU", "RTU", "telecom",
+                            {"link_up": 1.0}),
+        "tc_mw":    _device("tc_mw",    "Microwave Relay RTU", "RTU", "telecom",
+                            {"link_up": 1.0}),
     }
 
     def facility(fid, name, kind, dev_ids, x, y):
@@ -94,11 +110,14 @@ def build_town():
                              ["hp_it", "hp_ats", "hp_bms", "hp_o2"], 720, 210),
         "base":     facility("base", "Fort Marin (Military Base)", "base",
                              ["fb_it", "fb_sub", "fb_fuel", "fb_c2", "fb_perim"], 910, 110),
+        "airport":  facility("airport", "Marin Regional Airport", "airport",
+                             ["ap_it", "ap_radar", "ap_nav", "ap_tower"], 840, 440),
+        "telecom":  facility("telecom", "Marin Telecom Central Office", "telecom",
+                             ["tc_it", "tc_core", "tc_fiber", "tc_mw"], 620, 250),
     }
 
     districts = [
         {"id": "downtown",    "name": "Downtown / Government", "x": 540, "y": 340, "critical": True},
-        {"id": "airport",     "name": "Marin Regional Airport", "x": 820, "y": 420, "critical": True},
         {"id": "stadium",     "name": "Civic Sports Arena",     "x": 300, "y": 400, "critical": False},
         {"id": "mfg",         "name": "Industrial / Mfg Park",  "x": 120, "y": 390, "critical": False},
         {"id": "residential", "name": "Residential Districts",  "x": 430, "y": 480, "critical": False},

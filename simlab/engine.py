@@ -32,13 +32,16 @@ MILESTONES = {
     "base_dark": "Fort Marin lost all power",
     "base_breach": "Fort Marin perimeter breached",
     "base_comms": "Fort Marin C2/radar down",
-    "airport_down": "Airport radar/ATC down",
+    "airport_down": "Airport closed (radar/ATC/nav)",
+    "telecom_down": "Town telecom/SCADA transport lost",
 }
 
 TOWN_BASE_DEMAND_MW = 90.0
 WATER_DEMAND_MW = 8.0
 HOSPITAL_DEMAND_MW = 5.0
 BASE_DEMAND_MW = 6.0
+AIRPORT_DEMAND_MW = 4.0
+TELECOM_DEMAND_MW = 3.0
 
 PRESSURE_NOMINAL = 60.0
 PRESSURE_FALL = 9.0
@@ -258,6 +261,10 @@ class SimEngine:
             ("hp_ats", "force_utility"): ("mode", "locked_utility", "transfer switch locked to utility - generator inhibited"),
             ("fb_sub", "force_utility"): ("mode", "locked_utility", "base transfer switch locked to utility - generator inhibited"),
             ("fb_perim", "unlock_gates"): ("gates_locked", 0.0, "perimeter gates commanded UNLOCKED"),
+            ("ap_radar", "radar_stop"): ("sweep", 0.0, "surveillance radar sweep STOPPED"),
+            ("ap_tower", "comms_off"): ("freq_active", 0.0, "tower ATC comms DISABLED"),
+            ("tc_fiber", "cut_fiber"): ("link_up", 0.0, "fiber backbone path CUT"),
+            ("tc_mw", "jam_microwave"): ("link_up", 0.0, "microwave relay path JAMMED"),
         }
         key = (dev["id"], cmd)
         if key in table:
@@ -293,7 +300,8 @@ class SimEngine:
         pump = d["wt_pump"]
         pumping_wanted = pump["online"] and pump["functional"] and (self._v(pump, "speed_pct") or 0) > 0
         water_demand = WATER_DEMAND_MW if pumping_wanted else 0.0
-        demand = TOWN_BASE_DEMAND_MW + water_demand + HOSPITAL_DEMAND_MW + BASE_DEMAND_MW
+        demand = (TOWN_BASE_DEMAND_MW + water_demand + HOSPITAL_DEMAND_MW
+                  + BASE_DEMAND_MW + AIRPORT_DEMAND_MW + TELECOM_DEMAND_MW)
         grid_ok = gen >= demand
         deficit = max(0.0, demand - gen)
 
@@ -339,8 +347,11 @@ class SimEngine:
         o2_ok = (o2_min <= o2 <= o2_max) and d["hp_o2"]["online"]
         hospital_water = water_flowing and water_quality == "safe"
 
-        # 5) Fort Marin (military base).
-        base = self._recompute_base(d, grid_ok, advance)
+        # 5) Telecom transport, then Fort Marin + Marin Regional Airport
+        #    (base C2 and airport radar coordination ride the telecom backbone).
+        telecom = self._recompute_telecom(d, grid_ok)
+        base = self._recompute_base(d, grid_ok, advance, telecom)
+        airport = self._recompute_airport(d, grid_ok, base, telecom)
 
         # 6) Civilian consequence scoring.
         lives, notes = 0, []
@@ -356,14 +367,12 @@ class SimEngine:
             lives += 15; notes.append(f"public water {water_quality.replace('_', ' ')}")
 
         population_wo_power = min(100, int(deficit / demand * 100) + 60) if not grid_ok else 0
-        severity = self._severity(lives, grid_ok, water_flowing, water_quality, base)
+        severity = self._severity(lives, grid_ok, water_flowing, water_quality, base, airport, telecom)
 
         districts = []
         for dist in self.town["districts"]:
-            powered = grid_ok
-            if dist["id"] == "airport":
-                powered = grid_ok and base["comms"]  # radar/ATC depends on base C2
-            districts.append({**dist, "powered": powered, "water": water_flowing and water_quality == "safe"})
+            districts.append({**dist, "powered": grid_ok,
+                              "water": water_flowing and water_quality == "safe"})
 
         self.derived = {
             "tick": self.tick, "running": self.running,
@@ -376,7 +385,7 @@ class SimEngine:
             "o2_ok": o2_ok, "lives_at_risk": lives,
             "population_without_power_pct": population_wo_power,
             "severity": severity, "consequence_notes": notes,
-            "base": base, "districts": districts,
+            "base": base, "airport": airport, "telecom": telecom, "districts": districts,
         }
         self._track()
         if advance:
@@ -387,7 +396,6 @@ class SimEngine:
         self.peak_lives = max(self.peak_lives, d["lives_at_risk"])
         if SEV_RANK[d["severity"]] > SEV_RANK[self.worst_sev]:
             self.worst_sev = d["severity"]
-        airport = next((x for x in d["districts"] if x["id"] == "airport"), {})
         conds = {
             "blackout": not d["grid_ok"],
             "hospital_dark": not d["hospital_powered"],
@@ -396,13 +404,14 @@ class SimEngine:
             "base_dark": d["base"]["readiness"] == "dark",
             "base_breach": d["base"]["breach"],
             "base_comms": not d["base"]["comms"],
-            "airport_down": not airport.get("powered", True),
+            "airport_down": d["airport"]["status"] == "closed",
+            "telecom_down": not d["telecom"]["up"],
         }
         for k, on in conds.items():
             if on and k not in self.milestones:
                 self.milestones[k] = self.tick
 
-    def _recompute_base(self, d, grid_ok, advance):
+    def _recompute_base(self, d, grid_ok, advance, telecom):
         sub, fuel, c2, perim = d["fb_sub"], d["fb_fuel"], d["fb_c2"], d["fb_perim"]
         ats_ok = sub["online"] and sub["functional"]
         fuel_ok = fuel["online"] and fuel["functional"] and (self._v(fuel, "level_pct") or 0) > 0
@@ -414,7 +423,8 @@ class SimEngine:
         sub["state"]["on_generator"] = on_gen
         powered = grid_ok or (on_gen and (self._v(sub, "gen_fuel_min") or 0) > 0)
 
-        comms = bool(powered and c2["online"] and c2["functional"] and self._v(c2, "link_up") == 1)
+        comms = bool(powered and c2["online"] and c2["functional"]
+                     and self._v(c2, "link_up") == 1 and telecom["up"])
         gates_locked = self._v(perim, "gates_locked") == 1 and perim["safety"]
         secure = bool(powered and perim["online"] and perim["functional"] and gates_locked)
         breach = bool(perim["online"] and (self._v(perim, "gates_locked") == 0 or not perim["safety"]))
@@ -440,13 +450,62 @@ class SimEngine:
             "readiness": readiness, "notes": notes,
         }
 
-    def _severity(self, lives, grid_ok, water_flowing, water_quality, base):
+    def _recompute_airport(self, d, grid_ok, base, telecom):
+        radar, nav, tower = d["ap_radar"], d["ap_nav"], d["ap_tower"]
+        powered = grid_ok
+        radar_up = bool(powered and radar["online"] and radar["functional"] and self._v(radar, "sweep") == 1)
+        nav_up = bool(powered and nav["online"] and nav["functional"] and self._v(nav, "ils_on") == 1)
+        tower_up = bool(powered and tower["online"] and tower["functional"] and self._v(tower, "freq_active") == 1)
+        notes = []
+        if not powered:
+            status = "closed"; notes.append("airport lost power - field closed")
+        elif not tower_up:
+            status = "closed"; notes.append("tower ATC comms down - field closed")
+        elif not radar_up or not nav_up:
+            status = "degraded"
+            if not radar_up:
+                notes.append("surveillance radar down - procedural separation only")
+            if not nav_up:
+                notes.append("ILS/navaids down - no precision approaches")
+        elif not telecom["up"]:
+            status = "degraded"; notes.append("telecom backhaul lost - remote monitoring blind")
+        elif not base["comms"]:
+            status = "degraded"; notes.append("military radar feed lost - reduced airspace picture")
+        else:
+            status = "normal"
+        return {"powered": powered, "radar_up": radar_up, "nav_up": nav_up,
+                "tower_up": tower_up, "status": status, "notes": notes}
+
+    def _recompute_telecom(self, d, grid_ok):
+        core, fiber, mw = d["tc_core"], d["tc_fiber"], d["tc_mw"]
+        powered = grid_ok
+        routing = bool(core["online"] and core["functional"] and self._v(core, "routing") == 1)
+        fiber_up = bool(powered and routing and fiber["online"] and fiber["functional"] and self._v(fiber, "link_up") == 1)
+        mw_up = bool(powered and routing and mw["online"] and mw["functional"] and self._v(mw, "link_up") == 1)
+        up = fiber_up or mw_up
+        notes = []
+        if not up:
+            if not powered:
+                notes.append("telecom central office lost power")
+            elif not routing:
+                notes.append("core router down - town-wide transport lost")
+            else:
+                notes.append("both fiber and microwave paths down - operators blind across sectors")
+        elif not fiber_up:
+            notes.append("fiber path down - running on microwave backup")
+        elif not mw_up:
+            notes.append("microwave path down - fiber primary intact")
+        return {"powered": powered, "routing": routing, "fiber_up": fiber_up,
+                "mw_up": mw_up, "up": up, "notes": notes}
+
+    def _severity(self, lives, grid_ok, water_flowing, water_quality, base, airport, telecom):
         base_bad = base["readiness"] in ("compromised", "dark")
         if lives >= 60 or (not grid_ok and not water_flowing) or base["readiness"] == "dark":
             return "catastrophic"
-        if lives >= 25 or water_quality != "safe" or base_bad:
+        if lives >= 25 or water_quality != "safe" or base_bad or airport["status"] == "closed":
             return "severe"
-        if lives > 0 or not grid_ok or not water_flowing or base["readiness"] == "degraded":
+        if (lives > 0 or not grid_ok or not water_flowing or not telecom["up"]
+                or base["readiness"] == "degraded" or airport["status"] == "degraded"):
             return "degraded"
         return "nominal"
 
@@ -454,7 +513,8 @@ class SimEngine:
         sev = self.derived["severity"]
         if sev != self._last_severity:
             level = {"nominal": "info", "degraded": "warn", "severe": "alert", "catastrophic": "alert"}[sev]
-            notes = "; ".join(self.derived["consequence_notes"] + self.derived["base"]["notes"]) or "systems recovering"
+            notes = "; ".join(self.derived["consequence_notes"] + self.derived["base"]["notes"]
+                              + self.derived["airport"]["notes"] + self.derived["telecom"]["notes"]) or "systems recovering"
             self._log("town", "CONSEQUENCE", f"Town status -> {sev.upper()}: {notes}", level)
             self._last_severity = sev
 
@@ -617,7 +677,10 @@ class SimEngine:
                 "water_quality": d["water_quality"], "hospital_powered": d["hospital_powered"],
                 "population_without_power_pct": d["population_without_power_pct"],
                 "base_readiness": d["base"]["readiness"],
-                "consequence_notes": d["consequence_notes"] + d["base"]["notes"],
+                "airport_status": d["airport"]["status"],
+                "telecom_up": d["telecom"]["up"],
+                "consequence_notes": (d["consequence_notes"] + d["base"]["notes"]
+                                      + d["airport"]["notes"] + d["telecom"]["notes"]),
             },
             "milestones": milestones,
             "narrative": [{"tick": e["tick"], "source": e["source"], "technique": e.get("technique"),
