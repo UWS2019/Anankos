@@ -18,6 +18,8 @@ from fastapi.staticfiles import StaticFiles
 from .engine import SimEngine
 from .modbus import ModbusServer
 from .report import render_html
+from . import catalog
+from .catalog_view import render_catalog_html
 
 WEB = Path(__file__).parent.parent / "web"
 
@@ -153,6 +155,16 @@ async def device_flag(payload: dict):
         payload.get("device_id"), payload.get("flag"), payload.get("value"))
     await hub.broadcast(engine.snapshot())
     return res
+
+
+@app.get("/api/catalog")
+def catalog_info():
+    return catalog.describe_catalog()
+
+
+@app.get("/catalog.html", response_class=HTMLResponse)
+def catalog_html():
+    return render_catalog_html(catalog.describe_catalog())
 
 
 @app.get("/api/protocol")

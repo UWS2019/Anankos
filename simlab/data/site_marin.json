@@ -1,0 +1,30 @@
+{
+  "comment": "Reference site pack: the town of Marin, assembled from facility templates. placements bind a template to a facility id + prefix + map position; links are the cross-facility wiring; districts are ambient consumers.",
+  "name": "Marin",
+  "placements": [
+    {"template": "power_plant",     "facility": "power",    "name": "Riverside Power Plant",        "prefix": "pp", "map": {"x": 120, "y": 160}},
+    {"template": "water_treatment", "facility": "water",    "name": "Northgate Water Treatment",    "prefix": "wt", "map": {"x": 430, "y": 110}},
+    {"template": "hospital",        "facility": "hospital", "name": "St. Marin General Hospital",    "prefix": "hp", "map": {"x": 720, "y": 210}},
+    {"template": "military_base",   "facility": "base",     "name": "Fort Marin (Military Base)",    "prefix": "fb", "map": {"x": 910, "y": 110}},
+    {"template": "airport",         "facility": "airport",  "name": "Marin Regional Airport",        "prefix": "ap", "map": {"x": 840, "y": 440}},
+    {"template": "telecom",         "facility": "telecom",  "name": "Marin Telecom Central Office",  "prefix": "tc", "map": {"x": 620, "y": 250}}
+  ],
+  "links": [
+    {"src": "grid", "dst": "telecom",    "role": "grid", "resource": "power"},
+    {"src": "grid", "dst": "water_pump", "role": "grid", "resource": "power"},
+    {"src": "grid", "dst": "hospital",   "role": "grid", "resource": "power"},
+    {"src": "grid", "dst": "base",       "role": "grid", "resource": "power"},
+    {"src": "grid", "dst": "airport",    "role": "grid", "resource": "power"},
+    {"src": "water_pressure", "dst": "hospital", "role": "water_press", "resource": "water"},
+    {"src": "water_quality",  "dst": "hospital", "role": "water_qual",  "resource": "water"},
+    {"src": "telecom", "dst": "base",    "role": "transport",  "resource": "comms"},
+    {"src": "telecom", "dst": "airport", "role": "transport",  "resource": "comms"},
+    {"src": "base",    "dst": "airport", "role": "base_comms", "resource": "comms"}
+  ],
+  "districts": [
+    {"id": "downtown",    "name": "Downtown / Government", "x": 540, "y": 340, "critical": true},
+    {"id": "stadium",     "name": "Civic Sports Arena",    "x": 300, "y": 400, "critical": false},
+    {"id": "mfg",         "name": "Industrial / Mfg Park", "x": 120, "y": 390, "critical": false},
+    {"id": "residential", "name": "Residential Districts", "x": 430, "y": 480, "critical": false}
+  ]
+}

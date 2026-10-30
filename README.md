@@ -152,13 +152,19 @@ simlab/
   topology.py     the town as a data graph of archetype nodes + typed links
   archetypes.py   reusable node behaviors (generator, grid, pump, comms, …)
   solver.py       generic graph solver (demand pass + topological evaluation)
+  catalog.py      archetype catalog + facility templates: load/validate/instantiate
+  catalog_view.py read-only HTML view of the device library (builder palette)
   modbus.py       dependency-free simulated Modbus/TCP server + register map
   report.py       standalone printable assessment-report renderer
   data/
-    techniques.json   MITRE ATT&CK technique library (data-driven)
-    defenses.json     MITRE D3FEND countermeasure library (data-driven)
+    techniques.json       MITRE ATT&CK technique library (data-driven)
+    defenses.json         MITRE D3FEND countermeasure library (data-driven)
+    archetype_catalog.json archetype metadata (ports, params, device roles, modbus)
+    templates.json        facility templates (pre-wired archetype bundles)
+    site_marin.json       reference site pack (Marin, built from templates)
 tests/
   parity.py           physics regression test vs physics_golden.json
+  catalog.py          catalog validation + site-instantiation reproduction test
 web/
   index.html      sand-table dashboard
   city.js         sand-table renderer (buildings, roads, responders, zoom/pan)
@@ -221,10 +227,28 @@ foundation for a future drag-and-drop topology builder (reconstruct a client's
 own system topography from the archetype library). `tests/parity.py` proves the
 solver reproduces the previous hand-written physics byte-for-byte.
 
+## Device library & templates (Phase 2)
+
+The archetype **catalog** (`data/archetype_catalog.json`) and **facility
+templates** (`data/templates.json`) are the data a builder palette draws from.
+Each archetype declares its typed ports, parameters, device roles, Modbus
+register hints, and — computed at load time — the ATT&CK techniques its devices
+expose and the D3FEND countermeasures that address them. Each template is a
+pre-wired bundle of archetype nodes + devices (a whole facility) with declared
+`consumes`/`provides` ports. A **site pack** (`data/site_marin.json`) places
+templates and wires them into a town.
+
+`catalog.py` loads, **validates** (catalog ⇄ runtime consistency), and
+**instantiates** a site into the concrete device/node/link structures the engine
+runs. `tests/catalog.py` proves the Marin site pack reproduces the live town +
+topology byte-for-byte, so the data-driven palette is complete and correct.
+Browse it at **`/catalog.html`** (or `/api/catalog`).
+
 ## Roadmap (discussed, not yet built)
 
-- **Topology builder UI** — drag-and-drop archetypes onto a canvas to model a
-  client's exact topography (Phase 2+; Phase 1 data-driven engine is done).
+- **Topology builder UI** (Phase 3) — drag archetypes/templates from the
+  library onto a canvas to model a client's exact topography, then run the
+  engine against it (the catalog + instantiator are ready).
 - **Deepen more districts** — promote government and manufacturing to
   fully-modeled facilities (power, water, Fort Marin, airport, telecom done).
 - **More protocols** — DNP3 / IEC-104 alongside the Modbus surface.

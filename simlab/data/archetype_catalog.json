@@ -1,0 +1,113 @@
+{
+  "comment": "Anankos archetype catalog (Phase 2). Describes each reusable node behavior for the builder palette and validates against the runtime archetype registry (archetypes.py). Ports declare the typed resources a node consumes/produces; device_roles name the simulated devices the archetype needs (type only; concrete defaults live in templates). modbus hints describe how a node would expose registers when auto-provisioned. attack/d3fend relevance is computed at load time from the technique/defense libraries.",
+  "resources": {
+    "power": {"label": "Electric power", "color": "#fbbf24"},
+    "water": {"label": "Water (pressure/quality)", "color": "#38bdf8"},
+    "comms": {"label": "Comms/SCADA transport", "color": "#34d399"},
+    "fuel": {"label": "Fuel", "color": "#f59e0b"},
+    "control": {"label": "Control signal", "color": "#f472b6"}
+  },
+  "archetypes": [
+    {
+      "id": "generator", "name": "Power Generator", "category": "generation",
+      "icon": "power",
+      "description": "Turbine/plant generation gated by its governor setpoint and main breaker.",
+      "ports": {"in": [], "out": [{"resource": "power", "role": "supply"}]},
+      "params": [],
+      "device_roles": {"gov": {"type": "PLC", "label": "Turbine governor"},
+                        "bkr": {"type": "RTU", "label": "Main breaker"}},
+      "modbus": [{"kind": "holding", "label": "turbine setpoint MW (x10)", "role": "gov.setpoint_mw"},
+                 {"kind": "coil", "label": "main breaker closed", "role": "bkr.closed"}]
+    },
+    {
+      "id": "grid_bus", "name": "Grid Bus", "category": "distribution",
+      "icon": "power",
+      "description": "Balances total electrical demand against available generation; feeds every powered node.",
+      "ports": {"in": [{"resource": "power", "role": "supply"}], "out": [{"resource": "power", "role": "grid"}]},
+      "params": [{"name": "base_load", "label": "Base town load", "type": "number", "default": 90.0, "min": 0, "unit": "MW"}],
+      "device_roles": {},
+      "modbus": [{"kind": "input", "label": "generation MW (x10)"}, {"kind": "input", "label": "demand MW (x10)"}, {"kind": "input", "label": "grid ok"}]
+    },
+    {
+      "id": "comms_backbone", "name": "Telecom Backbone", "category": "comms",
+      "icon": "telecom",
+      "description": "Redundant fiber + microwave transport carrying SCADA/comms to every sector; core router routes both paths.",
+      "ports": {"in": [{"resource": "power", "role": "grid"}], "out": [{"resource": "comms", "role": "transport"}]},
+      "params": [{"name": "demand", "label": "Electrical load", "type": "number", "default": 3.0, "min": 0, "unit": "MW"}],
+      "device_roles": {"core": {"type": "PLC", "label": "Core switch/router"},
+                        "fiber": {"type": "RTU", "label": "Fiber backbone"},
+                        "mw": {"type": "RTU", "label": "Microwave relay"}},
+      "modbus": [{"kind": "coil", "label": "fiber path up", "role": "fiber.link_up"},
+                 {"kind": "coil", "label": "microwave path up", "role": "mw.link_up"},
+                 {"kind": "coil", "label": "core routing", "role": "core.routing"}]
+    },
+    {
+      "id": "pump", "name": "Pump (VFD)", "category": "process",
+      "icon": "water",
+      "description": "Variable-speed pump; moves fluid only when powered and running.",
+      "ports": {"in": [{"resource": "power", "role": "grid"}], "out": [{"resource": "water", "role": "pump"}]},
+      "params": [{"name": "demand", "label": "Electrical load when running", "type": "number", "default": 8.0, "min": 0, "unit": "MW"}],
+      "device_roles": {"vfd": {"type": "VFD", "label": "Pump drive"}},
+      "modbus": [{"kind": "holding", "label": "pump speed % (x10)", "role": "vfd.speed_pct"}, {"kind": "coil", "label": "pump running"}]
+    },
+    {
+      "id": "pressure_tank", "name": "Pressure/Storage", "category": "process",
+      "icon": "water",
+      "description": "Integrates pump flow into system pressure; drains when unfed.",
+      "ports": {"in": [{"resource": "water", "role": "pump"}], "out": [{"resource": "water", "role": "water_press"}]},
+      "params": [{"name": "nominal", "label": "Nominal pressure", "type": "number", "default": 60.0, "unit": "psi"},
+                 {"name": "rise", "label": "Recovery/tick", "type": "number", "default": 6.0, "unit": "psi"},
+                 {"name": "fall", "label": "Decay/tick", "type": "number", "default": 9.0, "unit": "psi"}],
+      "device_roles": {},
+      "modbus": [{"kind": "input", "label": "pressure psi (x10)"}]
+    },
+    {
+      "id": "treatment", "name": "Chemical Treatment", "category": "process",
+      "icon": "water",
+      "description": "Chemical dosing stage; output quality is safe only within the dose safe band (a Safety Instrumented System clamps it).",
+      "ports": {"in": [], "out": [{"resource": "water", "role": "water_qual"}]},
+      "params": [],
+      "device_roles": {"dose": {"type": "PLC", "label": "Dosing controller"}},
+      "modbus": [{"kind": "holding", "label": "chemical dose ppm (x10)", "role": "dose.dose_ppm"}, {"kind": "input", "label": "quality 0/1/2"}]
+    },
+    {
+      "id": "hospital_sector", "name": "Hospital Sector", "category": "consumer",
+      "icon": "hospital",
+      "description": "Critical care load with automatic transfer to a fuel-limited backup generator; consumes power + clean water; tracks medical-gas safety.",
+      "ports": {"in": [{"resource": "power", "role": "grid"}, {"resource": "water", "role": "water_press"}, {"resource": "water", "role": "water_qual"}], "out": [{"resource": "control", "role": "status"}]},
+      "params": [{"name": "demand", "label": "Electrical load", "type": "number", "default": 5.0, "min": 0, "unit": "MW"}],
+      "device_roles": {"ats": {"type": "ATS", "label": "Transfer switch + generator"},
+                        "o2": {"type": "PLC", "label": "Medical-gas / O2 monitor"}},
+      "modbus": [{"kind": "holding", "label": "O2 psi (x10)", "role": "o2.o2_psi"},
+                 {"kind": "holding", "label": "gen fuel min", "role": "ats.gen_fuel_min"},
+                 {"kind": "coil", "label": "transfer switch AUTO", "role": "ats.mode"}]
+    },
+    {
+      "id": "base_sector", "name": "Military Base Sector", "category": "consumer",
+      "icon": "base",
+      "description": "Base with substation + fuel-farm-fed backup generator, C2/radar comms (rides the telecom backbone), and perimeter security; produces a readiness status.",
+      "ports": {"in": [{"resource": "power", "role": "grid"}, {"resource": "comms", "role": "transport"}], "out": [{"resource": "control", "role": "status"}]},
+      "params": [{"name": "demand", "label": "Electrical load", "type": "number", "default": 6.0, "min": 0, "unit": "MW"}],
+      "device_roles": {"sub": {"type": "ATS", "label": "Substation transfer switch"},
+                        "fuel": {"type": "PLC", "label": "Fuel farm"},
+                        "c2": {"type": "RTU", "label": "C2 / radar comms"},
+                        "perim": {"type": "PLC", "label": "Perimeter security"}},
+      "modbus": [{"kind": "holding", "label": "fuel farm level % (x10)", "role": "fuel.level_pct"},
+                 {"kind": "coil", "label": "perimeter gates locked", "role": "perim.gates_locked"},
+                 {"kind": "coil", "label": "C2/radar link up", "role": "c2.link_up"}]
+    },
+    {
+      "id": "airport_sector", "name": "Airport Sector", "category": "consumer",
+      "icon": "airport",
+      "description": "Airfield with surveillance radar, ILS/navaids, and tower ATC comms; airspace degrades/closes as those fail or the telecom backhaul is lost.",
+      "ports": {"in": [{"resource": "power", "role": "grid"}, {"resource": "comms", "role": "transport"}, {"resource": "comms", "role": "base_comms"}], "out": [{"resource": "control", "role": "status"}]},
+      "params": [{"name": "demand", "label": "Electrical load", "type": "number", "default": 4.0, "min": 0, "unit": "MW"}],
+      "device_roles": {"radar": {"type": "RTU", "label": "Surveillance radar"},
+                        "nav": {"type": "PLC", "label": "ILS / navaids"},
+                        "tower": {"type": "RTU", "label": "Tower ATC comms"}},
+      "modbus": [{"kind": "coil", "label": "radar sweep", "role": "radar.sweep"},
+                 {"kind": "coil", "label": "ILS/navaids", "role": "nav.ils_on"},
+                 {"kind": "coil", "label": "tower ATC comms", "role": "tower.freq_active"}]
+    }
+  ]
+}

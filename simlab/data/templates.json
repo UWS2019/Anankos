@@ -1,0 +1,110 @@
+{
+  "comment": "Anankos facility templates (Phase 2). Each template is a pre-wired bundle of archetype nodes + their devices + internal links the builder can drop as a unit. Device local keys are prefixed per placement (prefix + '_' + key) to form global device ids; node ids are used verbatim. Device defaults here match the reference Marin build exactly. consumes/provides declare the external ports a placement must wire.",
+  "templates": [
+    {
+      "id": "power_plant", "name": "Power Plant", "category": "generation",
+      "facility_kind": "power", "icon": "power",
+      "devices": {
+        "it":  {"type": "IT",  "name": "Plant Business Network", "state": {}},
+        "gov": {"type": "PLC", "name": "Turbine Governor PLC", "state": {"setpoint_mw": 125.0, "max_mw": 140.0}},
+        "bkr": {"type": "RTU", "name": "Main Breaker RTU", "state": {"closed": true}},
+        "hmi": {"type": "HMI", "name": "Generation Control HMI", "state": {}}
+      },
+      "nodes": [
+        {"id": "gen",  "arch": "generator", "dmap": {"gov": "gov", "bkr": "bkr"}, "params": {}},
+        {"id": "grid", "arch": "grid_bus",  "dmap": {}, "params": {"base_load": 90.0}}
+      ],
+      "internal_links": [{"src": "gen", "dst": "grid", "role": "supply", "resource": "power"}],
+      "consumes": [], "provides": [{"resource": "power", "node": "grid", "role": "grid"}]
+    },
+    {
+      "id": "water_treatment", "name": "Water Treatment", "category": "process",
+      "facility_kind": "water", "icon": "water",
+      "devices": {
+        "it":   {"type": "IT",  "name": "Utility Business Network", "state": {}},
+        "pump": {"type": "VFD", "name": "High-Lift Pump VFD", "state": {"speed_pct": 85.0}},
+        "dose": {"type": "PLC", "name": "Chlorine Dosing PLC", "state": {"dose_ppm": 1.0, "safe_min": 0.2, "safe_max": 4.0}},
+        "hmi":  {"type": "HMI", "name": "SCADA HMI", "state": {}}
+      },
+      "nodes": [
+        {"id": "water_pump",     "arch": "pump",          "dmap": {"vfd": "pump"}, "params": {"demand": 8.0}},
+        {"id": "water_pressure", "arch": "pressure_tank", "dmap": {}, "params": {"nominal": 60.0, "rise": 6.0, "fall": 9.0}},
+        {"id": "water_quality",  "arch": "treatment",     "dmap": {"dose": "dose"}, "params": {}}
+      ],
+      "internal_links": [{"src": "water_pump", "dst": "water_pressure", "role": "pump", "resource": "water"}],
+      "consumes": [{"resource": "power", "node": "water_pump", "role": "grid"}],
+      "provides": [{"resource": "water", "node": "water_pressure", "role": "water_press"},
+                   {"resource": "water", "node": "water_quality", "role": "water_qual"}]
+    },
+    {
+      "id": "hospital", "name": "Hospital", "category": "consumer",
+      "facility_kind": "hospital", "icon": "hospital",
+      "devices": {
+        "it":  {"type": "IT",  "name": "Hospital IT Network", "state": {}},
+        "ats": {"type": "ATS", "name": "Automatic Transfer Switch", "state": {"mode": "auto", "on_generator": false, "gen_fuel_min": 240.0}},
+        "bms": {"type": "PLC", "name": "Building HVAC / BMS PLC", "state": {"temp_f": 71.0}},
+        "o2":  {"type": "PLC", "name": "Medical Gas / O2 Monitor PLC", "state": {"o2_psi": 55.0, "safe_min": 45.0, "safe_max": 65.0}}
+      },
+      "nodes": [
+        {"id": "hospital", "arch": "hospital_sector", "dmap": {"ats": "ats", "o2": "o2"}, "params": {"demand": 5.0}}
+      ],
+      "internal_links": [],
+      "consumes": [{"resource": "power", "node": "hospital", "role": "grid"},
+                   {"resource": "water", "node": "hospital", "role": "water_press"},
+                   {"resource": "water", "node": "hospital", "role": "water_qual"}],
+      "provides": []
+    },
+    {
+      "id": "military_base", "name": "Military Base", "category": "consumer",
+      "facility_kind": "base", "icon": "base",
+      "devices": {
+        "it":    {"type": "IT",  "name": "Base Admin Network", "state": {}},
+        "sub":   {"type": "ATS", "name": "Base Substation ATS", "state": {"mode": "auto", "on_generator": false, "gen_fuel_min": 480.0}},
+        "fuel":  {"type": "PLC", "name": "Fuel Farm PLC", "state": {"level_pct": 90.0}},
+        "c2":    {"type": "RTU", "name": "C2 / Radar Comms RTU", "state": {"link_up": 1.0}},
+        "perim": {"type": "PLC", "name": "Perimeter Security PLC", "state": {"gates_locked": 1.0, "lighting": 1.0}}
+      },
+      "nodes": [
+        {"id": "base", "arch": "base_sector", "dmap": {"sub": "sub", "fuel": "fuel", "c2": "c2", "perim": "perim"}, "params": {"demand": 6.0}}
+      ],
+      "internal_links": [],
+      "consumes": [{"resource": "power", "node": "base", "role": "grid"},
+                   {"resource": "comms", "node": "base", "role": "transport"}],
+      "provides": [{"resource": "comms", "node": "base", "role": "base_comms"}]
+    },
+    {
+      "id": "airport", "name": "Airport", "category": "consumer",
+      "facility_kind": "airport", "icon": "airport",
+      "devices": {
+        "it":    {"type": "IT",  "name": "Airport IT Network", "state": {}},
+        "radar": {"type": "RTU", "name": "Surveillance Radar RTU", "state": {"sweep": 1.0}},
+        "nav":   {"type": "PLC", "name": "ILS / Navaids PLC", "state": {"ils_on": 1.0}},
+        "tower": {"type": "RTU", "name": "Tower ATC Comms RTU", "state": {"freq_active": 1.0, "lighting": 1.0}}
+      },
+      "nodes": [
+        {"id": "airport", "arch": "airport_sector", "dmap": {"radar": "radar", "nav": "nav", "tower": "tower"}, "params": {"demand": 4.0}}
+      ],
+      "internal_links": [],
+      "consumes": [{"resource": "power", "node": "airport", "role": "grid"},
+                   {"resource": "comms", "node": "airport", "role": "transport"},
+                   {"resource": "comms", "node": "airport", "role": "base_comms"}],
+      "provides": []
+    },
+    {
+      "id": "telecom", "name": "Telecom Central Office", "category": "comms",
+      "facility_kind": "telecom", "icon": "telecom",
+      "devices": {
+        "it":    {"type": "IT",  "name": "Telecom OSS/BSS Network", "state": {}},
+        "core":  {"type": "PLC", "name": "Core Switch/Router PLC", "state": {"routing": 1.0}},
+        "fiber": {"type": "RTU", "name": "Fiber Backbone RTU", "state": {"link_up": 1.0}},
+        "mw":    {"type": "RTU", "name": "Microwave Relay RTU", "state": {"link_up": 1.0}}
+      },
+      "nodes": [
+        {"id": "telecom", "arch": "comms_backbone", "dmap": {"core": "core", "fiber": "fiber", "mw": "mw"}, "params": {"demand": 3.0}}
+      ],
+      "internal_links": [],
+      "consumes": [{"resource": "power", "node": "telecom", "role": "grid"}],
+      "provides": [{"resource": "comms", "node": "telecom", "role": "transport"}]
+    }
+  ]
+}
