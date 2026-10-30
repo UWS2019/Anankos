@@ -30,6 +30,7 @@
         <div class="stat"><div class="k">Water pressure</div><div class="v" id="s-water">— psi</div></div>
         <div class="stat"><div class="k">Hospital power</div><div class="v" id="s-hosp">—</div></div>
         <div class="stat"><div class="k">City w/o power</div><div class="v" id="s-pop">0%</div></div>
+        <div class="stat"><div class="k">Base readiness</div><div class="v" id="s-base">—</div></div>
       </div>
     </div>
 
@@ -39,12 +40,20 @@
     </div>
   </section>
 
-  <!-- RIGHT: attack console + event log -->
+  <!-- RIGHT: attack console + authoring + event log -->
   <section>
     <div class="card">
       <h2>ATT&amp;CK Console — Red / Consequence</h2>
       <div class="field">
-        <label>Technique (MITRE ATT&amp;CK for ICS)</label>
+        <label>Domain</label>
+        <div class="seg" id="domain-seg">
+          <button data-dom="all" class="on">All</button>
+          <button data-dom="enterprise">IT (Enterprise)</button>
+          <button data-dom="ics">OT (ICS)</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Technique (MITRE ATT&amp;CK)</label>
         <select id="tech"></select>
         <div class="tech-desc" id="tech-desc"></div>
       </div>
@@ -60,6 +69,30 @@
       <button id="btn-exec" class="primary" style="width:100%">Execute Technique</button>
       <div class="notice" style="padding-left:0;padding-bottom:0">
         Simulation only. Techniques mutate in-memory device models and never touch real systems.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Assessment / Findings — mirror ground truth</h2>
+      <div class="field">
+        <label>Facility</label>
+        <select id="auth-fac"></select>
+      </div>
+      <div class="field">
+        <label>Findings observed on this facility</label>
+        <div id="findings"></div>
+      </div>
+      <div class="field">
+        <label>Device state authoring</label>
+        <div id="authoring"></div>
+      </div>
+      <div class="btns" style="margin-top:4px">
+        <button id="btn-export">⬇ Export scenario</button>
+        <button id="btn-import">⬆ Import scenario</button>
+        <input type="file" id="import-file" accept="application/json" style="display:none">
+      </div>
+      <div class="notice" style="padding-left:0;padding-bottom:0">
+        Set the conditions you found in the field, then run the chain to show the client the outcome.
       </div>
     </div>
 

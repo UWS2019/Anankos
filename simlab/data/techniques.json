@@ -1,105 +1,138 @@
 {
-  "comment": "Anankos Sim Lab v1 - focused MITRE ATT&CK for ICS technique library. SIMULATION ONLY: every effect mutates in-memory simulated device state. No real protocols, devices, or networks are touched.",
+  "comment": "Anankos Sim Lab technique library. SIMULATION ONLY: every effect mutates in-memory simulated state. 'requires' gates the kill chain: none | it | it_or_exposed | exposed | ot. 'stage': it_access -> pivot -> ot_access -> impact. 'domain': enterprise (IT ATT&CK) | ics (ATT&CK for ICS).",
   "techniques": [
     {
-      "id": "T0812",
-      "name": "Default Credentials",
-      "tactic": "Initial Access / Lateral Movement",
-      "kill_chain": "access",
-      "description": "Authenticate to an engineering/management interface using factory-default credentials to gain control of a facility's control network.",
-      "applies_to": ["PLC", "RTU", "HMI", "VFD", "ATS"],
-      "effect": "compromise",
-      "requires_compromise": false
+      "id": "T1190", "name": "Exploit Public-Facing Application",
+      "domain": "enterprise", "tactic": "Initial Access (IT)",
+      "stage": "it_access", "requires": "none", "effect": "compromise_it",
+      "applies_to": ["IT"],
+      "description": "Exploit an internet-facing enterprise application (VPN, web portal, email) to gain a foothold on the business/IT network."
     },
     {
-      "id": "T0866",
-      "name": "Exploitation of Remote Services",
-      "tactic": "Initial Access / Lateral Movement",
-      "kill_chain": "access",
-      "description": "Exploit an exposed remote service (e.g. an internet-reachable VPN or RDP jump host) to pivot onto the OT network of a facility.",
-      "applies_to": ["PLC", "RTU", "HMI", "VFD", "ATS"],
-      "effect": "compromise",
-      "requires_compromise": false
+      "id": "T1566", "name": "Phishing",
+      "domain": "enterprise", "tactic": "Initial Access (IT)",
+      "stage": "it_access", "requires": "none", "effect": "compromise_it",
+      "applies_to": ["IT"],
+      "description": "Trick a staff member into running attacker code or giving up credentials, establishing an IT-network foothold."
     },
     {
-      "id": "T0836",
-      "name": "Modify Parameter",
-      "tactic": "Impair Process Control",
-      "kill_chain": "impact",
-      "description": "Change a device setpoint or configuration parameter (e.g. turbine output setpoint, chemical dose, pump speed) to drive the process out of its safe band.",
+      "id": "T1133", "name": "External Remote Services",
+      "domain": "enterprise", "tactic": "Initial Access (IT)",
+      "stage": "it_access", "requires": "none", "effect": "compromise_it",
+      "applies_to": ["IT"],
+      "description": "Abuse an exposed remote-access service (RDP, VPN, Citrix) to log into the enterprise network."
+    },
+    {
+      "id": "T1078", "name": "Valid Accounts",
+      "domain": "enterprise", "tactic": "Initial Access / Persistence (IT)",
+      "stage": "it_access", "requires": "none", "effect": "compromise_it",
+      "applies_to": ["IT"],
+      "description": "Use legitimate (stolen or leaked) credentials to access the enterprise network as a trusted user."
+    },
+    {
+      "id": "T1210", "name": "Exploitation of Remote Services",
+      "domain": "enterprise", "tactic": "Lateral Movement (IT->OT)",
+      "stage": "pivot", "requires": "it", "effect": "pivot",
+      "applies_to": ["IT"],
+      "description": "Pivot from the compromised IT network across the IT/OT boundary into the control network, gaining OT access."
+    },
+    {
+      "id": "T0883", "name": "Internet Accessible Device",
+      "domain": "ics", "tactic": "Initial Access (OT)",
+      "stage": "ot_access", "requires": "exposed", "effect": "compromise",
+      "applies_to": ["PLC", "RTU", "HMI", "VFD", "ATS"],
+      "description": "Connect directly to a control device that is reachable from the internet. Only viable where the 'internet exposed' finding is set."
+    },
+    {
+      "id": "T0812", "name": "Default Credentials",
+      "domain": "ics", "tactic": "Initial Access / Lateral (OT)",
+      "stage": "ot_access", "requires": "it_or_exposed", "effect": "compromise",
+      "applies_to": ["PLC", "RTU", "HMI", "VFD", "ATS"],
+      "description": "Authenticate to an engineering interface with factory-default credentials. Needs network reach: an IT foothold or an internet-exposed device."
+    },
+    {
+      "id": "T0866", "name": "Exploitation of Remote Services",
+      "domain": "ics", "tactic": "Initial Access / Lateral (OT)",
+      "stage": "ot_access", "requires": "it_or_exposed", "effect": "compromise",
+      "applies_to": ["PLC", "RTU", "HMI", "VFD", "ATS"],
+      "description": "Exploit an exposed OT service to gain control of a facility's control network. Needs an IT foothold or an internet-exposed device."
+    },
+    {
+      "id": "T0836", "name": "Modify Parameter",
+      "domain": "ics", "tactic": "Impair Process Control",
+      "stage": "impact", "requires": "ot", "effect": "set_param",
       "applies_to": ["PLC", "VFD"],
-      "effect": "set_param",
-      "requires_compromise": true
+      "description": "Change a device setpoint or configuration parameter to drive the process out of its safe band."
     },
     {
-      "id": "T0855",
-      "name": "Unauthorized Command Message",
-      "tactic": "Impair Process Control",
-      "kill_chain": "impact",
-      "description": "Issue an unauthorized control command to an actuator (e.g. open a breaker, stop a pump, force a transfer switch).",
+      "id": "T0855", "name": "Unauthorized Command Message",
+      "domain": "ics", "tactic": "Impair Process Control",
+      "stage": "impact", "requires": "ot", "effect": "command",
       "applies_to": ["RTU", "PLC", "ATS"],
-      "effect": "command",
-      "requires_compromise": true
+      "description": "Issue an unauthorized control command to an actuator (open a breaker, stop a pump, force a transfer switch)."
     },
     {
-      "id": "T0831",
-      "name": "Manipulation of Control",
-      "tactic": "Impair Process Control",
-      "kill_chain": "impact",
-      "description": "Take direct control of a process actuator, overriding normal automatic regulation.",
+      "id": "T0831", "name": "Manipulation of Control",
+      "domain": "ics", "tactic": "Impair Process Control",
+      "stage": "impact", "requires": "ot", "effect": "set_param",
       "applies_to": ["PLC", "VFD", "RTU"],
-      "effect": "set_param",
-      "requires_compromise": true
+      "description": "Take direct control of a process actuator, overriding normal automatic regulation."
     },
     {
-      "id": "T0835",
-      "name": "Manipulate I/O Image",
-      "tactic": "Impair Process Control",
-      "kill_chain": "impact",
-      "description": "Alter the I/O image the controller reads so logic acts on falsified field values while the physical process diverges.",
+      "id": "T0835", "name": "Manipulate I/O Image",
+      "domain": "ics", "tactic": "Impair Process Control",
+      "stage": "impact", "requires": "ot", "effect": "set_param",
       "applies_to": ["PLC", "VFD"],
-      "effect": "set_param",
-      "requires_compromise": true
+      "description": "Alter the I/O image the controller reads so logic acts on falsified field values while the physical process diverges."
     },
     {
-      "id": "T0856",
-      "name": "Spoof Reporting Message",
-      "tactic": "Impair Process Control",
-      "kill_chain": "impact",
-      "description": "Falsify the value reported to the operator HMI so the control room sees normal readings while the real process value is different.",
+      "id": "T0856", "name": "Spoof Reporting Message",
+      "domain": "ics", "tactic": "Impair Process Control",
+      "stage": "impact", "requires": "ot", "effect": "spoof",
       "applies_to": ["HMI", "PLC", "RTU"],
-      "effect": "spoof",
-      "requires_compromise": true
+      "description": "Falsify the value reported to the operator HMI so the control room sees normal readings while the real value diverges."
     },
     {
-      "id": "T0814",
-      "name": "Denial of Service",
-      "tactic": "Inhibit Response Function",
-      "kill_chain": "impact",
-      "description": "Flood or crash a device's communications so it can no longer respond to commands or protective logic (e.g. blind a transfer switch or safety controller).",
+      "id": "T0813", "name": "Denial of View",
+      "domain": "ics", "tactic": "Inhibit Response Function",
+      "stage": "impact", "requires": "ot", "effect": "dos",
+      "applies_to": ["HMI"],
+      "description": "Blind the operator by denying the control-room view of the process."
+    },
+    {
+      "id": "T0814", "name": "Denial of Service",
+      "domain": "ics", "tactic": "Inhibit Response Function",
+      "stage": "impact", "requires": "ot", "effect": "dos",
       "applies_to": ["PLC", "RTU", "HMI", "VFD", "ATS"],
-      "effect": "dos",
-      "requires_compromise": true
+      "description": "Flood or crash a device's communications so it can no longer respond to commands or protective logic."
     },
     {
-      "id": "T0816",
-      "name": "Device Restart/Shutdown",
-      "tactic": "Inhibit Response Function",
-      "kill_chain": "impact",
-      "description": "Force a controller or actuator to restart or shut down, dropping the process it governs.",
+      "id": "T0816", "name": "Device Restart/Shutdown",
+      "domain": "ics", "tactic": "Inhibit Response Function",
+      "stage": "impact", "requires": "ot", "effect": "shutdown",
       "applies_to": ["PLC", "RTU", "VFD", "ATS"],
-      "effect": "shutdown",
-      "requires_compromise": true
+      "description": "Force a controller or actuator to restart or shut down, dropping the process it governs."
     },
     {
-      "id": "T0880",
-      "name": "Loss of Safety",
-      "tactic": "Impact",
-      "kill_chain": "impact",
-      "description": "Defeat or disable a safety instrumented function so the process can reach an unsafe state without protective intervention.",
+      "id": "T0826", "name": "Loss of Availability",
+      "domain": "ics", "tactic": "Impact",
+      "stage": "impact", "requires": "ot", "effect": "shutdown",
+      "applies_to": ["PLC", "RTU", "VFD", "ATS"],
+      "description": "Render a control function unavailable, stopping the process or service it provides."
+    },
+    {
+      "id": "T0827", "name": "Loss of Control",
+      "domain": "ics", "tactic": "Impact",
+      "stage": "impact", "requires": "ot", "effect": "dos",
+      "applies_to": ["PLC", "RTU", "VFD"],
+      "description": "Deny operators the ability to control the process, leaving it in whatever state the attacker set."
+    },
+    {
+      "id": "T0880", "name": "Loss of Safety",
+      "domain": "ics", "tactic": "Impact",
+      "stage": "impact", "requires": "ot", "effect": "disable_safety",
       "applies_to": ["PLC", "RTU"],
-      "effect": "disable_safety",
-      "requires_compromise": true
+      "description": "Defeat or disable a safety instrumented function so the process can reach an unsafe state without protective intervention."
     }
   ]
 }

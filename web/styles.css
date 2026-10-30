@@ -126,6 +126,27 @@ select, input[type=text], input[type=number] {
 .ev.alert { color: #fca5a5; }
 .ev.info { color: var(--ink); }
 
+/* --- segmented control + findings/authoring --- */
+.seg { display: flex; gap: 4px; }
+.seg button { flex: 1; padding: 6px 8px; font-size: .8rem; }
+.seg button.on { background: #0c3b36; border-color: #1c6b61; color: #c9fff6; }
+.chk { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: .86rem; cursor: pointer; }
+.chk input { width: 16px; height: 16px; accent-color: var(--attack); }
+.chk .hint { color: var(--muted); font-size: .74rem; }
+.auth-dev { border-top: 1px dashed var(--line); padding: 7px 0; }
+.auth-dev .anm { font-weight: 600; font-size: .86rem; }
+.auth-dev .arow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 5px; }
+.pill {
+  font-size: .72rem; padding: 3px 9px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--panel-2); color: var(--muted);
+}
+.pill.on { color: #c9fff6; border-color: var(--ok); background: #0d2a1c; }
+.pill.off { color: #fca5a5; border-color: #5c1a1a; background: #2a0f12; }
+.auth-dev select, .auth-dev input { padding: 5px 7px; font-size: .8rem; width: auto; flex: 1; min-width: 90px; }
+.auth-dev button.set { padding: 5px 10px; }
+.v.compromised { color: var(--alert); }
+.v.degraded { color: var(--warn); }
+
 .notice { font-size: .74rem; color: var(--muted); padding: 8px 14px; border-top: 1px solid var(--line); }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
 .toast {

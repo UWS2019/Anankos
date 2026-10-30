@@ -122,6 +122,35 @@ async def manual(payload: dict):
     return res
 
 
+# --- assessor authoring (mirror ground-truth findings) ----------------------
+@app.post("/api/finding")
+async def finding(payload: dict):
+    res = engine.set_finding(
+        payload.get("facility_id"), payload.get("key"), payload.get("value"))
+    await hub.broadcast(engine.snapshot())
+    return res
+
+
+@app.post("/api/device_flag")
+async def device_flag(payload: dict):
+    res = engine.set_device_flag(
+        payload.get("device_id"), payload.get("flag"), payload.get("value"))
+    await hub.broadcast(engine.snapshot())
+    return res
+
+
+@app.get("/api/scenario")
+def scenario_export():
+    return engine.export_scenario()
+
+
+@app.post("/api/scenario")
+async def scenario_import(payload: dict):
+    res = engine.import_scenario(payload)
+    await hub.broadcast(engine.snapshot())
+    return res
+
+
 # --- WebSocket --------------------------------------------------------------
 @app.websocket("/ws")
 async def ws_endpoint(ws: WebSocket):

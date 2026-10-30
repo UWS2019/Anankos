@@ -18,30 +18,43 @@ training, tabletop exercises, and resilience assessment.
   pulses when lives are at risk. The wider city (Downtown/Government, Airport,
   Sports Arena, Industrial Park, **Fort Marin military base**, Residential)
   reacts to grid and water status.
-- **Three deeply-modeled facilities**, wired through a dependency cascade:
-  **Riverside Power Plant → Northgate Water Treatment → St. Marin General Hospital**.
-- **MITRE ATT&CK for ICS** console — a focused 10-technique library. Each
-  action runs a mini kill chain: **Initial Access → Impact**, and every event
-  is tagged with its ATT&CK ID.
+- **Four deeply-modeled facilities**, wired through a dependency cascade:
+  **Riverside Power Plant → Northgate Water Treatment → St. Marin General
+  Hospital**, and **Fort Marin (military base)** — power, fuel farm, C2/radar,
+  and perimeter security, with readiness scoring and a knock-on to airport
+  radar/ATC.
+- **MITRE ATT&CK console** — a 19-technique library spanning the **Enterprise
+  IT chain and the ATT&CK for ICS chain**. Actions follow a realistic kill
+  chain: **IT Initial Access → IT→OT Pivot → OT Access → Impact**, gated by
+  preconditions, with every event tagged by ATT&CK ID.
+- **Assessment / Findings authoring** — set the exact conditions you found on
+  the ground (internet-exposed device, default creds, flat network, unpatched;
+  plus direct device-state and parameter authoring) so the lab mirrors reality
+  and demonstrates the resulting outcome to a client. **Export / import**
+  whole scenarios as JSON to prep and replay client-specific engagements.
 - **Consequence engine** — a tick-based model (1 tick = 1 simulated minute)
   that scores lives-at-risk, grid balance, water pressure/quality, hospital
   power and backup-generator fuel, and a town severity level
   (nominal → degraded → severe → catastrophic).
 
-### Technique library (v1)
+### Technique library
 
-| ID | Technique | Tactic | Effect in sim |
-|----|-----------|--------|---------------|
-| T0812 | Default Credentials | Initial Access | Compromise a facility (unlocks impact) |
-| T0866 | Exploitation of Remote Services | Initial Access | Compromise a facility |
-| T0836 | Modify Parameter | Impair Process Control | Change a setpoint (e.g. chlorine dose, turbine MW) |
-| T0855 | Unauthorized Command Message | Impair Process Control | Open breaker / stop pump / force transfer switch |
-| T0831 | Manipulation of Control | Impair Process Control | Override an actuator setpoint |
-| T0835 | Manipulate I/O Image | Impair Process Control | Falsify a controller's I/O value |
-| T0856 | Spoof Reporting Message | Impair Process Control | HMI shows normal while reality diverges |
-| T0814 | Denial of Service | Inhibit Response Function | Make a device unresponsive |
-| T0816 | Device Restart/Shutdown | Inhibit Response Function | Force a device offline |
-| T0880 | Loss of Safety | Impact | Defeat a safety function |
+The kill chain is gated: **IT access → pivot → OT access → impact**. OT access
+needs either an IT foothold (pivot) or an `internet exposed` finding on the
+target.
+
+**Enterprise (IT):** T1190 Exploit Public-Facing Application · T1566 Phishing ·
+T1133 External Remote Services · T1078 Valid Accounts (Initial Access) ·
+T1210 Exploitation of Remote Services (IT→OT pivot).
+
+**ICS (OT) — access:** T0883 Internet Accessible Device · T0812 Default
+Credentials · T0866 Exploitation of Remote Services.
+
+**ICS (OT) — impact:** T0836 Modify Parameter · T0855 Unauthorized Command
+Message · T0831 Manipulation of Control · T0835 Manipulate I/O Image · T0856
+Spoof Reporting Message · T0813 Denial of View · T0814 Denial of Service ·
+T0816 Device Restart/Shutdown · T0826 Loss of Availability · T0827 Loss of
+Control · T0880 Loss of Safety.
 
 ---
 
@@ -116,8 +129,10 @@ Config via env vars: `ANANKOS_HOST` (default `0.0.0.0`),
 ## Roadmap (discussed, not yet built)
 
 - **Blue team / MITRE D3FEND** — detections, mitigations, and red/blue scoring.
-- **Deepen the city** — promote ambient districts (military base, airport,
-  government, manufacturing) to fully-modeled facilities with their own devices.
+- **Deepen more districts** — promote airport, government, and manufacturing to
+  fully-modeled facilities with their own devices (Fort Marin already done).
 - **Simulated protocol endpoints** — let trainees drive the sandbox with
   external tooling instead of only the UI.
-- **Scenario save/replay** and multi-user exercises with roles.
+- **Assessment report export** — one-click after-action report (timeline,
+  ATT&CK coverage, findings, consequence summary) from a run.
+- **Multi-user exercises** with roles.
