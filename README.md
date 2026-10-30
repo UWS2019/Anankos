@@ -147,13 +147,18 @@ pressure bleeds off → town status reaches **catastrophic**.
 ```
 simlab/
   app.py          FastAPI: REST + WebSocket + static hosting + Modbus startup
-  engine.py       tick engine, technique application, cascade + scoring + report data
+  engine.py       tick loop, technique application, consequence scoring + report
   town.py         facilities, simulated devices, city layout
+  topology.py     the town as a data graph of archetype nodes + typed links
+  archetypes.py   reusable node behaviors (generator, grid, pump, comms, …)
+  solver.py       generic graph solver (demand pass + topological evaluation)
   modbus.py       dependency-free simulated Modbus/TCP server + register map
   report.py       standalone printable assessment-report renderer
   data/
     techniques.json   MITRE ATT&CK technique library (data-driven)
     defenses.json     MITRE D3FEND countermeasure library (data-driven)
+tests/
+  parity.py           physics regression test vs physics_golden.json
 web/
   index.html      sand-table dashboard
   city.js         sand-table renderer (buildings, roads, responders, zoom/pan)
@@ -201,9 +206,26 @@ coverage matrix grouped by tactic, and a facility posture + findings table.
 It prints cleanly to PDF from the browser, so a run becomes a client
 deliverable. `/api/report` returns the same data as JSON.
 
+## Data-driven topology (Phase 1)
+
+The physical cascade no longer lives in hand-written per-facility code. The town
+is a **graph of archetype nodes** (`topology.py`) — generator, grid bus, pump,
+pressure tank, treatment, comms backbone, and sector archetypes — wired by
+**typed links** (power / water / comms). A **generic solver** (`solver.py`)
+sums electrical demand and evaluates nodes in topological order; the
+Anankos-specific consequence scoring (lives, severity, milestones) reads the
+resolved node states. Archetypes (`archetypes.py`) are reusable behaviors bound
+to the same simulated devices the attacker manipulates, so the ATT&CK console,
+Modbus endpoint, findings, and blue-team layers are unchanged. This is the
+foundation for a future drag-and-drop topology builder (reconstruct a client's
+own system topography from the archetype library). `tests/parity.py` proves the
+solver reproduces the previous hand-written physics byte-for-byte.
+
 ## Roadmap (discussed, not yet built)
 
-- **Deepen more districts** — promote airport, government, and manufacturing to
-  fully-modeled facilities with their own devices (Fort Marin already done).
+- **Topology builder UI** — drag-and-drop archetypes onto a canvas to model a
+  client's exact topography (Phase 2+; Phase 1 data-driven engine is done).
+- **Deepen more districts** — promote government and manufacturing to
+  fully-modeled facilities (power, water, Fort Marin, airport, telecom done).
 - **More protocols** — DNP3 / IEC-104 alongside the Modbus surface.
 - **Multi-user exercises** with roles.

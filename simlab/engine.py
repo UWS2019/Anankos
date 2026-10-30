@@ -20,6 +20,9 @@ import time
 from pathlib import Path
 
 from .town import fresh_town
+from .topology import fresh_topology
+from . import solver
+from .archetypes import Ctx
 
 DATA = Path(__file__).parent / "data"
 
@@ -65,6 +68,7 @@ class SimEngine:
     # -- lifecycle -----------------------------------------------------------
     def reset(self):
         self.town = fresh_town()
+        self.topo = fresh_topology()
         self.tick = 0
         self.running = False
         self.events = []
@@ -284,76 +288,22 @@ class SimEngine:
         return dev["state"].get(param)
 
     def _recompute(self, advance=False):
-        d = self.town["devices"]
+        # Generic topology solve: archetype nodes wired by links (topology.py),
+        # resolved by the solver. The consequence/scoring below is the
+        # Anankos-specific layer that turns node states into civilian impact.
+        out = solver.solve(Ctx(self), self.topo, advance)
+        grid = out["grid"]
+        gen, demand, deficit, grid_ok = grid["gen_mw"], grid["demand_mw"], grid["deficit"], grid["grid_ok"]
+        wp = out["water_pressure"]; pressure, water_flowing = wp["pressure"], wp["flowing"]
+        wq = out["water_quality"]; water_quality, dose_safe = wq["quality"], wq["dose_safe"]
+        hosp, telecom, base, airport = out["hospital"], out["telecom"], out["base"], out["airport"]
+        hospital_powered = hosp["powered"]
+        on_generator = hosp["on_generator"]
+        fuel = hosp["gen_fuel_min"]
+        o2_ok = hosp["o2_ok"]
+        hospital_water = hosp["hospital_water"]
 
-        # 1) Power generation.
-        gov, bkr = d["pp_gov"], d["pp_bkr"]
-        gen = self._v(gov, "setpoint_mw") or 0.0
-        gen = min(gen, self._v(gov, "max_mw") or 0.0)
-        if not gov["online"] or not gov["functional"]:
-            gen = 0.0
-        if not bkr["online"] or not self._v(bkr, "closed"):
-            gen = 0.0
-        gen = max(0.0, gen)
-
-        # 2) Demand + grid balance.
-        pump = d["wt_pump"]
-        pumping_wanted = pump["online"] and pump["functional"] and (self._v(pump, "speed_pct") or 0) > 0
-        water_demand = WATER_DEMAND_MW if pumping_wanted else 0.0
-        demand = (TOWN_BASE_DEMAND_MW + water_demand + HOSPITAL_DEMAND_MW
-                  + BASE_DEMAND_MW + AIRPORT_DEMAND_MW + TELECOM_DEMAND_MW)
-        grid_ok = gen >= demand
-        deficit = max(0.0, demand - gen)
-
-        # 3) Water treatment.
-        pump_powered = grid_ok and pump["online"] and pump["functional"]
-        pumping = pump_powered and (self._v(pump, "speed_pct") or 0) > 0
-        if advance:
-            if pumping:
-                self.water_pressure = min(PRESSURE_NOMINAL,
-                    self.water_pressure + PRESSURE_RISE * (self._v(pump, "speed_pct") / 100.0))
-            else:
-                self.water_pressure = max(0.0, self.water_pressure - PRESSURE_FALL)
-        pressure = self.water_pressure
-        water_flowing = pressure >= 20.0
-
-        dose = self._v(d["wt_dose"], "dose_ppm") or 0.0
-        smin, smax = self._v(d["wt_dose"], "safe_min"), self._v(d["wt_dose"], "safe_max")
-        sis = self._sis_on()  # safety instrumented system clamps the process envelope
-        if sis:
-            dose = min(max(dose, smin), smax)
-        dose_safe = (smin <= dose <= smax) and (d["wt_dose"]["safety"] or sis)
-        if dose > smax:
-            water_quality = "unsafe_chemical"
-        elif dose < smin:
-            water_quality = "unsafe_untreated"
-        else:
-            water_quality = "safe"
-
-        # 4) Hospital.
-        ats = d["hp_ats"]
-        ats_ok = ats["online"] and ats["functional"]
-        can_transfer = ats_ok and self._v(ats, "mode") == "auto"
-        on_generator = bool(not grid_ok and can_transfer and (self._v(ats, "gen_fuel_min") or 0) > 0)
-        if advance and on_generator:
-            ats["state"]["gen_fuel_min"] = max(0.0, self._v(ats, "gen_fuel_min") - 1.0)
-        fuel = self._v(ats, "gen_fuel_min") or 0.0
-        hospital_powered = grid_ok or (on_generator and fuel > 0)
-        ats["state"]["on_generator"] = on_generator
-        o2 = self._v(d["hp_o2"], "o2_psi") or 0.0
-        o2_min, o2_max = self._v(d["hp_o2"], "safe_min"), self._v(d["hp_o2"], "safe_max")
-        if sis:
-            o2 = min(max(o2, o2_min), o2_max)
-        o2_ok = (o2_min <= o2 <= o2_max) and d["hp_o2"]["online"]
-        hospital_water = water_flowing and water_quality == "safe"
-
-        # 5) Telecom transport, then Fort Marin + Marin Regional Airport
-        #    (base C2 and airport radar coordination ride the telecom backbone).
-        telecom = self._recompute_telecom(d, grid_ok)
-        base = self._recompute_base(d, grid_ok, advance, telecom)
-        airport = self._recompute_airport(d, grid_ok, base, telecom)
-
-        # 6) Civilian consequence scoring.
+        # Civilian consequence scoring.
         lives, notes = 0, []
         if not hospital_powered:
             lives += 45; notes.append("hospital lost all power (ICU/OR/ventilators)")
@@ -410,93 +360,6 @@ class SimEngine:
         for k, on in conds.items():
             if on and k not in self.milestones:
                 self.milestones[k] = self.tick
-
-    def _recompute_base(self, d, grid_ok, advance, telecom):
-        sub, fuel, c2, perim = d["fb_sub"], d["fb_fuel"], d["fb_c2"], d["fb_perim"]
-        ats_ok = sub["online"] and sub["functional"]
-        fuel_ok = fuel["online"] and fuel["functional"] and (self._v(fuel, "level_pct") or 0) > 0
-        on_gen = bool(not grid_ok and ats_ok and self._v(sub, "mode") == "auto"
-                      and (self._v(sub, "gen_fuel_min") or 0) > 0 and fuel_ok)
-        if advance and on_gen:
-            sub["state"]["gen_fuel_min"] = max(0.0, self._v(sub, "gen_fuel_min") - 1.0)
-            fuel["state"]["level_pct"] = max(0.0, self._v(fuel, "level_pct") - 0.5)
-        sub["state"]["on_generator"] = on_gen
-        powered = grid_ok or (on_gen and (self._v(sub, "gen_fuel_min") or 0) > 0)
-
-        comms = bool(powered and c2["online"] and c2["functional"]
-                     and self._v(c2, "link_up") == 1 and telecom["up"])
-        gates_locked = self._v(perim, "gates_locked") == 1 and perim["safety"]
-        secure = bool(powered and perim["online"] and perim["functional"] and gates_locked)
-        breach = bool(perim["online"] and (self._v(perim, "gates_locked") == 0 or not perim["safety"]))
-
-        notes = []
-        if not powered:
-            readiness = "dark"; notes.append("base lost all power")
-        elif breach or not comms:
-            readiness = "compromised"
-            if not comms: notes.append("C2/radar link down (airspace & comms blind)")
-            if breach: notes.append("perimeter breach (gates unlocked)")
-        elif on_gen or not secure:
-            readiness = "degraded"
-            if on_gen: notes.append(f"base on backup generator, fuel farm {int(self._v(fuel,'level_pct'))}%")
-            if not secure: notes.append("perimeter security degraded")
-        else:
-            readiness = "full"
-        return {
-            "powered": powered, "on_generator": on_gen,
-            "gen_fuel_min": round(self._v(sub, "gen_fuel_min") or 0, 0),
-            "fuel_level_pct": round(self._v(fuel, "level_pct") or 0, 0),
-            "comms": comms, "perimeter_secure": secure, "breach": breach,
-            "readiness": readiness, "notes": notes,
-        }
-
-    def _recompute_airport(self, d, grid_ok, base, telecom):
-        radar, nav, tower = d["ap_radar"], d["ap_nav"], d["ap_tower"]
-        powered = grid_ok
-        radar_up = bool(powered and radar["online"] and radar["functional"] and self._v(radar, "sweep") == 1)
-        nav_up = bool(powered and nav["online"] and nav["functional"] and self._v(nav, "ils_on") == 1)
-        tower_up = bool(powered and tower["online"] and tower["functional"] and self._v(tower, "freq_active") == 1)
-        notes = []
-        if not powered:
-            status = "closed"; notes.append("airport lost power - field closed")
-        elif not tower_up:
-            status = "closed"; notes.append("tower ATC comms down - field closed")
-        elif not radar_up or not nav_up:
-            status = "degraded"
-            if not radar_up:
-                notes.append("surveillance radar down - procedural separation only")
-            if not nav_up:
-                notes.append("ILS/navaids down - no precision approaches")
-        elif not telecom["up"]:
-            status = "degraded"; notes.append("telecom backhaul lost - remote monitoring blind")
-        elif not base["comms"]:
-            status = "degraded"; notes.append("military radar feed lost - reduced airspace picture")
-        else:
-            status = "normal"
-        return {"powered": powered, "radar_up": radar_up, "nav_up": nav_up,
-                "tower_up": tower_up, "status": status, "notes": notes}
-
-    def _recompute_telecom(self, d, grid_ok):
-        core, fiber, mw = d["tc_core"], d["tc_fiber"], d["tc_mw"]
-        powered = grid_ok
-        routing = bool(core["online"] and core["functional"] and self._v(core, "routing") == 1)
-        fiber_up = bool(powered and routing and fiber["online"] and fiber["functional"] and self._v(fiber, "link_up") == 1)
-        mw_up = bool(powered and routing and mw["online"] and mw["functional"] and self._v(mw, "link_up") == 1)
-        up = fiber_up or mw_up
-        notes = []
-        if not up:
-            if not powered:
-                notes.append("telecom central office lost power")
-            elif not routing:
-                notes.append("core router down - town-wide transport lost")
-            else:
-                notes.append("both fiber and microwave paths down - operators blind across sectors")
-        elif not fiber_up:
-            notes.append("fiber path down - running on microwave backup")
-        elif not mw_up:
-            notes.append("microwave path down - fiber primary intact")
-        return {"powered": powered, "routing": routing, "fiber_up": fiber_up,
-                "mw_up": mw_up, "up": up, "notes": notes}
 
     def _severity(self, lives, grid_ok, water_flowing, water_quality, base, airport, telecom):
         base_bad = base["readiness"] in ("compromised", "dark")

@@ -1,0 +1,4780 @@
+{
+ "base_dark_breach": [
+  {
+   "airport": {
+    "nav_up": false,
+    "notes": [
+     "airport lost power - field closed"
+    ],
+    "powered": false,
+    "radar_up": false,
+    "status": "closed",
+    "tower_up": false
+   },
+   "base": {
+    "breach": true,
+    "comms": false,
+    "fuel_level_pct": 0,
+    "gen_fuel_min": 480.0,
+    "notes": [
+     "base lost all power"
+    ],
+    "on_generator": false,
+    "perimeter_secure": false,
+    "powered": false,
+    "readiness": "dark"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 116.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": false,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": false,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": false,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": false,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 0.0,
+   "grid_ok": false,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": true,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 100,
+   "severity": "catastrophic",
+   "telecom": {
+    "fiber_up": false,
+    "mw_up": false,
+    "notes": [
+     "telecom central office lost power"
+    ],
+    "powered": false,
+    "routing": true,
+    "up": false
+   },
+   "tick": 0,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": false,
+    "notes": [
+     "airport lost power - field closed"
+    ],
+    "powered": false,
+    "radar_up": false,
+    "status": "closed",
+    "tower_up": false
+   },
+   "base": {
+    "breach": true,
+    "comms": false,
+    "fuel_level_pct": 0,
+    "gen_fuel_min": 480.0,
+    "notes": [
+     "base lost all power"
+    ],
+    "on_generator": false,
+    "perimeter_secure": false,
+    "powered": false,
+    "readiness": "dark"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 116.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": false,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": false,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": false,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": false,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 0.0,
+   "grid_ok": false,
+   "hospital_gen_fuel_min": 239.0,
+   "hospital_on_generator": true,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 100,
+   "severity": "catastrophic",
+   "telecom": {
+    "fiber_up": false,
+    "mw_up": false,
+    "notes": [
+     "telecom central office lost power"
+    ],
+    "powered": false,
+    "routing": true,
+    "up": false
+   },
+   "tick": 1,
+   "water_flowing": true,
+   "water_pressure": 51.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": false,
+    "notes": [
+     "airport lost power - field closed"
+    ],
+    "powered": false,
+    "radar_up": false,
+    "status": "closed",
+    "tower_up": false
+   },
+   "base": {
+    "breach": true,
+    "comms": false,
+    "fuel_level_pct": 0,
+    "gen_fuel_min": 480.0,
+    "notes": [
+     "base lost all power"
+    ],
+    "on_generator": false,
+    "perimeter_secure": false,
+    "powered": false,
+    "readiness": "dark"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 116.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": false,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": false,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": false,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": false,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 0.0,
+   "grid_ok": false,
+   "hospital_gen_fuel_min": 238.0,
+   "hospital_on_generator": true,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 100,
+   "severity": "catastrophic",
+   "telecom": {
+    "fiber_up": false,
+    "mw_up": false,
+    "notes": [
+     "telecom central office lost power"
+    ],
+    "powered": false,
+    "routing": true,
+    "up": false
+   },
+   "tick": 2,
+   "water_flowing": true,
+   "water_pressure": 42.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": false,
+    "notes": [
+     "airport lost power - field closed"
+    ],
+    "powered": false,
+    "radar_up": false,
+    "status": "closed",
+    "tower_up": false
+   },
+   "base": {
+    "breach": true,
+    "comms": false,
+    "fuel_level_pct": 0,
+    "gen_fuel_min": 480.0,
+    "notes": [
+     "base lost all power"
+    ],
+    "on_generator": false,
+    "perimeter_secure": false,
+    "powered": false,
+    "readiness": "dark"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 116.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": false,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": false,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": false,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": false,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 0.0,
+   "grid_ok": false,
+   "hospital_gen_fuel_min": 237.0,
+   "hospital_on_generator": true,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 100,
+   "severity": "catastrophic",
+   "telecom": {
+    "fiber_up": false,
+    "mw_up": false,
+    "notes": [
+     "telecom central office lost power"
+    ],
+    "powered": false,
+    "routing": true,
+    "up": false
+   },
+   "tick": 3,
+   "water_flowing": true,
+   "water_pressure": 33.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": false,
+    "notes": [
+     "airport lost power - field closed"
+    ],
+    "powered": false,
+    "radar_up": false,
+    "status": "closed",
+    "tower_up": false
+   },
+   "base": {
+    "breach": true,
+    "comms": false,
+    "fuel_level_pct": 0,
+    "gen_fuel_min": 480.0,
+    "notes": [
+     "base lost all power"
+    ],
+    "on_generator": false,
+    "perimeter_secure": false,
+    "powered": false,
+    "readiness": "dark"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 116.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": false,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": false,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": false,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": false,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 0.0,
+   "grid_ok": false,
+   "hospital_gen_fuel_min": 236.0,
+   "hospital_on_generator": true,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 100,
+   "severity": "catastrophic",
+   "telecom": {
+    "fiber_up": false,
+    "mw_up": false,
+    "notes": [
+     "telecom central office lost power"
+    ],
+    "powered": false,
+    "routing": true,
+    "up": false
+   },
+   "tick": 4,
+   "water_flowing": true,
+   "water_pressure": 24.0,
+   "water_quality": "safe"
+  }
+ ],
+ "baseline": [
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 0,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 1,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 2,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 3,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 4,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 5,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  }
+ ],
+ "breaker_open": [
+  {
+   "airport": {
+    "nav_up": false,
+    "notes": [
+     "airport lost power - field closed"
+    ],
+    "powered": false,
+    "radar_up": false,
+    "status": "closed",
+    "tower_up": false
+   },
+   "base": {
+    "breach": false,
+    "comms": false,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [
+     "C2/radar link down (airspace & comms blind)"
+    ],
+    "on_generator": true,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "compromised"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 116.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": false,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": false,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": false,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": false,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 0.0,
+   "grid_ok": false,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": true,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 100,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": false,
+    "mw_up": false,
+    "notes": [
+     "telecom central office lost power"
+    ],
+    "powered": false,
+    "routing": true,
+    "up": false
+   },
+   "tick": 0,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": false,
+    "notes": [
+     "airport lost power - field closed"
+    ],
+    "powered": false,
+    "radar_up": false,
+    "status": "closed",
+    "tower_up": false
+   },
+   "base": {
+    "breach": false,
+    "comms": false,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 479.0,
+    "notes": [
+     "C2/radar link down (airspace & comms blind)"
+    ],
+    "on_generator": true,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "compromised"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 116.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": false,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": false,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": false,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": false,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 0.0,
+   "grid_ok": false,
+   "hospital_gen_fuel_min": 239.0,
+   "hospital_on_generator": true,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 100,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": false,
+    "mw_up": false,
+    "notes": [
+     "telecom central office lost power"
+    ],
+    "powered": false,
+    "routing": true,
+    "up": false
+   },
+   "tick": 1,
+   "water_flowing": true,
+   "water_pressure": 51.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": false,
+    "notes": [
+     "airport lost power - field closed"
+    ],
+    "powered": false,
+    "radar_up": false,
+    "status": "closed",
+    "tower_up": false
+   },
+   "base": {
+    "breach": false,
+    "comms": false,
+    "fuel_level_pct": 89.0,
+    "gen_fuel_min": 478.0,
+    "notes": [
+     "C2/radar link down (airspace & comms blind)"
+    ],
+    "on_generator": true,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "compromised"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 116.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": false,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": false,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": false,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": false,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 0.0,
+   "grid_ok": false,
+   "hospital_gen_fuel_min": 238.0,
+   "hospital_on_generator": true,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 100,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": false,
+    "mw_up": false,
+    "notes": [
+     "telecom central office lost power"
+    ],
+    "powered": false,
+    "routing": true,
+    "up": false
+   },
+   "tick": 2,
+   "water_flowing": true,
+   "water_pressure": 42.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": false,
+    "notes": [
+     "airport lost power - field closed"
+    ],
+    "powered": false,
+    "radar_up": false,
+    "status": "closed",
+    "tower_up": false
+   },
+   "base": {
+    "breach": false,
+    "comms": false,
+    "fuel_level_pct": 88.0,
+    "gen_fuel_min": 477.0,
+    "notes": [
+     "C2/radar link down (airspace & comms blind)"
+    ],
+    "on_generator": true,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "compromised"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 116.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": false,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": false,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": false,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": false,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 0.0,
+   "grid_ok": false,
+   "hospital_gen_fuel_min": 237.0,
+   "hospital_on_generator": true,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 100,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": false,
+    "mw_up": false,
+    "notes": [
+     "telecom central office lost power"
+    ],
+    "powered": false,
+    "routing": true,
+    "up": false
+   },
+   "tick": 3,
+   "water_flowing": true,
+   "water_pressure": 33.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": false,
+    "notes": [
+     "airport lost power - field closed"
+    ],
+    "powered": false,
+    "radar_up": false,
+    "status": "closed",
+    "tower_up": false
+   },
+   "base": {
+    "breach": false,
+    "comms": false,
+    "fuel_level_pct": 88.0,
+    "gen_fuel_min": 476.0,
+    "notes": [
+     "C2/radar link down (airspace & comms blind)"
+    ],
+    "on_generator": true,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "compromised"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 116.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": false,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": false,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": false,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": false,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 0.0,
+   "grid_ok": false,
+   "hospital_gen_fuel_min": 236.0,
+   "hospital_on_generator": true,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 100,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": false,
+    "mw_up": false,
+    "notes": [
+     "telecom central office lost power"
+    ],
+    "powered": false,
+    "routing": true,
+    "up": false
+   },
+   "tick": 4,
+   "water_flowing": true,
+   "water_pressure": 24.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": false,
+    "notes": [
+     "airport lost power - field closed"
+    ],
+    "powered": false,
+    "radar_up": false,
+    "status": "closed",
+    "tower_up": false
+   },
+   "base": {
+    "breach": false,
+    "comms": false,
+    "fuel_level_pct": 88.0,
+    "gen_fuel_min": 475.0,
+    "notes": [
+     "C2/radar link down (airspace & comms blind)"
+    ],
+    "on_generator": true,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "compromised"
+   },
+   "consequence_notes": [
+    "hospital water loss (sterilization/dialysis impaired)"
+   ],
+   "deficit_mw": 116.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": false,
+     "water": false,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": false,
+     "water": false,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": false,
+     "water": false,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": false,
+     "water": false,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 0.0,
+   "grid_ok": false,
+   "hospital_gen_fuel_min": 235.0,
+   "hospital_on_generator": true,
+   "hospital_powered": true,
+   "hospital_water": false,
+   "lives_at_risk": 20,
+   "o2_ok": true,
+   "population_without_power_pct": 100,
+   "severity": "catastrophic",
+   "telecom": {
+    "fiber_up": false,
+    "mw_up": false,
+    "notes": [
+     "telecom central office lost power"
+    ],
+    "powered": false,
+    "routing": true,
+    "up": false
+   },
+   "tick": 5,
+   "water_flowing": false,
+   "water_pressure": 15.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": false,
+    "notes": [
+     "airport lost power - field closed"
+    ],
+    "powered": false,
+    "radar_up": false,
+    "status": "closed",
+    "tower_up": false
+   },
+   "base": {
+    "breach": false,
+    "comms": false,
+    "fuel_level_pct": 87.0,
+    "gen_fuel_min": 474.0,
+    "notes": [
+     "C2/radar link down (airspace & comms blind)"
+    ],
+    "on_generator": true,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "compromised"
+   },
+   "consequence_notes": [
+    "hospital water loss (sterilization/dialysis impaired)"
+   ],
+   "deficit_mw": 116.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": false,
+     "water": false,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": false,
+     "water": false,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": false,
+     "water": false,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": false,
+     "water": false,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 0.0,
+   "grid_ok": false,
+   "hospital_gen_fuel_min": 234.0,
+   "hospital_on_generator": true,
+   "hospital_powered": true,
+   "hospital_water": false,
+   "lives_at_risk": 20,
+   "o2_ok": true,
+   "population_without_power_pct": 100,
+   "severity": "catastrophic",
+   "telecom": {
+    "fiber_up": false,
+    "mw_up": false,
+    "notes": [
+     "telecom central office lost power"
+    ],
+    "powered": false,
+    "routing": true,
+    "up": false
+   },
+   "tick": 6,
+   "water_flowing": false,
+   "water_pressure": 6.0,
+   "water_quality": "safe"
+  }
+ ],
+ "chlorine": [
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [
+    "hospital water loss (sterilization/dialysis impaired)",
+    "public water unsafe chemical"
+   ],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": false,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": false,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": false,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": false,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": false,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": false,
+   "lives_at_risk": 35,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 0,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "unsafe_chemical"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [
+    "hospital water loss (sterilization/dialysis impaired)",
+    "public water unsafe chemical"
+   ],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": false,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": false,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": false,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": false,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": false,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": false,
+   "lives_at_risk": 35,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 1,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "unsafe_chemical"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [
+    "hospital water loss (sterilization/dialysis impaired)",
+    "public water unsafe chemical"
+   ],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": false,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": false,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": false,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": false,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": false,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": false,
+   "lives_at_risk": 35,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 2,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "unsafe_chemical"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [
+    "hospital water loss (sterilization/dialysis impaired)",
+    "public water unsafe chemical"
+   ],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": false,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": false,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": false,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": false,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": false,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": false,
+   "lives_at_risk": 35,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 3,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "unsafe_chemical"
+  }
+ ],
+ "fiber_cut": [
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "fiber_up": false,
+    "mw_up": true,
+    "notes": [
+     "fiber path down - running on microwave backup"
+    ],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 0,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "fiber_up": false,
+    "mw_up": true,
+    "notes": [
+     "fiber path down - running on microwave backup"
+    ],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 1,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "fiber_up": false,
+    "mw_up": true,
+    "notes": [
+     "fiber path down - running on microwave backup"
+    ],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 2,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  }
+ ],
+ "flags": [
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [
+    "medical O2 pressure out of safe range"
+   ],
+   "deficit_mw": 0.0,
+   "demand_mw": 108.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 25,
+   "o2_ok": false,
+   "population_without_power_pct": 0,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 0,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [
+    "medical O2 pressure out of safe range"
+   ],
+   "deficit_mw": 0.0,
+   "demand_mw": 108.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 25,
+   "o2_ok": false,
+   "population_without_power_pct": 0,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 1,
+   "water_flowing": true,
+   "water_pressure": 51.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [
+    "medical O2 pressure out of safe range"
+   ],
+   "deficit_mw": 0.0,
+   "demand_mw": 108.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 25,
+   "o2_ok": false,
+   "population_without_power_pct": 0,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 2,
+   "water_flowing": true,
+   "water_pressure": 42.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [
+    "medical O2 pressure out of safe range"
+   ],
+   "deficit_mw": 0.0,
+   "demand_mw": 108.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 25,
+   "o2_ok": false,
+   "population_without_power_pct": 0,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 3,
+   "water_flowing": true,
+   "water_pressure": 33.0,
+   "water_quality": "safe"
+  }
+ ],
+ "low_setpoint": [
+  {
+   "airport": {
+    "nav_up": false,
+    "notes": [
+     "airport lost power - field closed"
+    ],
+    "powered": false,
+    "radar_up": false,
+    "status": "closed",
+    "tower_up": false
+   },
+   "base": {
+    "breach": false,
+    "comms": false,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [
+     "C2/radar link down (airspace & comms blind)"
+    ],
+    "on_generator": true,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "compromised"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 16.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": false,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": false,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": false,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": false,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 100.0,
+   "grid_ok": false,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": true,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 73,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": false,
+    "mw_up": false,
+    "notes": [
+     "telecom central office lost power"
+    ],
+    "powered": false,
+    "routing": true,
+    "up": false
+   },
+   "tick": 0,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": false,
+    "notes": [
+     "airport lost power - field closed"
+    ],
+    "powered": false,
+    "radar_up": false,
+    "status": "closed",
+    "tower_up": false
+   },
+   "base": {
+    "breach": false,
+    "comms": false,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 479.0,
+    "notes": [
+     "C2/radar link down (airspace & comms blind)"
+    ],
+    "on_generator": true,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "compromised"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 16.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": false,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": false,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": false,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": false,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 100.0,
+   "grid_ok": false,
+   "hospital_gen_fuel_min": 239.0,
+   "hospital_on_generator": true,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 73,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": false,
+    "mw_up": false,
+    "notes": [
+     "telecom central office lost power"
+    ],
+    "powered": false,
+    "routing": true,
+    "up": false
+   },
+   "tick": 1,
+   "water_flowing": true,
+   "water_pressure": 51.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": false,
+    "notes": [
+     "airport lost power - field closed"
+    ],
+    "powered": false,
+    "radar_up": false,
+    "status": "closed",
+    "tower_up": false
+   },
+   "base": {
+    "breach": false,
+    "comms": false,
+    "fuel_level_pct": 89.0,
+    "gen_fuel_min": 478.0,
+    "notes": [
+     "C2/radar link down (airspace & comms blind)"
+    ],
+    "on_generator": true,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "compromised"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 16.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": false,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": false,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": false,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": false,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 100.0,
+   "grid_ok": false,
+   "hospital_gen_fuel_min": 238.0,
+   "hospital_on_generator": true,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 73,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": false,
+    "mw_up": false,
+    "notes": [
+     "telecom central office lost power"
+    ],
+    "powered": false,
+    "routing": true,
+    "up": false
+   },
+   "tick": 2,
+   "water_flowing": true,
+   "water_pressure": 42.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": false,
+    "notes": [
+     "airport lost power - field closed"
+    ],
+    "powered": false,
+    "radar_up": false,
+    "status": "closed",
+    "tower_up": false
+   },
+   "base": {
+    "breach": false,
+    "comms": false,
+    "fuel_level_pct": 88.0,
+    "gen_fuel_min": 477.0,
+    "notes": [
+     "C2/radar link down (airspace & comms blind)"
+    ],
+    "on_generator": true,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "compromised"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 16.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": false,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": false,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": false,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": false,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 100.0,
+   "grid_ok": false,
+   "hospital_gen_fuel_min": 237.0,
+   "hospital_on_generator": true,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 73,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": false,
+    "mw_up": false,
+    "notes": [
+     "telecom central office lost power"
+    ],
+    "powered": false,
+    "routing": true,
+    "up": false
+   },
+   "tick": 3,
+   "water_flowing": true,
+   "water_pressure": 33.0,
+   "water_quality": "safe"
+  }
+ ],
+ "pump_stop": [
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 108.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 0,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 108.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 1,
+   "water_flowing": true,
+   "water_pressure": 51.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 108.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 2,
+   "water_flowing": true,
+   "water_pressure": 42.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 108.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 3,
+   "water_flowing": true,
+   "water_pressure": 33.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 108.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 4,
+   "water_flowing": true,
+   "water_pressure": 24.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [
+    "hospital water loss (sterilization/dialysis impaired)"
+   ],
+   "deficit_mw": 0.0,
+   "demand_mw": 108.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": false,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": false,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": false,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": false,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": false,
+   "lives_at_risk": 20,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "degraded",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 5,
+   "water_flowing": false,
+   "water_pressure": 15.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [
+    "hospital water loss (sterilization/dialysis impaired)"
+   ],
+   "deficit_mw": 0.0,
+   "demand_mw": 108.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": false,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": false,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": false,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": false,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": false,
+   "lives_at_risk": 20,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "degraded",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 6,
+   "water_flowing": false,
+   "water_pressure": 6.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [
+    "hospital water loss (sterilization/dialysis impaired)"
+   ],
+   "deficit_mw": 0.0,
+   "demand_mw": 108.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": false,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": false,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": false,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": false,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": false,
+   "lives_at_risk": 20,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "degraded",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 7,
+   "water_flowing": false,
+   "water_pressure": 0.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [
+    "hospital water loss (sterilization/dialysis impaired)"
+   ],
+   "deficit_mw": 0.0,
+   "demand_mw": 108.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": false,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": false,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": false,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": false,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": false,
+   "lives_at_risk": 20,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "degraded",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 8,
+   "water_flowing": false,
+   "water_pressure": 0.0,
+   "water_quality": "safe"
+  }
+ ],
+ "radar_stop": [
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [
+     "surveillance radar down - procedural separation only"
+    ],
+    "powered": true,
+    "radar_up": false,
+    "status": "degraded",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "degraded",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 0,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [
+     "surveillance radar down - procedural separation only"
+    ],
+    "powered": true,
+    "radar_up": false,
+    "status": "degraded",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "degraded",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 1,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [
+     "surveillance radar down - procedural separation only"
+    ],
+    "powered": true,
+    "radar_up": false,
+    "status": "degraded",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "degraded",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 2,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  }
+ ],
+ "sis_clamp": [
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 0,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 1,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 2,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  }
+ ],
+ "telecom_down": [
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [
+     "telecom backhaul lost - remote monitoring blind"
+    ],
+    "powered": true,
+    "radar_up": true,
+    "status": "degraded",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": false,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [
+     "C2/radar link down (airspace & comms blind)"
+    ],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "compromised"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": false,
+    "mw_up": false,
+    "notes": [
+     "both fiber and microwave paths down - operators blind across sectors"
+    ],
+    "powered": true,
+    "routing": true,
+    "up": false
+   },
+   "tick": 0,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [
+     "telecom backhaul lost - remote monitoring blind"
+    ],
+    "powered": true,
+    "radar_up": true,
+    "status": "degraded",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": false,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [
+     "C2/radar link down (airspace & comms blind)"
+    ],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "compromised"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": false,
+    "mw_up": false,
+    "notes": [
+     "both fiber and microwave paths down - operators blind across sectors"
+    ],
+    "powered": true,
+    "routing": true,
+    "up": false
+   },
+   "tick": 1,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [
+     "telecom backhaul lost - remote monitoring blind"
+    ],
+    "powered": true,
+    "radar_up": true,
+    "status": "degraded",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": false,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [
+     "C2/radar link down (airspace & comms blind)"
+    ],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "compromised"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": false,
+    "mw_up": false,
+    "notes": [
+     "both fiber and microwave paths down - operators blind across sectors"
+    ],
+    "powered": true,
+    "routing": true,
+    "up": false
+   },
+   "tick": 2,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  }
+ ],
+ "tower_off": [
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [
+     "tower ATC comms down - field closed"
+    ],
+    "powered": true,
+    "radar_up": true,
+    "status": "closed",
+    "tower_up": false
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 0,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [
+     "tower ATC comms down - field closed"
+    ],
+    "powered": true,
+    "radar_up": true,
+    "status": "closed",
+    "tower_up": false
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 1,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [
+     "tower ATC comms down - field closed"
+    ],
+    "powered": true,
+    "radar_up": true,
+    "status": "closed",
+    "tower_up": false
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "severe",
+   "telecom": {
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [],
+    "powered": true,
+    "routing": true,
+    "up": true
+   },
+   "tick": 2,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  }
+ ]
+}
