@@ -52,6 +52,12 @@ class RegisterMap:
     # ---- reads -------------------------------------------------------------
     def read_holding(self, unit, addr):
         d = self.e.town["devices"]
+        try:
+            return self._holding_map(d).get((unit, addr))
+        except KeyError:
+            return None
+
+    def _holding_map(self, d):
         m = {
             (1, 0): _u16((d["pp_gov"]["state"]["setpoint_mw"]) * 10),
             (2, 0): _u16(d["wt_pump"]["state"]["speed_pct"] * 10),
@@ -61,7 +67,7 @@ class RegisterMap:
             (3, 2): _u16(d["hp_ats"]["state"]["gen_fuel_min"]),
             (4, 0): _u16(d["fb_fuel"]["state"]["level_pct"] * 10),
         }
-        return m.get((unit, addr))
+        return m
 
     def read_input(self, unit, addr):
         g = self.e.derived
@@ -86,6 +92,12 @@ class RegisterMap:
 
     def read_coil(self, unit, addr):
         d = self.e.town["devices"]
+        try:
+            return self._coil_map(d).get((unit, addr))
+        except KeyError:
+            return None
+
+    def _coil_map(self, d):
         m = {
             (1, 0): d["pp_bkr"]["state"]["closed"] in (1, 1.0, True),
             (2, 0): (d["wt_pump"]["state"]["speed_pct"] or 0) > 0,
@@ -99,7 +111,7 @@ class RegisterMap:
             (6, 1): d["tc_mw"]["state"]["link_up"] in (1, 1.0, True),
             (6, 2): d["tc_core"]["state"]["routing"] in (1, 1.0, True),
         }
-        return m.get((unit, addr))
+        return m
 
     # ---- writes ------------------------------------------------------------
     def write_holding(self, unit, addr, raw):
@@ -116,6 +128,8 @@ class RegisterMap:
         if (unit, addr) not in table:
             return False
         did, param, scale = table[(unit, addr)]
+        if did not in d:
+            return False
         val = raw / scale
         d[did]["state"][param] = val
         self._log(f"wrote {did}.{param} = {val} (HR{addr})")
@@ -124,6 +138,12 @@ class RegisterMap:
     def write_coil(self, unit, addr, on):
         d = self.e.town["devices"]
         key = (unit, addr)
+        try:
+            return self._write_coil(d, key, on)
+        except KeyError:
+            return False
+
+    def _write_coil(self, d, key, on):
         if key == (1, 0):
             d["pp_bkr"]["state"]["closed"] = 1 if on else 0
             self._log(f"main breaker {'CLOSED' if on else 'OPEN'} (coil)")

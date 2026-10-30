@@ -83,6 +83,29 @@ check(out["grid"]["grid_ok"] is True, "instantiated topology should solve to gri
 check(out["telecom"]["up"] is True and out["airport"]["status"] == "normal",
       "instantiated topology baseline telecom/airport should be healthy")
 
+# 4) a subset client site (no base/airport) builds and scores correctly
+from simlab.engine import SimEngine  # noqa: E402
+eng = SimEngine()
+subset = {"name": "ClientA", "placements": [
+    {"template": "power_plant", "facility": "power", "name": "City Power", "prefix": "pp", "map": {"x": 120, "y": 200}},
+    {"template": "water_treatment", "facility": "water", "name": "City Water", "prefix": "wt", "map": {"x": 430, "y": 150}},
+    {"template": "hospital", "facility": "hospital", "name": "Mercy", "prefix": "hp", "map": {"x": 720, "y": 250}},
+], "districts": []}
+eng.load_site(subset)
+check(set(eng.town["facilities"]) == {"power", "water", "hospital"}, "subset facilities wrong")
+check(eng.derived["severity"] == "nominal", "subset baseline should be nominal")
+check(eng.derived["present"] == {"water": True, "hospital": True, "base": False,
+                                 "airport": False, "telecom": False, "power": True},
+      f"subset presence wrong: {eng.derived['present']}")
+eng.town["devices"]["wt_dose"]["state"]["dose_ppm"] = 15.0
+eng._recompute()
+check(eng.derived["severity"] == "severe" and eng.derived["lives_at_risk"] == 35,
+      "subset chlorine attack should be severe / 35 lives")
+# rebuilding full Marin via load_site still matches the default
+eng.reset()
+check(set(eng.town["facilities"]) == {"power", "water", "hospital", "base", "airport", "telecom"},
+      "reset should restore full Marin")
+
 if fails:
     print("FAIL:")
     for f in fails:

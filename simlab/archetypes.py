@@ -37,6 +37,25 @@ def _clamp(x, lo, hi):
     return min(max(x, lo), hi)
 
 
+# Defaults used when a consumer node has no link supplying a role. They are
+# deliberately "not limiting" (healthy), so a topology that omits a facility
+# (e.g. a client with no military base) does not create phantom outages.
+INPUT_DEFAULTS = {
+    "supply": {"power_mw": 0.0},
+    "grid": {"grid_ok": True, "gen_mw": 0.0, "demand_mw": 0.0, "deficit": 0.0},
+    "transport": {"up": True, "fiber_up": True, "mw_up": True},
+    "water_press": {"flowing": True, "pressure": 60.0},
+    "water_qual": {"quality": "safe", "dose_safe": True},
+    "base_comms": {"comms": True},
+    "pump": {"pumping": False, "speed": 0.0, "powered": False},
+}
+
+
+def _in(inp, role):
+    """Resolve an input port, falling back to a non-limiting default."""
+    return inp.get(role) or INPUT_DEFAULTS.get(role, {})
+
+
 # --- demand hooks (grid-independent electrical load, MW) --------------------
 def _demand_const(ctx, node):
     return float(node["params"].get("demand", 0.0))
@@ -65,7 +84,7 @@ def _eval_generator(ctx, node, inp, advance):
 
 
 def _eval_grid(ctx, node, inp, advance):
-    gen = inp["supply"]["power_mw"]
+    gen = _in(inp, "supply")["power_mw"]
     demand = inp["_demand"]
     grid_ok = gen >= demand
     return {"gen_mw": round(gen, 1), "demand_mw": round(demand, 1),
@@ -73,7 +92,7 @@ def _eval_grid(ctx, node, inp, advance):
 
 
 def _eval_comms_backbone(ctx, node, inp, advance):
-    grid_ok = inp["grid"]["grid_ok"]
+    grid_ok = _in(inp, "grid")["grid_ok"]
     core, fiber, mw = ctx.dev(node["dmap"]["core"]), ctx.dev(node["dmap"]["fiber"]), ctx.dev(node["dmap"]["mw"])
     powered = grid_ok
     routing = bool(core["online"] and core["functional"] and ctx.v(core, "routing") == 1)
@@ -98,7 +117,7 @@ def _eval_comms_backbone(ctx, node, inp, advance):
 
 def _eval_pump(ctx, node, inp, advance):
     pump = ctx.dev(node["dmap"]["vfd"])
-    grid_ok = inp["grid"]["grid_ok"]
+    grid_ok = _in(inp, "grid")["grid_ok"]
     powered = grid_ok and pump["online"] and pump["functional"]
     speed = ctx.v(pump, "speed_pct") or 0.0
     pumping = powered and speed > 0
@@ -107,8 +126,8 @@ def _eval_pump(ctx, node, inp, advance):
 
 def _eval_pressure_tank(ctx, node, inp, advance):
     p = node["params"]
-    pumping = inp["pump"]["pumping"]
-    speed = inp["pump"]["speed"]
+    pumping = _in(inp, "pump")["pumping"]
+    speed = _in(inp, "pump")["speed"]
     if advance:
         if pumping:
             ctx.e.water_pressure = min(p["nominal"], ctx.e.water_pressure + p["rise"] * (speed / 100.0))
@@ -137,9 +156,9 @@ def _eval_treatment(ctx, node, inp, advance):
 
 def _eval_hospital_sector(ctx, node, inp, advance):
     ats, o2 = ctx.dev(node["dmap"]["ats"]), ctx.dev(node["dmap"]["o2"])
-    grid_ok = inp["grid"]["grid_ok"]
-    flowing = inp["water_press"]["flowing"]
-    quality = inp["water_qual"]["quality"]
+    grid_ok = _in(inp, "grid")["grid_ok"]
+    flowing = _in(inp, "water_press")["flowing"]
+    quality = _in(inp, "water_qual")["quality"]
     ats_ok = ats["online"] and ats["functional"]
     can_transfer = ats_ok and ctx.v(ats, "mode") == "auto"
     on_gen = bool(not grid_ok and can_transfer and (ctx.v(ats, "gen_fuel_min") or 0) > 0)
@@ -160,8 +179,8 @@ def _eval_hospital_sector(ctx, node, inp, advance):
 def _eval_base_sector(ctx, node, inp, advance):
     sub, fuel, c2, perim = (ctx.dev(node["dmap"]["sub"]), ctx.dev(node["dmap"]["fuel"]),
                             ctx.dev(node["dmap"]["c2"]), ctx.dev(node["dmap"]["perim"]))
-    grid_ok = inp["grid"]["grid_ok"]
-    transport_up = inp["transport"]["up"]
+    grid_ok = _in(inp, "grid")["grid_ok"]
+    transport_up = _in(inp, "transport")["up"]
     ats_ok = sub["online"] and sub["functional"]
     fuel_ok = fuel["online"] and fuel["functional"] and (ctx.v(fuel, "level_pct") or 0) > 0
     on_gen = bool(not grid_ok and ats_ok and ctx.v(sub, "mode") == "auto"
@@ -202,9 +221,9 @@ def _eval_base_sector(ctx, node, inp, advance):
 
 def _eval_airport_sector(ctx, node, inp, advance):
     radar, nav, tower = ctx.dev(node["dmap"]["radar"]), ctx.dev(node["dmap"]["nav"]), ctx.dev(node["dmap"]["tower"])
-    grid_ok = inp["grid"]["grid_ok"]
-    transport_up = inp["transport"]["up"]
-    base_comms = inp["base_comms"]["comms"]
+    grid_ok = _in(inp, "grid")["grid_ok"]
+    transport_up = _in(inp, "transport")["up"]
+    base_comms = _in(inp, "base_comms")["comms"]
     powered = grid_ok
     radar_up = bool(powered and radar["online"] and radar["functional"] and ctx.v(radar, "sweep") == 1)
     nav_up = bool(powered and nav["online"] and nav["functional"] and ctx.v(nav, "ils_on") == 1)

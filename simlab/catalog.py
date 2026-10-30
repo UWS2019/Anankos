@@ -75,6 +75,29 @@ def instantiate_site(site, templates=None):
             "nodes": nodes, "links": links}
 
 
+def autowire(placements, templates=None):
+    """Derive standard cross-facility links from each template's declared
+    consumes/provides ports: a consumer port links to the first placement that
+    provides the same resource+role. Missing providers are simply left
+    unwired (the solver's input defaults treat them as not-limiting)."""
+    templates = templates or load_templates()
+    # index providers by (resource, role) -> node id
+    providers = {}
+    for pl in placements:
+        tpl = templates[pl["template"]]
+        for prov in tpl.get("provides", []):
+            providers.setdefault((prov["resource"], prov["role"]), prov["node"])
+    links = []
+    for pl in placements:
+        tpl = templates[pl["template"]]
+        for cons in tpl.get("consumes", []):
+            src = providers.get((cons["resource"], cons["role"]))
+            if src:
+                links.append({"src": src, "dst": cons["node"],
+                              "role": cons["role"], "resource": cons["resource"]})
+    return links
+
+
 # --- validation -------------------------------------------------------------
 def validate():
     """Return a list of consistency problems between the catalog data and the

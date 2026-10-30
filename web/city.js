@@ -263,6 +263,12 @@ const City = {
     this._drawEdges(state); this._drawNodes(state);
   },
 
+  _points(state) {
+    const pt = {};
+    for (const fid in state.facilities) pt[state.facilities[fid].kind] = this._pt(state, fid);
+    return pt;
+  },
+
   _signature(state) {
     const d = state.derived, f = state.facilities;
     const facs = Object.values(f).map((x) => `${x.compromised ? 1 : 0}${x.it_compromised ? 1 : 0}`).join("");
@@ -278,9 +284,6 @@ const City = {
   _drawEdges(state) {
     const g = this.layers.edges; g.innerHTML = "";
     const d = state.derived;
-    const pp = this._pt(state, "power"), wt = this._pt(state, "water"),
-      hp = this._pt(state, "hospital"), fb = this._pt(state, "base"),
-      ap = this._pt(state, "airport"), tc = this._pt(state, "telecom");
     const dmap = Object.fromEntries(d.districts.map((x) => [x.id, x]));
     const edge = (a, b, color, flow, wdt, opacity, dash) => {
       const ln = E("line", { x1: a.x, y1: a.y, x2: b.x, y2: b.y, stroke: color, "stroke-width": wdt, "stroke-linecap": "round", opacity: opacity != null ? opacity : (flow ? 0.95 : 0.4) });
@@ -294,20 +297,31 @@ const City = {
       g.appendChild(p);
     };
 
-    // --- telecom transport (drawn first, underneath) ---
-    const tel = d.telecom;
-    const allSectors = [pp, wt, hp, fb, ap, ...d.districts.map((x) => ({ x: x.x, y: x.y }))];
-    const fColor = tel.fiber_up ? "#34d399" : "#52607a";
-    allSectors.forEach((t) => edge(tc, t, fColor, tel.fiber_up, 1.3, tel.fiber_up ? 0.55 : 0.28, "1 7"));
-    const mColor = tel.mw_up ? "#22d3ee" : "#52607a";
-    [fb, ap, pp].forEach((t) => arc(tc, t, mColor, tel.mw_up));  // microwave hops to far sectors
+    const pt = this._points(state);
+    const distPts = d.districts.map((x) => ({ x: x.x, y: x.y }));
+    const some = (...a) => a.filter(Boolean);
 
+    // --- telecom transport (drawn first, underneath) ---
+    if (pt.telecom) {
+      const tel = d.telecom;
+      const fColor = tel.fiber_up ? "#34d399" : "#52607a";
+      some(pt.power, pt.water, pt.hospital, pt.base, pt.airport).concat(distPts)
+        .forEach((t) => edge(pt.telecom, t, fColor, tel.fiber_up, 1.3, tel.fiber_up ? 0.55 : 0.28, "1 7"));
+      const mColor = tel.mw_up ? "#22d3ee" : "#52607a";
+      some(pt.base, pt.airport, pt.power).forEach((t) => arc(pt.telecom, t, mColor, tel.mw_up));
+    }
     // --- power grid ---
-    const pColor = d.grid_ok ? "#fbbf24" : "#7f1d1d";
-    [wt, hp, fb, ap, tc, ...d.districts.map((x) => ({ x: x.x, y: x.y }))].forEach((t) => edge(pp, t, pColor, d.grid_ok, 2.5));
+    if (pt.power) {
+      const pColor = d.grid_ok ? "#fbbf24" : "#7f1d1d";
+      some(pt.water, pt.hospital, pt.base, pt.airport, pt.telecom).concat(distPts)
+        .forEach((t) => edge(pt.power, t, pColor, d.grid_ok, 2.5));
+    }
     // --- water ---
-    const wColor = !d.water_flowing ? "#334155" : (d.water_quality !== "safe" ? "#ef4444" : "#38bdf8");
-    [hp, dmap.downtown, dmap.residential].forEach((t) => t && edge(wt, { x: t.x, y: t.y }, wColor, d.water_flowing, 4));
+    if (pt.water) {
+      const wColor = !d.water_flowing ? "#334155" : (d.water_quality !== "safe" ? "#ef4444" : "#38bdf8");
+      some(pt.hospital, dmap.downtown, dmap.residential)
+        .forEach((t) => edge(pt.water, { x: t.x, y: t.y }, wColor, d.water_flowing, 4));
+    }
   },
 
   _drawNodes(state) {
@@ -341,19 +355,29 @@ const City = {
       if (f[fid].compromised) g.appendChild(label(p.x, p.y - 34, "⚠ OT OWNED", "#f472b6", 9));
       else if (f[fid].it_compromised) g.appendChild(label(p.x, p.y - 34, "• IT FOOTHOLD", "#f59e0b", 9));
     };
-    place("power", "power", { powered: d.grid_ok, running: d.grid_ok, alarm: !d.grid_ok }, f.power.name);
-    place("water", "water", { powered: d.grid_ok, quality: d.water_quality, pressure: d.water_pressure }, f.water.name);
-    place("hospital", "hospital", { powered: d.hospital_powered }, f.hospital.name,
-      { pulse: d.lives_at_risk > 0, sub: d.hospital_on_generator ? `GEN · ${d.hospital_gen_fuel_min}min` : null });
-    const b = d.base;
-    place("base", "base", { powered: b.powered, readiness: b.readiness, comms: b.comms, breach: b.breach }, f.base.name,
-      { pulse: b.breach, badges: [{ t: b.comms ? "C2 ✓" : "C2 DOWN", ok: b.comms }, { t: b.perimeter_secure ? "PERIM ✓" : "PERIM ✗", ok: b.perimeter_secure }] });
-    const a = d.airport;
-    place("airport", "airport", { powered: a.powered, radar_up: a.radar_up, status: a.status }, f.airport.name,
-      { badges: [{ t: a.radar_up ? "RADAR ✓" : "RADAR ✗", ok: a.radar_up }, { t: "ATC " + a.status.toUpperCase(), ok: a.status === "normal" }] });
-    const tel = d.telecom;
-    place("telecom", "telecom", { powered: tel.powered, up: tel.up, fiber_up: tel.fiber_up, mw_up: tel.mw_up }, f.telecom.name,
-      { pulse: !tel.up, badges: [{ t: tel.fiber_up ? "FIBER ✓" : "FIBER ✗", ok: tel.fiber_up }, { t: tel.mw_up ? "MW ✓" : "MW ✗", ok: tel.mw_up }] });
+    for (const fid in f) {
+      const kind = f[fid].kind, name = f[fid].name;
+      if (kind === "power") {
+        place(fid, "power", { powered: d.grid_ok, running: d.grid_ok, alarm: !d.grid_ok }, name);
+      } else if (kind === "water") {
+        place(fid, "water", { powered: d.grid_ok, quality: d.water_quality, pressure: d.water_pressure }, name);
+      } else if (kind === "hospital") {
+        place(fid, "hospital", { powered: d.hospital_powered }, name,
+          { pulse: d.lives_at_risk > 0, sub: d.hospital_on_generator ? `GEN · ${d.hospital_gen_fuel_min}min` : null });
+      } else if (kind === "base") {
+        const b = d.base;
+        place(fid, "base", { powered: b.powered, readiness: b.readiness, comms: b.comms, breach: b.breach }, name,
+          { pulse: b.breach, badges: [{ t: b.comms ? "C2 ✓" : "C2 DOWN", ok: b.comms }, { t: b.perimeter_secure ? "PERIM ✓" : "PERIM ✗", ok: b.perimeter_secure }] });
+      } else if (kind === "airport") {
+        const a = d.airport;
+        place(fid, "airport", { powered: a.powered, radar_up: a.radar_up, status: a.status }, name,
+          { badges: [{ t: a.radar_up ? "RADAR ✓" : "RADAR ✗", ok: a.radar_up }, { t: "ATC " + a.status.toUpperCase(), ok: a.status === "normal" }] });
+      } else if (kind === "telecom") {
+        const tel = d.telecom;
+        place(fid, "telecom", { powered: tel.powered, up: tel.up, fiber_up: tel.fiber_up, mw_up: tel.mw_up }, name,
+          { pulse: !tel.up, badges: [{ t: tel.fiber_up ? "FIBER ✓" : "FIBER ✗", ok: tel.fiber_up }, { t: tel.mw_up ? "MW ✓" : "MW ✗", ok: tel.mw_up }] });
+      }
+    }
   },
 
   // ---- zoom / pan ----------------------------------------------------------

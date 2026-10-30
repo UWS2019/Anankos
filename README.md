@@ -169,7 +169,9 @@ web/
   index.html      sand-table dashboard
   city.js         sand-table renderer (buildings, roads, responders, zoom/pan)
   app.js          WebSocket client, ATT&CK console, findings authoring
-  styles.css
+  builder.html    drag-and-drop topology builder
+  builder.js      builder canvas (palette, placement, auto-wiring, run)
+  *.css
 start.bat         one-click Windows launcher
 start.sh          Linux/macOS launcher
 ```
@@ -244,11 +246,35 @@ runs. `tests/catalog.py` proves the Marin site pack reproduces the live town +
 topology byte-for-byte, so the data-driven palette is complete and correct.
 Browse it at **`/catalog.html`** (or `/api/catalog`).
 
+## Topology builder (Phase 3)
+
+The **`/builder.html`** canvas lets you compose a client's system topography:
+drag facility templates from the library onto the map, position and rename them,
+and the power / water / comms links **auto-wire** from each facility's declared
+ports. Hit **Run in Simulator** and the engine rebuilds onto that topology — the
+sand table, ATT&CK console, Modbus endpoint, blue-team defenses, and report all
+operate on the custom site. **Save / Load** a site as JSON (a client "site
+pack"), or **Reset to Marin**.
+
+The engine builds every run from a site pack via the catalog, so the default
+town and a custom build take the same path. The consequence layer tolerates
+absent facilities (a client with no military base or airport still scores and
+renders correctly). Endpoints: `GET /api/site` (current spec), `POST /api/build`
+(load a composed site). `tests/catalog.py` also verifies a subset site builds
+and scores correctly, while `tests/parity.py` keeps the full-Marin physics
+locked.
+
+Current builder scope is one of each facility kind with auto-wired links;
+multiple-of-a-kind, free-form link drawing, geospatial backgrounds, and Modbus
+auto-provisioning for custom builds are the next increments.
+
 ## Roadmap (discussed, not yet built)
 
-- **Topology builder UI** (Phase 3) — drag archetypes/templates from the
-  library onto a canvas to model a client's exact topography, then run the
-  engine against it (the catalog + instantiator are ready).
+- **Builder v2** — multiple-of-a-kind facilities, free-form link drawing,
+  per-device parameter editing on the canvas, and geospatial/floorplan
+  backgrounds.
+- **Modbus auto-provisioning** for custom builds (register maps generated from
+  archetype hints) and more protocols (DNP3 / IEC-104).
 - **Deepen more districts** — promote government and manufacturing to
   fully-modeled facilities (power, water, Fort Marin, airport, telecom done).
 - **More protocols** — DNP3 / IEC-104 alongside the Modbus surface.

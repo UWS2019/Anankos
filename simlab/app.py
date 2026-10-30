@@ -162,6 +162,28 @@ def catalog_info():
     return catalog.describe_catalog()
 
 
+@app.get("/api/site")
+def site_info():
+    return engine.site_spec
+
+
+@app.post("/api/build")
+async def build(payload: dict):
+    placements = payload.get("placements") or []
+    if not placements:
+        return {"ok": False, "error": "no placements"}
+    templates = catalog.load_templates()
+    for pl in placements:
+        if pl.get("template") not in templates:
+            return {"ok": False, "error": f"unknown template {pl.get('template')}"}
+    spec = {"name": payload.get("name", "Custom Site"),
+            "placements": placements,
+            "districts": payload.get("districts", [])}
+    engine.load_site(spec, msg=f"Site '{spec['name']}' built and loaded.")
+    await hub.broadcast(engine.snapshot())
+    return {"ok": True, "facilities": list(engine.town["facilities"])}
+
+
 @app.get("/catalog.html", response_class=HTMLResponse)
 def catalog_html():
     return render_catalog_html(catalog.describe_catalog())
@@ -226,6 +248,11 @@ async def ws_endpoint(ws: WebSocket):
 @app.get("/")
 def index():
     return FileResponse(WEB / "index.html")
+
+
+@app.get("/builder.html")
+def builder():
+    return FileResponse(WEB / "builder.html")
 
 
 app.mount("/static", StaticFiles(directory=WEB), name="static")

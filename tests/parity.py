@@ -22,6 +22,11 @@ GOLDEN = Path(__file__).parent / "physics_golden.json"
 def snap(e):
     d = copy.deepcopy(e.derived)
     d.pop("running", None)
+    d.pop("present", None)  # additive presence metadata, not physics
+    # absent-facility blocks carry a 'present' flag that is True for Marin
+    for k in ("base", "airport", "telecom"):
+        if isinstance(d.get(k), dict):
+            d[k].pop("present", None)
     return d
 
 

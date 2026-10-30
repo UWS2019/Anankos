@@ -19,9 +19,8 @@ import json
 import time
 from pathlib import Path
 
-from .town import fresh_town
-from .topology import fresh_topology
 from . import solver
+from . import catalog
 from .archetypes import Ctx
 
 DATA = Path(__file__).parent / "data"
@@ -38,6 +37,16 @@ MILESTONES = {
     "airport_down": "Airport closed (radar/ATC/nav)",
     "telecom_down": "Town telecom/SCADA transport lost",
 }
+
+# Healthy "not present" blocks so the consequence/UI layer works for topologies
+# that omit a facility.
+_ABSENT_BASE = {"present": False, "powered": True, "on_generator": False, "gen_fuel_min": 0,
+                "fuel_level_pct": 0, "comms": True, "perimeter_secure": True, "breach": False,
+                "readiness": "full", "notes": []}
+_ABSENT_AIRPORT = {"present": False, "powered": True, "radar_up": True, "nav_up": True,
+                   "tower_up": True, "status": "normal", "notes": []}
+_ABSENT_TELECOM = {"present": False, "powered": True, "routing": True, "fiber_up": True,
+                   "mw_up": True, "up": True, "notes": []}
 
 TOWN_BASE_DEMAND_MW = 90.0
 WATER_DEMAND_MW = 8.0
@@ -67,24 +76,33 @@ class SimEngine:
 
     # -- lifecycle -----------------------------------------------------------
     def reset(self):
-        self.town = fresh_town()
-        self.topo = fresh_topology()
+        self.load_site(catalog.load_site("marin"), msg="Simulation reset. Town nominal.")
+
+    def load_site(self, spec, msg="Site loaded."):
+        """Build the running town + topology from a site pack (placements +
+        optional links/districts), via the archetype catalog. Links are
+        autowired from template consumes/provides when not supplied."""
+        spec = dict(spec)
+        if not spec.get("links"):
+            spec["links"] = catalog.autowire(spec["placements"])
+        struct = catalog.instantiate_site(spec)
+        self.site_spec = spec
+        self.town = {"devices": struct["devices"], "facilities": struct["facilities"],
+                     "districts": struct["districts"]}
+        self.topo = {"nodes": struct["nodes"], "links": struct["links"]}
         self.tick = 0
         self.running = False
         self.events = []
         self.water_pressure = PRESSURE_NOMINAL
         self._last_severity = "nominal"
-        self.derived = {}
-        # --- run tracking for assessment reporting ---
         self.started_at = time.time()
         self.peak_lives = 0
         self.worst_sev = "nominal"
-        self.milestones = {}   # milestone key -> first tick observed
-        # --- blue team ---
-        self.defenses_on = set()   # deployed D3FEND defense ids (global scope in v1)
+        self.milestones = {}
+        self.defenses_on = set()
         self.score = {"attempts": 0, "blocked": 0, "detected": 0, "undetected": 0}
         self.derived = {}
-        self._log("system", "SIM", "Simulation reset. Town nominal.", "info")
+        self._log("system", "SIM", msg, "info")
         self._recompute()
 
     def _log(self, source, tag, message, level="info", technique=None):
@@ -292,31 +310,41 @@ class SimEngine:
         # resolved by the solver. The consequence/scoring below is the
         # Anankos-specific layer that turns node states into civilian impact.
         out = solver.solve(Ctx(self), self.topo, advance)
-        grid = out["grid"]
+        # Defaults keep the consequence layer working when a facility is absent
+        # from the topology (a client site without, say, a military base).
+        grid = out.get("grid", {"gen_mw": 0.0, "demand_mw": 0.0, "deficit": 0.0, "grid_ok": True})
         gen, demand, deficit, grid_ok = grid["gen_mw"], grid["demand_mw"], grid["deficit"], grid["grid_ok"]
-        wp = out["water_pressure"]; pressure, water_flowing = wp["pressure"], wp["flowing"]
-        wq = out["water_quality"]; water_quality, dose_safe = wq["quality"], wq["dose_safe"]
-        hosp, telecom, base, airport = out["hospital"], out["telecom"], out["base"], out["airport"]
-        hospital_powered = hosp["powered"]
-        on_generator = hosp["on_generator"]
-        fuel = hosp["gen_fuel_min"]
-        o2_ok = hosp["o2_ok"]
-        hospital_water = hosp["hospital_water"]
+        wp = out.get("water_pressure", {"pressure": 60.0, "flowing": True})
+        pressure, water_flowing = wp["pressure"], wp["flowing"]
+        wq = out.get("water_quality", {"quality": "safe", "dose_safe": True})
+        water_quality, dose_safe = wq["quality"], wq["dose_safe"]
+        hosp = out.get("hospital")
+        telecom = {**{"present": True}, **out["telecom"]} if "telecom" in out else _ABSENT_TELECOM
+        base = {**{"present": True}, **out["base"]} if "base" in out else _ABSENT_BASE
+        airport = {**{"present": True}, **out["airport"]} if "airport" in out else _ABSENT_AIRPORT
+
+        if hosp:
+            hospital_powered, on_generator = hosp["powered"], hosp["on_generator"]
+            fuel, o2_ok, hospital_water = hosp["gen_fuel_min"], hosp["o2_ok"], hosp["hospital_water"]
+        else:
+            hospital_powered, on_generator, fuel, o2_ok, hospital_water = True, False, 0, True, True
 
         # Civilian consequence scoring.
         lives, notes = 0, []
-        if not hospital_powered:
-            lives += 45; notes.append("hospital lost all power (ICU/OR/ventilators)")
-        elif on_generator and fuel <= 20:
-            lives += 18; notes.append(f"hospital on backup generator, ~{int(fuel)} min fuel left")
-        if not hospital_water:
-            lives += 20; notes.append("hospital water loss (sterilization/dialysis impaired)")
-        if not o2_ok:
-            lives += 25; notes.append("medical O2 pressure out of safe range")
+        if hosp:
+            if not hospital_powered:
+                lives += 45; notes.append("hospital lost all power (ICU/OR/ventilators)")
+            elif on_generator and fuel <= 20:
+                lives += 18; notes.append(f"hospital on backup generator, ~{int(fuel)} min fuel left")
+            if not hospital_water:
+                lives += 20; notes.append("hospital water loss (sterilization/dialysis impaired)")
+            if not o2_ok:
+                lives += 25; notes.append("medical O2 pressure out of safe range")
         if water_quality != "safe":
             lives += 15; notes.append(f"public water {water_quality.replace('_', ' ')}")
 
-        population_wo_power = min(100, int(deficit / demand * 100) + 60) if not grid_ok else 0
+        population_wo_power = (min(100, int(deficit / demand * 100) + 60)
+                              if not grid_ok and demand > 0 else 0)
         severity = self._severity(lives, grid_ok, water_flowing, water_quality, base, airport, telecom)
 
         districts = []
@@ -336,6 +364,9 @@ class SimEngine:
             "population_without_power_pct": population_wo_power,
             "severity": severity, "consequence_notes": notes,
             "base": base, "airport": airport, "telecom": telecom, "districts": districts,
+            "present": {"water": "water_quality" in out, "hospital": bool(hosp),
+                        "base": base["present"], "airport": airport["present"],
+                        "telecom": telecom["present"], "power": "grid" in out},
         }
         self._track()
         if advance:

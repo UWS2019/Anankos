@@ -66,12 +66,17 @@ function renderStats() {
   const W = $("s-water"); W.textContent = `${d.water_pressure} psi` + (d.water_quality !== "safe" ? " ⚠" : ""); W.className = cls(!d.water_flowing || d.water_quality !== "safe", d.water_pressure < 40);
   const H = $("s-hosp"); H.textContent = d.hospital_powered ? (d.hospital_on_generator ? "GENERATOR" : "Utility") : "DARK"; H.className = cls(!d.hospital_powered, d.hospital_on_generator);
   const P = $("s-pop"); P.textContent = `${d.population_without_power_pct}%`; P.className = cls(d.population_without_power_pct >= 50, d.population_without_power_pct > 0);
-  const B = $("s-base"); B.textContent = d.base.readiness.toUpperCase(); B.className = "v " + d.base.readiness;
-  const A = $("s-air"); A.textContent = d.airport.status.toUpperCase();
-  A.className = cls(d.airport.status === "closed", d.airport.status === "degraded");
+  const present = d.present || { base: true, airport: true, telecom: true };
+  const B = $("s-base");
+  B.textContent = present.base ? d.base.readiness.toUpperCase() : "—";
+  B.className = present.base ? "v " + d.base.readiness : "v";
+  const A = $("s-air");
+  A.textContent = present.airport ? d.airport.status.toUpperCase() : "—";
+  A.className = present.airport ? cls(d.airport.status === "closed", d.airport.status === "degraded") : "v";
   const T = $("s-tel");
-  T.textContent = d.telecom.up ? (d.telecom.fiber_up && d.telecom.mw_up ? "UP" : "BACKUP") : "DOWN";
-  T.className = cls(!d.telecom.up, d.telecom.up && !(d.telecom.fiber_up && d.telecom.mw_up));
+  T.textContent = !present.telecom ? "—"
+    : d.telecom.up ? (d.telecom.fiber_up && d.telecom.mw_up ? "UP" : "BACKUP") : "DOWN";
+  T.className = !present.telecom ? "v" : cls(!d.telecom.up, d.telecom.up && !(d.telecom.fiber_up && d.telecom.mw_up));
 }
 
 function deviceBadges(dev) {

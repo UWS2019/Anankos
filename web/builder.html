@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anankos Topology Builder</title>
+<link rel="stylesheet" href="/static/builder.css">
+</head>
+<body>
+<header>
+  <div class="brand">ANANKOS · TOPOLOGY BUILDER <small>&nbsp;· compose a client's system topography</small></div>
+  <input id="site-name" class="namein" value="Marin" title="Site name">
+  <div class="btns">
+    <button id="b-load">↺ Current site</button>
+    <button id="b-import">📂 Load</button>
+    <button id="b-export">💾 Save</button>
+    <button id="b-reset" class="danger">Reset to Marin</button>
+    <button id="b-run" class="primary">▶ Run in Simulator</button>
+    <a class="opensim" href="/" target="_blank">Open Simulator ↗</a>
+    <input type="file" id="import-file" accept="application/json" style="display:none">
+  </div>
+</header>
+
+<main>
+  <aside class="palette">
+    <h2>Facility Library</h2>
+    <div id="palette"></div>
+    <div class="hint">Click to add to the canvas (one of each kind). Drag nodes to position. Links auto-wire from each facility's power / water / comms ports.</div>
+  </aside>
+
+  <section class="canvaswrap">
+    <svg id="canvas" viewBox="0 0 1040 600" preserveAspectRatio="xMidYMid meet"></svg>
+  </section>
+
+  <aside class="inspector">
+    <h2>Selected</h2>
+    <div id="inspector"><div class="hint">Select a facility on the canvas.</div></div>
+  </aside>
+</main>
+
+<div id="toast" class="toast" style="display:none"></div>
+<script src="/static/builder.js"></script>
+</body>
+</html>

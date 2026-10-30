@@ -44,7 +44,9 @@ header {
 .sev.severe       { color: #fb923c;      border-color: #6b3310; background:#1b1008; }
 .sev.catastrophic { color: #fff;         border-color: var(--alert); background: var(--alert); animation: pulse 1s infinite; }
 
-.btns { display: flex; gap: 8px; }
+.btns { display: flex; gap: 8px; align-items: center; }
+.hdr-link { color: var(--accent); text-decoration: none; font-size: .85rem; padding: 7px 6px; border: 1px solid var(--line); border-radius: 8px; }
+.hdr-link:hover { border-color: var(--accent); }
 button {
   font: inherit; color: var(--ink); background: #182236; border: 1px solid var(--line);
   padding: 7px 13px; border-radius: 8px; cursor: pointer;
