@@ -196,6 +196,31 @@ class ModbusServer:
     def _exc(self, fc, code):
         return struct.pack(">BB", fc | 0x80, code)
 
+    def _protocol_gate(self, unit):
+        """Returns (allowed, detect_defense). Scores the attempt; logs/blocks."""
+        e = self.regs.e
+        fac = UNIT_FACILITY[unit]
+        block, detect = e.eval_protocol_defense(fac)
+        e.score["attempts"] += 1
+        if block:
+            e.score["blocked"] += 1
+            e._log("defense", block["id"],
+                   f"Unauthenticated Modbus write to {fac} BLOCKED by {block['name']} ({block['id']}).",
+                   "defense")
+            return False, detect
+        return True, detect
+
+    def _protocol_result(self, unit, detect):
+        e = self.regs.e
+        fac = UNIT_FACILITY[unit]
+        if detect:
+            e.score["detected"] += 1
+            e._log("defense", detect["id"],
+                   f"Unauthenticated Modbus write to {fac} DETECTED by {detect['name']} ({detect['id']}).",
+                   "detect")
+        else:
+            e.score["undetected"] += 1
+
     def _dispatch(self, unit, pdu):
         if not pdu:
             return self._exc(0, ILLEGAL_FUNCTION), False
@@ -228,24 +253,39 @@ class ModbusServer:
                 return struct.pack(">BB", fc, qty * 2) + b"".join(struct.pack(">H", r) for r in regs), False
             if fc == 5:  # write single coil
                 addr, val = struct.unpack(">HH", pdu[1:5])
+                allowed, detect = self._protocol_gate(unit)
+                if not allowed:
+                    self.regs.e._recompute()
+                    return self._exc(fc, 0x04), True  # SLAVE DEVICE FAILURE: write rejected
                 ok = self.regs.write_coil(unit, addr, val == 0xFF00)
                 if not ok:
                     return self._exc(fc, ILLEGAL_ADDRESS), False
+                self._protocol_result(unit, detect)
                 self.regs.e._recompute()
                 return pdu[:5], True
             if fc == 6:  # write single register
                 addr, val = struct.unpack(">HH", pdu[1:5])
+                allowed, detect = self._protocol_gate(unit)
+                if not allowed:
+                    self.regs.e._recompute()
+                    return self._exc(fc, 0x04), True
                 ok = self.regs.write_holding(unit, addr, val)
                 if not ok:
                     return self._exc(fc, ILLEGAL_ADDRESS), False
+                self._protocol_result(unit, detect)
                 self.regs.e._recompute()
                 return pdu[:5], True
             if fc == 16:  # write multiple registers
                 addr, qty = struct.unpack(">HH", pdu[1:5])
                 vals = struct.unpack(">" + "H" * qty, pdu[6:6 + qty * 2])
+                allowed, detect = self._protocol_gate(unit)
+                if not allowed:
+                    self.regs.e._recompute()
+                    return self._exc(fc, 0x04), True
                 for i, v in enumerate(vals):
                     if not self.regs.write_holding(unit, addr + i, v):
                         return self._exc(fc, ILLEGAL_ADDRESS), False
+                self._protocol_result(unit, detect)
                 self.regs.e._recompute()
                 return struct.pack(">BHH", fc, addr, qty), True
             return self._exc(fc, ILLEGAL_FUNCTION), False

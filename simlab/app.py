@@ -167,6 +167,13 @@ def protocol_info():
     }
 
 
+@app.post("/api/defense")
+async def defense(payload: dict):
+    res = engine.set_defense(payload.get("defense_id"), bool(payload.get("deployed")))
+    await hub.broadcast(engine.snapshot())
+    return res
+
+
 @app.get("/api/report")
 def report_json():
     return engine.build_report()

@@ -48,11 +48,16 @@ PRESSURE_RISE = 6.0
 class SimEngine:
     def __init__(self):
         self.techniques = self._load_techniques()
+        self.defenses = self._load_defenses()
         self.reset()
 
     def _load_techniques(self):
         raw = json.loads((DATA / "techniques.json").read_text())
         return {t["id"]: t for t in raw["techniques"]}
+
+    def _load_defenses(self):
+        raw = json.loads((DATA / "defenses.json").read_text())
+        return {d["id"]: d for d in raw["defenses"]}
 
     # -- lifecycle -----------------------------------------------------------
     def reset(self):
@@ -68,6 +73,9 @@ class SimEngine:
         self.peak_lives = 0
         self.worst_sev = "nominal"
         self.milestones = {}   # milestone key -> first tick observed
+        # --- blue team ---
+        self.defenses_on = set()   # deployed D3FEND defense ids (global scope in v1)
+        self.score = {"attempts": 0, "blocked": 0, "detected": 0, "undetected": 0}
         self.derived = {}
         self._log("system", "SIM", "Simulation reset. Town nominal.", "info")
         self._recompute()
@@ -97,10 +105,91 @@ class SimEngine:
         if gate:
             return {"ok": False, "error": gate}
 
+        blocks, detects, mitigates = self._eval_defenses(tech, fac)
+        self.score["attempts"] += 1
+        if blocks:
+            d = blocks[0]
+            self.score["blocked"] += 1
+            msg = f"{tech['name']} BLOCKED by {d['name']} ({d['id']})."
+            self._log("defense", d["id"], msg, "defense", technique=tech["id"])
+            self._recompute()
+            return {"ok": False, "blocked": True, "defense": d["id"], "error": msg}
+
         msg = self._apply_effect(tech["effect"], tech, fac, dev, params)
         self._log("attacker", tech["id"], msg, "attack", technique=tech["id"])
+        if detects:
+            self.score["detected"] += 1
+            d = detects[0]
+            self._log("defense", d["id"],
+                      f"DETECTED: {tech['id']} {tech['name']} flagged by {d['name']} ({d['id']}).",
+                      "detect", technique=tech["id"])
+        else:
+            self.score["undetected"] += 1
+        if mitigates:
+            d = mitigates[0]
+            self._log("defense", d["id"],
+                      f"MITIGATED: physical effect of {tech['id']} bounded by {d['name']} ({d['id']}).",
+                      "defense", technique=tech["id"])
         self._recompute()
-        return {"ok": True, "message": msg}
+        return {"ok": True, "message": msg,
+                "detected": bool(detects), "mitigated": bool(mitigates)}
+
+    # -- blue team / D3FEND --------------------------------------------------
+    def _defense_applies(self, d, tech, fac):
+        cid = tech["id"]
+        if d["id"] == "D3-BDI":
+            if tech.get("stage") == "pivot":
+                return "block"
+            if (tech.get("stage") == "ot_access" and cid in d["counters"]
+                    and not fac["findings"].get("internet_exposed")):
+                return "block"
+            return None
+        if d["id"] == "D3-SIS":
+            if cid == "T0880":
+                return "block"
+            if cid == "T0836":
+                return "mitigate"
+            return None
+        if cid in d["counters"]:
+            return d["mode"]
+        return None
+
+    def _eval_defenses(self, tech, fac):
+        blocks, detects, mitigates = [], [], []
+        for did in self.defenses_on:
+            d = self.defenses[did]
+            kind = self._defense_applies(d, tech, fac)
+            if kind == "block":
+                blocks.append(d)
+            elif kind == "detect":
+                detects.append(d)
+            elif kind == "mitigate":
+                mitigates.append(d)
+        return blocks, detects, mitigates
+
+    def eval_protocol_defense(self, facility_id):
+        """Defense evaluation for an unauthenticated Modbus write (MODBUS token)."""
+        block = next((self.defenses[d] for d in self.defenses_on
+                      if "MODBUS" in self.defenses[d]["counters"] and self.defenses[d]["mode"] == "block"), None)
+        detect = next((self.defenses[d] for d in self.defenses_on
+                       if "MODBUS" in self.defenses[d]["counters"] and self.defenses[d]["mode"] == "detect"), None)
+        return block, detect
+
+    def set_defense(self, defense_id, on):
+        if defense_id not in self.defenses:
+            return {"ok": False, "error": "unknown defense"}
+        d = self.defenses[defense_id]
+        if on:
+            self.defenses_on.add(defense_id)
+        else:
+            self.defenses_on.discard(defense_id)
+        self._log("blue", d["id"], f"{d['name']} ({d['id']}) {'DEPLOYED' if on else 'stood down'}.",
+                  "defense")
+        self._recompute()
+        return {"ok": True}
+
+    def _sis_on(self):
+        return "D3-SIS" in self.defenses_on
 
     def _check_requires(self, tech, fac):
         req = tech.get("requires", "none")
@@ -222,7 +311,10 @@ class SimEngine:
 
         dose = self._v(d["wt_dose"], "dose_ppm") or 0.0
         smin, smax = self._v(d["wt_dose"], "safe_min"), self._v(d["wt_dose"], "safe_max")
-        dose_safe = (smin <= dose <= smax) and d["wt_dose"]["safety"]
+        sis = self._sis_on()  # safety instrumented system clamps the process envelope
+        if sis:
+            dose = min(max(dose, smin), smax)
+        dose_safe = (smin <= dose <= smax) and (d["wt_dose"]["safety"] or sis)
         if dose > smax:
             water_quality = "unsafe_chemical"
         elif dose < smin:
@@ -241,7 +333,10 @@ class SimEngine:
         hospital_powered = grid_ok or (on_generator and fuel > 0)
         ats["state"]["on_generator"] = on_generator
         o2 = self._v(d["hp_o2"], "o2_psi") or 0.0
-        o2_ok = (self._v(d["hp_o2"], "safe_min") <= o2 <= self._v(d["hp_o2"], "safe_max")) and d["hp_o2"]["online"]
+        o2_min, o2_max = self._v(d["hp_o2"], "safe_min"), self._v(d["hp_o2"], "safe_max")
+        if sis:
+            o2 = min(max(o2, o2_min), o2_max)
+        o2_ok = (o2_min <= o2 <= o2_max) and d["hp_o2"]["online"]
         hospital_water = water_flowing and water_quality == "safe"
 
         # 5) Fort Marin (military base).
@@ -484,7 +579,32 @@ class SimEngine:
             })
         milestones = [{"key": k, "label": MILESTONES[k], "tick": self.milestones[k]}
                       for k in sorted(self.milestones, key=lambda x: self.milestones[x])]
+        # blue-team summary + defensive recommendations
+        deployed = [{"id": self.defenses[d]["id"], "name": self.defenses[d]["name"],
+                     "d3f": self.defenses[d]["d3f"]} for d in sorted(self.defenses_on)]
+        s = self.score
+        decided = s["detected"] + s["undetected"]
+        recommendations = []
+        used_ids = set(coverage.keys())
+        if protocol_writes:
+            used_ids.add("MODBUS")
+        for did, dfn in self.defenses.items():
+            countered = used_ids.intersection(dfn["counters"])
+            if countered and did not in self.defenses_on:
+                recommendations.append({
+                    "id": dfn["id"], "name": dfn["name"], "d3f": dfn["d3f"],
+                    "addresses": sorted(countered), "recommends": dfn["recommends"],
+                })
+        blue = {
+            "deployed": deployed,
+            "attempts": s["attempts"], "blocked": s["blocked"],
+            "detected": s["detected"], "undetected": s["undetected"],
+            "detection_rate": round(100 * s["detected"] / decided) if decided else None,
+            "prevention_rate": round(100 * s["blocked"] / s["attempts"]) if s["attempts"] else None,
+            "recommendations": recommendations,
+        }
         return {
+            "blue": blue,
             "generated_at": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
             "town": "Marin",
             "duration_min": self.tick,
@@ -511,9 +631,11 @@ class SimEngine:
 
     # -- serialization -------------------------------------------------------
     def snapshot(self):
+        defenses = [{**d, "deployed": d["id"] in self.defenses_on} for d in self.defenses.values()]
         return {
-            "version": "0.2.0", "tick": self.tick, "running": self.running,
+            "version": "0.3.0", "tick": self.tick, "running": self.running,
             "facilities": self.town["facilities"], "devices": self.town["devices"],
             "derived": self.derived, "events": self.events[-90:],
             "techniques": list(self.techniques.values()),
+            "defenses": defenses, "score": self.score,
         }

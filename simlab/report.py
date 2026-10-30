@@ -60,6 +60,36 @@ def render_html(r):
 
     notes = "".join(f"<li>{_esc(n)}</li>" for n in cur["consequence_notes"]) or "<li class='muted'>No active civilian/mission impacts at report time.</li>"
 
+    # blue-team / D3FEND
+    b = r["blue"]
+    deployed = " ".join(f'<span class="chip">{_esc(d["id"])} {_esc(d["name"])}</span>' for d in b["deployed"]) \
+        or '<span class="muted">No defensive countermeasures were deployed during this run.</span>'
+    det_rate = f'{b["detection_rate"]}%' if b["detection_rate"] is not None else "—"
+    prev_rate = f'{b["prevention_rate"]}%' if b["prevention_rate"] is not None else "—"
+    recs = ""
+    for x in b["recommendations"]:
+        recs += (f'<tr><td class="mono">{_esc(x["id"])}</td><td><b>{_esc(x["name"])}</b>'
+                 f'<div class="muted">{_esc(x["d3f"])}</div></td>'
+                 f'<td class="mono">{_esc(", ".join(x["addresses"]))}</td>'
+                 f'<td>{_esc(x["recommends"])}</td></tr>')
+    recs = recs or '<tr><td colspan="4" class="muted">No additional countermeasures required for the techniques exercised.</td></tr>'
+    blue_html = f"""
+  <h2>Blue Team — MITRE D3FEND Posture</h2>
+  <div class="cards">
+    <div class="kcard"><div class="k">Attacker actions</div><div class="v">{b['attempts']}</div></div>
+    <div class="kcard"><div class="k">Prevented</div><div class="v" style="color:#16a34a">{b['blocked']}</div></div>
+    <div class="kcard"><div class="k">Detected</div><div class="v" style="color:#0f766e">{b['detected']}</div></div>
+    <div class="kcard"><div class="k">Undetected</div><div class="v" style="color:#dc2626">{b['undetected']}</div></div>
+  </div>
+  <p class="summary" style="margin-top:12px">Prevention rate <b>{prev_rate}</b> · Detection rate (of actions that landed) <b>{det_rate}</b>.</p>
+  <b style="font-size:.86rem">Countermeasures deployed:</b>
+  <div style="margin:6px 0 4px">{deployed}</div>
+
+  <h2>Defensive Recommendations (D3FEND)</h2>
+  <p class="summary">For each technique exercised in this run that was not already prevented or detected, the mapped MITRE D3FEND countermeasure is recommended:</p>
+  <table><thead><tr><th>D3FEND</th><th>Countermeasure</th><th>Addresses</th><th>Recommendation</th></tr></thead>
+    <tbody>{recs}</tbody></table>"""
+
     return f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <title>Anankos Assessment Report — {_esc(r['town'])}</title>
@@ -138,6 +168,7 @@ def render_html(r):
   <h2>Facility Posture &amp; Findings</h2>
   <table><thead><tr><th>Facility</th><th>Access gained</th><th>Findings mirrored from assessment</th></tr></thead>
     <tbody>{fac}</tbody></table>
+  {blue_html}
 
   <div class="disclaimer">
     <b>Simulation notice.</b> This report was produced by the Anankos Sim Lab, a training and

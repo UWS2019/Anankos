@@ -127,9 +127,28 @@ select, input[type=text], input[type=number] {
 .ev .t { color: var(--muted); font-variant-numeric: tabular-nums; min-width: 42px; }
 .ev .tg { font-family: ui-monospace, monospace; min-width: 92px; }
 .ev.attack .tg { color: var(--attack); }
+.ev.blue .tg { color: #4ade80; }
 .ev.warn { color: var(--warn); }
 .ev.alert { color: #fca5a5; }
 .ev.info { color: var(--ink); }
+.ev.defense { color: #86efac; }
+.ev.detect { color: var(--accent); }
+
+/* --- blue team / D3FEND --- */
+.score { display: flex; gap: 6px; margin-bottom: 10px; }
+.sc { flex: 1; background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; text-align: center; }
+.sc .k { color: var(--muted); font-size: .64rem; text-transform: uppercase; letter-spacing: .5px; }
+.sc .v { font-size: 1.1rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.sc .v.good { color: var(--ok); }
+.sc .v.acc { color: var(--accent); }
+.sc .v.bad { color: var(--alert); }
+.def { display: flex; gap: 9px; align-items: flex-start; padding: 7px 0; border-top: 1px dashed var(--line); }
+.def .dmain { flex: 1; font-size: .86rem; }
+.def .pill { white-space: nowrap; margin-top: 1px; }
+.mode { font-size: .62rem; padding: 1px 6px; border-radius: 5px; border: 1px solid var(--line); margin-left: 4px; vertical-align: middle; }
+.mode.block { color: #86efac; border-color: #1f6b43; }
+.mode.detect { color: var(--accent); border-color: #1c6b61; }
+.mode.mitigate { color: var(--warn); border-color: #5a4310; }
 
 /* --- segmented control + findings/authoring --- */
 .seg { display: flex; gap: 4px; }

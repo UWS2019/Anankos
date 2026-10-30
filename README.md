@@ -32,6 +32,10 @@ training, tabletop exercises, and resilience assessment.
   plus direct device-state and parameter authoring) so the lab mirrors reality
   and demonstrates the resulting outcome to a client. **Export / import**
   whole scenarios as JSON to prep and replay client-specific engagements.
+- **Blue team (MITRE D3FEND)** — deploy defensive countermeasures that
+  **block, detect, or mitigate** red actions live, with red-vs-blue scoring
+  (prevented / detected / undetected) and automatic **defensive
+  recommendations** in the report for every technique left uncovered.
 - **Consequence engine** — a tick-based model (1 tick = 1 simulated minute)
   that scores lives-at-risk, grid balance, water pressure/quality, hospital
   power and backup-generator fuel, and a town severity level
@@ -144,6 +148,7 @@ simlab/
   report.py       standalone printable assessment-report renderer
   data/
     techniques.json   MITRE ATT&CK technique library (data-driven)
+    defenses.json     MITRE D3FEND countermeasure library (data-driven)
 web/
   index.html      sand-table dashboard
   city.js         sand-table renderer (buildings, roads, responders, zoom/pan)
@@ -159,6 +164,28 @@ Config via env vars: `ANANKOS_HOST` (default `0.0.0.0`),
 
 ---
 
+## Blue team (MITRE D3FEND)
+
+Deploy countermeasures from the dashboard's **Blue Team** card and watch them
+act on red actions in real time. Each defense maps to the ATT&CK techniques it
+addresses and takes one of three effects:
+
+- **block** — prevents the technique (e.g. *Network Segmentation* blocks the
+  IT→OT pivot; *Credential Hardening/MFA* blocks default-credential access;
+  *Operational Command Authentication* rejects unauthenticated Modbus writes),
+- **detect** — the technique lands but an alert is raised and scored
+  (*Network/Protocol Traffic Analysis*, *Process Variable Monitoring*),
+- **mitigate** — the technique lands but the physical effect is bounded (a
+  *Safety Instrumented System* clamps chlorine dose / medical-gas pressure to a
+  safe envelope).
+
+A live scoreboard tracks attacks, prevented, detected, and undetected. The
+assessment report adds a **D3FEND posture** section (prevention/detection
+rates, deployed countermeasures) and a **Defensive Recommendations** table —
+for every technique exercised but not covered, the mapped D3FEND countermeasure
+and a plain-English recommendation. Run the same scenario with and without
+defenses to show a client the before/after.
+
 ## Assessment report
 
 Click **📄 Report** in the dashboard (or open `/api/report.html`) to generate a
@@ -171,7 +198,6 @@ deliverable. `/api/report` returns the same data as JSON.
 
 ## Roadmap (discussed, not yet built)
 
-- **Blue team / MITRE D3FEND** — detections, mitigations, and red/blue scoring.
 - **Deepen more districts** — promote airport, government, and manufacturing to
   fully-modeled facilities with their own devices (Fort Marin already done).
 - **More protocols** — DNP3 / IEC-104 alongside the Modbus surface.

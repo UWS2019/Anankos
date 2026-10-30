@@ -112,8 +112,11 @@ function renderFacilities() {
 }
 function renderLog() {
   const log = $("log");
+  const srcClass = (ev) =>
+    ev.source === "attacker" || ev.source === "protocol" ? "attack"
+      : ev.source === "defense" || ev.source === "blue" ? "blue" : "";
   log.innerHTML = STATE.events.slice().reverse().map((ev) =>
-    `<div class="ev ${ev.level} ${ev.source === "attacker" ? "attack" : ""}">
+    `<div class="ev ${ev.level} ${srcClass(ev)}">
       <span class="t">T+${String(ev.tick).padStart(3, "0")}</span>
       <span class="tg">${ev.technique ? `<span class="attid">${ev.technique}</span>` : ev.tag}</span>
       <span class="m">${ev.message}</span></div>`).join("");
@@ -241,6 +244,32 @@ function importScenario(file) {
   reader.readAsText(file);
 }
 
+// ---- blue team / D3FEND ----------------------------------------------------
+const MODE_LABEL = { block: "BLOCK", detect: "DETECT", mitigate: "MITIGATE" };
+function renderDefenses() {
+  const s = STATE.score || { attempts: 0, blocked: 0, detected: 0, undetected: 0 };
+  $("score").innerHTML = `
+    <div class="sc"><div class="k">Attacks</div><div class="v">${s.attempts}</div></div>
+    <div class="sc"><div class="k">Blocked</div><div class="v good">${s.blocked}</div></div>
+    <div class="sc"><div class="k">Detected</div><div class="v acc">${s.detected}</div></div>
+    <div class="sc"><div class="k">Undetected</div><div class="v bad">${s.undetected}</div></div>`;
+  const defs = STATE.defenses || [];
+  $("defenses").innerHTML = defs.map((d) =>
+    `<div class="def ${d.deployed ? "on" : ""}">
+       <span class="pill ${d.deployed ? "on" : ""}" data-def="${d.id}">${d.deployed ? "✓ deployed" : "deploy"}</span>
+       <div class="dmain">
+         <div><b>${d.id}</b> ${d.name} <span class="mode ${d.mode}">${MODE_LABEL[d.mode]}</span></div>
+         <div class="hint">${d.d3f} · counters ${d.counters.join(", ")}</div>
+       </div>
+     </div>`).join("");
+  $("defenses").querySelectorAll("[data-def]").forEach((p) => {
+    p.onclick = () => {
+      const d = defs.find((x) => x.id === p.dataset.def);
+      post("/api/defense", { defense_id: p.dataset.def, deployed: !d.deployed });
+    };
+  });
+}
+
 // ---- protocol endpoint card ------------------------------------------------
 async function renderProtocol() {
   let p;
@@ -273,7 +302,7 @@ function render(snap) {
   const first = STATE === null;
   STATE = snap;
   if (snap.techniques && snap.techniques.length && TECHS.length === 0) TECHS = snap.techniques;
-  renderSandTable(); renderStats(); renderFacilities(); renderLog(); renderAuthoring();
+  renderSandTable(); renderStats(); renderFacilities(); renderLog(); renderAuthoring(); renderDefenses();
   if (first && TECHS.length) populateTechniques();
   $("btn-start").disabled = snap.running; $("btn-pause").disabled = !snap.running;
 }

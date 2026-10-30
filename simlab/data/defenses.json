@@ -1,0 +1,68 @@
+{
+  "comment": "Anankos Sim Lab - MITRE D3FEND defensive countermeasure library. Each defense maps to the ATT&CK techniques it addresses and takes effect in the simulation: block (prevents the technique), detect (raises an alert but the technique still lands), or mitigate (bounds the physical effect). 'counters' lists ATT&CK technique IDs and/or MODBUS (unauthenticated protocol writes). SIMULATION ONLY.",
+  "defenses": [
+    {
+      "id": "D3-BDI", "name": "Network Segmentation (IT/OT boundary)",
+      "d3f": "Isolate / Network Isolation", "mode": "block",
+      "counters": ["T1210", "T0812", "T0866"],
+      "description": "Segment the OT network from IT and the internet so an IT foothold cannot pivot to control systems. Ineffective against a device that is itself internet-exposed.",
+      "recommends": "Enforce an IT/OT boundary (firewall/data diode); block routed pivots into the control network."
+    },
+    {
+      "id": "D3-MFA", "name": "Credential Hardening / MFA",
+      "d3f": "Harden / Credential Hardening", "mode": "block",
+      "counters": ["T1078", "T0812"],
+      "description": "Replace default/shared credentials and require multi-factor authentication on engineering and remote-access interfaces.",
+      "recommends": "Remove default credentials; require MFA on VPN, RDP and engineering workstations."
+    },
+    {
+      "id": "D3-FEMP", "name": "Firmware/Software Patching",
+      "d3f": "Harden / Platform Hardening", "mode": "block",
+      "counters": ["T1190", "T0866"],
+      "description": "Patch exploitable services on internet-facing apps and OT devices to remove the exploitation path.",
+      "recommends": "Patch internet-facing applications and OT firmware; retire end-of-life exploitable services."
+    },
+    {
+      "id": "D3-MAIL", "name": "Email Filtering & User Training",
+      "d3f": "Harden / Message Hardening", "mode": "block",
+      "counters": ["T1566"],
+      "description": "Filter malicious email and train staff so phishing fails to establish an IT foothold.",
+      "recommends": "Deploy email filtering/DMARC and run phishing-resistance training for OT-adjacent staff."
+    },
+    {
+      "id": "D3-NTA", "name": "Network/Protocol Traffic Analysis",
+      "d3f": "Detect / Network Traffic Analysis", "mode": "detect",
+      "counters": ["T0855", "T0814", "T0816", "T1210", "MODBUS"],
+      "description": "Monitor OT network traffic for unauthorized commands, lateral movement, protocol writes, and denial-of-service patterns.",
+      "recommends": "Deploy OT-aware network monitoring (e.g. ICS IDS) to alert on unauthorized Modbus/command traffic."
+    },
+    {
+      "id": "D3-PVM", "name": "Process Variable Monitoring",
+      "d3f": "Detect / Operational Activity Mapping", "mode": "detect",
+      "counters": ["T0836", "T0835", "T0831", "T0856"],
+      "description": "Independently monitor process variables and setpoints to detect manipulation and spoofed reporting.",
+      "recommends": "Baseline setpoints/process variables and alert on out-of-policy changes and HMI/field divergence."
+    },
+    {
+      "id": "D3-OAM", "name": "Operational Command Authentication",
+      "d3f": "Harden / Message Authentication", "mode": "block",
+      "counters": ["T0855", "MODBUS"],
+      "description": "Authenticate control commands (signed/authenticated protocol) so unauthorized and unauthenticated Modbus writes are rejected.",
+      "recommends": "Require authenticated control protocols or an application-aware proxy that rejects unauthorized writes."
+    },
+    {
+      "id": "D3-SIS", "name": "Safety Instrumented System",
+      "d3f": "Harden / Process Safety", "mode": "mitigate",
+      "counters": ["T0836", "T0880"],
+      "description": "An independent safety system clamps the process to a safe envelope and cannot be defeated from the control network, bounding the physical consequence.",
+      "recommends": "Maintain an independent, air-gapped SIS that holds chemical dosing and medical-gas pressure within safe limits."
+    },
+    {
+      "id": "D3-DRP", "name": "Device Restart/Shutdown Protection",
+      "d3f": "Harden / Platform Hardening", "mode": "block",
+      "counters": ["T0816", "T0826"],
+      "description": "Protect controllers from unauthorized restart/shutdown and provide redundant control so availability is preserved.",
+      "recommends": "Restrict restart/shutdown commands and deploy redundant controllers for critical functions."
+    }
+  ]
+}
