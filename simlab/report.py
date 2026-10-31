@@ -129,7 +129,7 @@ def render_html(r):
 </style></head>
 <body><div class="page">
   <header>
-    <div class="brand">ANANKOS<small>Critical-Infrastructure Consequence Assessment</small></div>
+    <div class="brand">ANANKOS<small>Critical Infrastructure Vulnerability Assessment</small></div>
     <div class="meta">Scenario town: <b>{_esc(r['town'])}</b><br>Generated {_esc(r['generated_at'])}<br>
       Run length: {r['duration_min']} simulated min</div>
   </header>
@@ -177,5 +177,5 @@ def render_html(r):
     an assessor configured to mirror a real environment, and outcomes illustrate potential
     cascading impact for planning and resilience purposes.
   </div>
-  <footer>Anankos · Critical-Infrastructure Consequence Assessment · {_esc(r['generated_at'])}</footer>
+  <footer>Anankos · Critical Infrastructure Vulnerability Assessment · {_esc(r['generated_at'])}</footer>
 </div></body></html>"""
