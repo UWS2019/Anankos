@@ -51,10 +51,13 @@ def build_results():
     run("chlorine", lambda e: dev(e, "wt_dose")["state"].__setitem__("dose_ppm", 15.0), 3)
     run("breaker_open", lambda e: dev(e, "pp_bkr")["state"].__setitem__("closed", 0), 6)
     run("fiber_cut", lambda e: dev(e, "tc_fiber")["state"].__setitem__("link_up", 0), 2)
+    run("cell_jam", lambda e: dev(e, "tc_cell")["state"].__setitem__("link_up", 0), 2)
+    run("gps_spoof", lambda e: dev(e, "tc_gps")["state"].__setitem__("timing_ok", 0), 2)
 
     def s3b(e):
         dev(e, "tc_fiber")["state"]["link_up"] = 0
         dev(e, "tc_mw")["state"]["link_up"] = 0
+        dev(e, "tc_cell")["state"]["link_up"] = 0
     run("telecom_down", s3b, 2)
     run("radar_stop", lambda e: dev(e, "ap_radar")["state"].__setitem__("sweep", 0), 2)
     run("tower_off", lambda e: dev(e, "ap_tower")["state"].__setitem__("freq_active", 0), 2)

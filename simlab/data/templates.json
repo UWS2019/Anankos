@@ -97,10 +97,14 @@
         "it":    {"type": "IT",  "name": "Telecom OSS/BSS Network", "state": {}},
         "core":  {"type": "PLC", "name": "Core Switch/Router PLC", "state": {"routing": 1.0}},
         "fiber": {"type": "RTU", "name": "Fiber Backbone RTU", "state": {"link_up": 1.0}},
-        "mw":    {"type": "RTU", "name": "Microwave Relay RTU", "state": {"link_up": 1.0}}
+        "mw":    {"type": "RTU", "name": "Microwave Relay RTU", "state": {"link_up": 1.0}},
+        "cell":  {"type": "RTU", "name": "Cellular / RF Backhaul RTU", "state": {"link_up": 1.0}},
+        "gps":   {"type": "PLC", "name": "GPS Timing PLC", "state": {"timing_ok": 1.0}}
       },
       "nodes": [
-        {"id": "telecom", "arch": "comms_backbone", "dmap": {"core": "core", "fiber": "fiber", "mw": "mw"}, "params": {"demand": 3.0}}
+        {"id": "telecom", "arch": "comms_backbone",
+         "dmap": {"core": "core", "fiber": "fiber", "mw": "mw", "cell": "cell", "gps": "gps"},
+         "params": {"demand": 3.0}}
       ],
       "internal_links": [],
       "consumes": [{"resource": "power", "node": "telecom", "role": "grid"}],

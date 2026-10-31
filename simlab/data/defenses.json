@@ -4,9 +4,9 @@
     {
       "id": "D3-BDI", "name": "Network Segmentation (IT/OT boundary)",
       "d3f": "Isolate / Network Isolation", "mode": "block",
-      "counters": ["T1210", "T0812", "T0866"],
-      "description": "Segment the OT network from IT and the internet so an IT foothold cannot pivot to control systems. Ineffective against a device that is itself internet-exposed.",
-      "recommends": "Enforce an IT/OT boundary (firewall/data diode); block routed pivots into the control network."
+      "counters": ["T1210", "T0812", "T0866", "T1199"],
+      "description": "Segment the OT network from IT, the internet, and third-party/provider links so an IT foothold or a compromised telecom carrier cannot pivot to control systems. Ineffective against a device that is itself internet-exposed.",
+      "recommends": "Enforce an IT/OT boundary (firewall/data diode); isolate telecom-provider/WAN links; block routed pivots into the control network."
     },
     {
       "id": "D3-MFA", "name": "Credential Hardening / MFA",
@@ -32,7 +32,7 @@
     {
       "id": "D3-NTA", "name": "Network/Protocol Traffic Analysis",
       "d3f": "Detect / Network Traffic Analysis", "mode": "detect",
-      "counters": ["T0855", "T0814", "T0816", "T1210", "MODBUS"],
+      "counters": ["T0855", "T0814", "T0816", "T1210", "T1199", "MODBUS"],
       "description": "Monitor OT network traffic for unauthorized commands, lateral movement, protocol writes, and denial-of-service patterns.",
       "recommends": "Deploy OT-aware network monitoring (e.g. ICS IDS) to alert on unauthorized Modbus/command traffic."
     },

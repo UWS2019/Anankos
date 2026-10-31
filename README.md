@@ -23,10 +23,24 @@ training, tabletop exercises, and resilience assessment.
   Hospital**; **Fort Marin (military base)** — power, fuel farm, C2/radar,
   perimeter security, with readiness scoring; **Marin Regional Airport** —
   surveillance radar, ILS/navaids, and tower ATC, with airspace status
-  (normal/degraded/closed); and **Marin Telecom Central Office** — redundant
-  **fiber + microwave** transport that carries SCADA/comms to every sector, so
-  losing both paths blinds operators town-wide and knocks down base C2 and
-  airport radar coordination.
+  (normal/degraded/closed); and **Marin Telecom Central Office** — a shared
+  carrier with redundant **fiber + microwave + cellular** transport, a core
+  router, and a **GPS timing** source. It carries SCADA/comms for every sector,
+  so it is both a single point of failure and a **pivot into every utility**
+  (see below).
+
+### Telecom: signal attacks + provider pivot
+
+The telecom carrier models four distinct signal attacks — **fiber cut**,
+**microwave jam**, **cellular/RF jam**, and **GPS timing spoof** — plus a
+**core routing (BGP) hijack**. Transport survives on any remaining bearer
+(degraded), and goes down only when all bearers fail or routing is hijacked.
+
+Because the carrier provides SCADA/comms to every utility, compromising its OT
+opens **T1199 Trusted Relationship** — a pivot into *any* subscriber utility.
+One telecom intrusion (phish → pivot) becomes OT footholds across power, water,
+hospital, base, and airport at once. **Network Segmentation (D3-BDI)** blocks
+the pivot; **Traffic Analysis (D3-NTA)** detects it.
 - **MITRE ATT&CK console** — a 19-technique library spanning the **Enterprise
   IT chain and the ATT&CK for ICS chain**. Actions follow a realistic kill
   chain: **IT Initial Access → IT→OT Pivot → OT Access → Impact**, gated by

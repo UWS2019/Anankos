@@ -37,6 +37,13 @@
       "description": "Pivot from the compromised IT network across the IT/OT boundary into the control network, gaining OT access."
     },
     {
+      "id": "T1199", "name": "Trusted Relationship (Telecom Provider Pivot)",
+      "domain": "enterprise", "tactic": "Lateral Movement (Provider Pivot)",
+      "stage": "pivot", "requires": "telecom", "effect": "provider_pivot",
+      "applies_to": ["PLC", "RTU", "HMI", "VFD", "ATS"],
+      "description": "Abuse the compromised telecom carrier's trusted connection to a subscriber utility: because the provider carries that utility's SCADA/comms, control of the provider opens an OT path into it. Requires the telecom provider's OT to be compromised first."
+    },
+    {
       "id": "T0883", "name": "Internet Accessible Device",
       "domain": "ics", "tactic": "Initial Access (OT)",
       "stage": "ot_access", "requires": "exposed", "effect": "compromise",

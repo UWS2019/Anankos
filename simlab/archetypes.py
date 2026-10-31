@@ -93,26 +93,47 @@ def _eval_grid(ctx, node, inp, advance):
 
 def _eval_comms_backbone(ctx, node, inp, advance):
     grid_ok = _in(inp, "grid")["grid_ok"]
-    core, fiber, mw = ctx.dev(node["dmap"]["core"]), ctx.dev(node["dmap"]["fiber"]), ctx.dev(node["dmap"]["mw"])
+    dm = node["dmap"]
+    core = ctx.dev(dm["core"])
     powered = grid_ok
     routing = bool(core["online"] and core["functional"] and ctx.v(core, "routing") == 1)
-    fiber_up = bool(powered and routing and fiber["online"] and fiber["functional"] and ctx.v(fiber, "link_up") == 1)
-    mw_up = bool(powered and routing and mw["online"] and mw["functional"] and ctx.v(mw, "link_up") == 1)
-    up = fiber_up or mw_up
+
+    def bearer(role):
+        if role not in dm:
+            return False
+        d = ctx.dev(dm[role])
+        return bool(powered and routing and d["online"] and d["functional"] and ctx.v(d, "link_up") == 1)
+
+    fiber_up, mw_up, cell_up = bearer("fiber"), bearer("mw"), bearer("cell")
+    # GPS timing is optional; absent -> treated as ok (not limiting)
+    if "gps" in dm:
+        g = ctx.dev(dm["gps"])
+        timing_ok = bool(powered and g["online"] and g["functional"] and ctx.v(g, "timing_ok") == 1)
+    else:
+        timing_ok = True
+    bearers_up = fiber_up or mw_up or cell_up
+    up = bearers_up
+
     notes = []
     if not up:
         if not powered:
             notes.append("telecom central office lost power")
         elif not routing:
-            notes.append("core router down - town-wide transport lost")
+            notes.append("core routing hijacked/down - town-wide transport lost")
         else:
-            notes.append("both fiber and microwave paths down - operators blind across sectors")
-    elif not fiber_up:
-        notes.append("fiber path down - running on microwave backup")
-    elif not mw_up:
-        notes.append("microwave path down - fiber primary intact")
-    return {"powered": powered, "routing": routing, "fiber_up": fiber_up,
-            "mw_up": mw_up, "up": up, "notes": notes}
+            notes.append("all transport paths (fiber/microwave/cell) down - operators blind across sectors")
+    else:
+        down = [n for n, ok, present in (("fiber", fiber_up, "fiber" in dm),
+                                         ("microwave", mw_up, "mw" in dm),
+                                         ("cellular", cell_up, "cell" in dm)) if present and not ok]
+        if down:
+            notes.append(f"{'/'.join(down)} path(s) down - running on backup bearer")
+        if not timing_ok:
+            notes.append("GPS timing spoofed/lost - SCADA time-sync drift")
+
+    status = "down" if not up else ("degraded" if (notes or not timing_ok) else "up")
+    return {"powered": powered, "routing": routing, "fiber_up": fiber_up, "mw_up": mw_up,
+            "cell_up": cell_up, "timing_ok": timing_ok, "up": up, "status": status, "notes": notes}
 
 
 def _eval_pump(ctx, node, inp, advance):

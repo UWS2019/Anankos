@@ -164,7 +164,7 @@ function buildingAirport(st) {
 }
 function buildingTelecom(st) {
   const g = E("g"); const lit = st.powered;
-  const stroke = st.up ? "#2b5a6a" : "#7f1d1d";
+  const stroke = st.up ? (st.status === "degraded" ? "#5a4310" : "#2b5a6a") : "#7f1d1d";
   g.appendChild(body(30, 26, lit ? "#10202a" : "#1a0f10", stroke));
   g.appendChild(winRow(0, -3, 3, lit, 7));
   g.appendChild(winRow(0, 6, 3, lit, 7));
@@ -177,6 +177,14 @@ function buildingTelecom(st) {
   g.appendChild(tw);
   // fiber node
   g.appendChild(E("circle", { cx: -15, cy: -14, r: 3.5, fill: st.fiber_up ? "#34d399" : "#55606f" }));
+  // cellular mast (left) with RF arcs
+  const cell = E("g", { transform: "translate(-20,-2)" });
+  cell.appendChild(E("line", { x1: 0, y1: 12, x2: 0, y2: -16, stroke, "stroke-width": 1.4 }));
+  [5, 9].forEach((r) => cell.appendChild(E("path", { d: `M${-r},-16 A ${r} ${r} 0 0 1 ${r},-16`, fill: "none",
+    stroke: st.cell_up ? "#a78bfa" : "#55606f", "stroke-width": 1.2, opacity: 0.9 })));
+  g.appendChild(cell);
+  // GPS timing marker
+  g.appendChild(E("circle", { cx: 12, cy: 12, r: 3, fill: st.timing_ok ? "#fde68a" : "#7f1d1d" }));
   return g;
 }
 function buildingFor(kind, st) {
@@ -276,7 +284,7 @@ const City = {
     const b = d.base, a = d.airport, t = d.telecom;
     return [d.grid_ok, d.water_flowing, d.water_quality, d.hospital_powered, d.hospital_on_generator,
       d.lives_at_risk, Math.round(d.water_pressure / 6), b.readiness, b.comms, b.perimeter_secure, b.breach,
-      a.status, a.radar_up, t.up, t.fiber_up, t.mw_up, facs, dist].join("|");
+      a.status, a.radar_up, t.up, t.fiber_up, t.mw_up, t.cell_up, t.timing_ok, t.status, facs, dist].join("|");
   },
 
   _pt(state, fid) { const m = state.facilities[fid].map; return { x: m.x, y: m.y }; },
@@ -309,6 +317,12 @@ const City = {
         .forEach((t) => edge(pt.telecom, t, fColor, tel.fiber_up, 1.3, tel.fiber_up ? 0.55 : 0.28, "1 7"));
       const mColor = tel.mw_up ? "#22d3ee" : "#52607a";
       some(pt.base, pt.airport, pt.power).forEach((t) => arc(pt.telecom, t, mColor, tel.mw_up));
+      // provider pivot: if the telecom OT is owned, show the trust-path reach
+      const telFid = Object.keys(state.facilities).find((fid) => state.facilities[fid].kind === "telecom");
+      if (telFid && state.facilities[telFid].compromised) {
+        some(pt.power, pt.water, pt.hospital, pt.base, pt.airport)
+          .forEach((t) => edge(pt.telecom, t, "#f472b6", true, 1.8, 0.85, "3 6"));
+      }
     }
     // --- power grid ---
     if (pt.power) {
@@ -374,8 +388,15 @@ const City = {
           { badges: [{ t: a.radar_up ? "RADAR ✓" : "RADAR ✗", ok: a.radar_up }, { t: "ATC " + a.status.toUpperCase(), ok: a.status === "normal" }] });
       } else if (kind === "telecom") {
         const tel = d.telecom;
-        place(fid, "telecom", { powered: tel.powered, up: tel.up, fiber_up: tel.fiber_up, mw_up: tel.mw_up }, name,
-          { pulse: !tel.up, badges: [{ t: tel.fiber_up ? "FIBER ✓" : "FIBER ✗", ok: tel.fiber_up }, { t: tel.mw_up ? "MW ✓" : "MW ✗", ok: tel.mw_up }] });
+        place(fid, "telecom", { powered: tel.powered, up: tel.up, status: tel.status,
+          fiber_up: tel.fiber_up, mw_up: tel.mw_up, cell_up: tel.cell_up, timing_ok: tel.timing_ok }, name,
+          { pulse: !tel.up || f[fid].compromised,
+            badges: [
+              { t: tel.fiber_up ? "FIBER ✓" : "FIBER ✗", ok: tel.fiber_up },
+              { t: tel.mw_up ? "MW ✓" : "MW ✗", ok: tel.mw_up },
+              { t: tel.cell_up ? "CELL ✓" : "CELL ✗", ok: tel.cell_up },
+              { t: tel.timing_ok ? "GPS ✓" : "GPS SPOOF", ok: tel.timing_ok },
+            ] });
       }
     }
   },

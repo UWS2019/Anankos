@@ -1,7 +1,7 @@
-"""Catalog test (Phase 2): the archetype catalog + templates are consistent
-with the runtime, and instantiating the Marin site pack reproduces the live
-town + topology exactly. Guarantees the data-driven palette is complete and
-correct, so the future builder can rely on it.
+"""Catalog test: the archetype catalog + facility templates are consistent with
+the runtime, instantiate into a valid topology that solves, and a subset client
+site builds and scores. The catalog is the single source of truth for the town
+(the engine builds every run from it).
 
 Run:  python tests/catalog.py
 """
@@ -10,8 +10,6 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from simlab import catalog                 # noqa: E402
-from simlab.town import fresh_town         # noqa: E402
-from simlab.topology import fresh_topology  # noqa: E402
 from simlab.archetypes import Ctx          # noqa: E402
 from simlab import solver                  # noqa: E402
 
@@ -30,45 +28,18 @@ check(not problems, f"catalog validation problems: {problems}")
 desc = catalog.describe_catalog()
 check(len(desc["archetypes"]) == 9, f"expected 9 archetypes, got {len(desc['archetypes'])}")
 check(len(desc["templates"]) == 6, f"expected 6 templates, got {len(desc['templates'])}")
-# spot-check computed attack surface: generator has PLC+RTU -> impact techniques apply
 gen = next(a for a in desc["archetypes"] if a["id"] == "generator")
 check("T0836" in gen["attack_techniques"], "generator should expose T0836 (Modify Parameter)")
 check(gen["d3fend"], "generator should map to at least one D3FEND countermeasure")
 
-# 2) instantiation reproduces the live build
+# 2) the Marin site pack instantiates into a complete, valid structure
 inst = catalog.instantiate_site(catalog.load_site("marin"))
-town = fresh_town()
-topo = fresh_topology()
-
-# devices
-check(set(inst["devices"]) == set(town["devices"]),
-      f"device id mismatch: {set(inst['devices']) ^ set(town['devices'])}")
-for did, d in town["devices"].items():
-    check(inst["devices"].get(did) == d, f"device {did} differs:\n  live={d}\n  inst={inst['devices'].get(did)}")
-
-# facilities
-check(set(inst["facilities"]) == set(town["facilities"]), "facility id mismatch")
-for fid, f in town["facilities"].items():
-    g = inst["facilities"].get(fid, {})
-    for k in ("id", "name", "kind", "map", "compromised", "it_compromised", "findings"):
-        check(g.get(k) == f.get(k), f"facility {fid}.{k} differs: live={f.get(k)} inst={g.get(k)}")
-    check(set(g.get("devices", [])) == set(f["devices"]), f"facility {fid} devices differ")
-
-# districts
-check(inst["districts"] == town["districts"], "districts differ")
-
-# nodes
-inst_nodes = {n["id"]: n for n in inst["nodes"]}
-live_nodes = {n["id"]: n for n in topo["nodes"]}
-check(set(inst_nodes) == set(live_nodes), f"node id mismatch: {set(inst_nodes) ^ set(live_nodes)}")
-for nid, n in live_nodes.items():
-    check(inst_nodes.get(nid) == n, f"node {nid} differs:\n  live={n}\n  inst={inst_nodes.get(nid)}")
-
-# links (order-independent)
-def lset(links):
-    return {(l["src"], l["dst"], l["role"], l["resource"]) for l in links}
-check(lset(inst["links"]) == lset(topo["links"]),
-      f"links differ: {lset(inst['links']) ^ lset(topo['links'])}")
+check(set(f["kind"] for f in inst["facilities"].values()) ==
+      {"power", "water", "hospital", "base", "airport", "telecom"},
+      "Marin site should instantiate all six facility kinds")
+for n in inst["nodes"]:
+    for role, did in n["dmap"].items():
+        check(did in inst["devices"], f"node {n['id']} dmap -> missing device {did}")
 
 # 3) instantiated topology actually solves (functional smoke)
 class _E:
@@ -111,5 +82,5 @@ if fails:
     for f in fails:
         print("  -", f)
     sys.exit(1)
-print("PASS: catalog validated; Marin site instantiation reproduces the live "
-      "town + topology exactly; instantiated topology solves ✓")
+print("PASS: catalog validated; Marin site instantiates a complete topology "
+      "that solves; subset site builds & scores; reset restores Marin ✓")

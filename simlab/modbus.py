@@ -87,6 +87,8 @@ class RegisterMap:
             (6, 0): 1 if g.get("telecom", {}).get("up") else 0,
             (6, 1): 1 if g.get("telecom", {}).get("fiber_up") else 0,
             (6, 2): 1 if g.get("telecom", {}).get("mw_up") else 0,
+            (6, 3): 1 if g.get("telecom", {}).get("cell_up") else 0,
+            (6, 4): 1 if g.get("telecom", {}).get("timing_ok") else 0,
         }
         return m.get((unit, addr))
 
@@ -110,6 +112,8 @@ class RegisterMap:
             (6, 0): d["tc_fiber"]["state"]["link_up"] in (1, 1.0, True),
             (6, 1): d["tc_mw"]["state"]["link_up"] in (1, 1.0, True),
             (6, 2): d["tc_core"]["state"]["routing"] in (1, 1.0, True),
+            (6, 3): d["tc_cell"]["state"]["link_up"] in (1, 1.0, True),
+            (6, 4): d["tc_gps"]["state"]["timing_ok"] in (1, 1.0, True),
         }
         return m
 
@@ -176,7 +180,13 @@ class RegisterMap:
             self._log(f"telecom microwave path {'UP' if on else 'JAMMED'} (coil)")
         elif key == (6, 2):
             d["tc_core"]["state"]["routing"] = 1 if on else 0
-            self._log(f"telecom core routing {'UP' if on else 'DOWN'} (coil)")
+            self._log(f"telecom core routing {'UP' if on else 'HIJACKED'} (coil)")
+        elif key == (6, 3):
+            d["tc_cell"]["state"]["link_up"] = 1 if on else 0
+            self._log(f"telecom cellular/RF path {'UP' if on else 'JAMMED'} (coil)")
+        elif key == (6, 4):
+            d["tc_gps"]["state"]["timing_ok"] = 1 if on else 0
+            self._log(f"telecom GPS timing {'OK' if on else 'SPOOFED'} (coil)")
         else:
             return False
         return True
@@ -209,8 +219,10 @@ class RegisterMap:
                  "input": {"IR0": "powered", "IR1": "radar up", "IR2": "airspace 0/1/2"}},
                 {"unit": 6, "facility": "Telecom",
                  "holding": {},
-                 "coils": {"C0": "fiber path up", "C1": "microwave path up", "C2": "core routing"},
-                 "input": {"IR0": "telecom up", "IR1": "fiber up", "IR2": "microwave up"}},
+                 "coils": {"C0": "fiber path up", "C1": "microwave path up", "C2": "core routing",
+                           "C3": "cellular/RF path up", "C4": "GPS timing ok"},
+                 "input": {"IR0": "telecom up", "IR1": "fiber up", "IR2": "microwave up",
+                           "IR3": "cellular up", "IR4": "GPS timing ok"}},
             ],
         }
 

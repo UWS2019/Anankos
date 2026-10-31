@@ -17,6 +17,9 @@ const COMMANDS = {
   ap_tower: [["comms_off", "Disable tower ATC comms"]],
   tc_fiber: [["cut_fiber", "Cut fiber backbone path"]],
   tc_mw: [["jam_microwave", "Jam microwave relay path"]],
+  tc_cell: [["jam_cell", "Jam cellular / RF backhaul"]],
+  tc_gps: [["spoof_gps", "Spoof GPS timing (clock drift)"]],
+  tc_core: [["hijack_routing", "Hijack core routing (BGP blackhole)"]],
 };
 const FINDING_HINT = {
   internet_exposed: "device reachable from the internet — enables direct OT access (T0883)",

@@ -77,6 +77,7 @@
    "population_without_power_pct": 100,
    "severity": "catastrophic",
    "telecom": {
+    "cell_up": false,
     "fiber_up": false,
     "mw_up": false,
     "notes": [
@@ -84,6 +85,8 @@
     ],
     "powered": false,
     "routing": true,
+    "status": "down",
+    "timing_ok": false,
     "up": false
    },
    "tick": 0,
@@ -168,6 +171,7 @@
    "population_without_power_pct": 100,
    "severity": "catastrophic",
    "telecom": {
+    "cell_up": false,
     "fiber_up": false,
     "mw_up": false,
     "notes": [
@@ -175,6 +179,8 @@
     ],
     "powered": false,
     "routing": true,
+    "status": "down",
+    "timing_ok": false,
     "up": false
    },
    "tick": 1,
@@ -259,6 +265,7 @@
    "population_without_power_pct": 100,
    "severity": "catastrophic",
    "telecom": {
+    "cell_up": false,
     "fiber_up": false,
     "mw_up": false,
     "notes": [
@@ -266,6 +273,8 @@
     ],
     "powered": false,
     "routing": true,
+    "status": "down",
+    "timing_ok": false,
     "up": false
    },
    "tick": 2,
@@ -350,6 +359,7 @@
    "population_without_power_pct": 100,
    "severity": "catastrophic",
    "telecom": {
+    "cell_up": false,
     "fiber_up": false,
     "mw_up": false,
     "notes": [
@@ -357,6 +367,8 @@
     ],
     "powered": false,
     "routing": true,
+    "status": "down",
+    "timing_ok": false,
     "up": false
    },
    "tick": 3,
@@ -441,6 +453,7 @@
    "population_without_power_pct": 100,
    "severity": "catastrophic",
    "telecom": {
+    "cell_up": false,
     "fiber_up": false,
     "mw_up": false,
     "notes": [
@@ -448,6 +461,8 @@
     ],
     "powered": false,
     "routing": true,
+    "status": "down",
+    "timing_ok": false,
     "up": false
    },
    "tick": 4,
@@ -530,11 +545,14 @@
    "population_without_power_pct": 0,
    "severity": "nominal",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 0,
@@ -615,11 +633,14 @@
    "population_without_power_pct": 0,
    "severity": "nominal",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 1,
@@ -700,11 +721,14 @@
    "population_without_power_pct": 0,
    "severity": "nominal",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 2,
@@ -785,11 +809,14 @@
    "population_without_power_pct": 0,
    "severity": "nominal",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 3,
@@ -870,11 +897,14 @@
    "population_without_power_pct": 0,
    "severity": "nominal",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 4,
@@ -955,11 +985,14 @@
    "population_without_power_pct": 0,
    "severity": "nominal",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 5,
@@ -1046,6 +1079,7 @@
    "population_without_power_pct": 100,
    "severity": "severe",
    "telecom": {
+    "cell_up": false,
     "fiber_up": false,
     "mw_up": false,
     "notes": [
@@ -1053,6 +1087,8 @@
     ],
     "powered": false,
     "routing": true,
+    "status": "down",
+    "timing_ok": false,
     "up": false
    },
    "tick": 0,
@@ -1137,6 +1173,7 @@
    "population_without_power_pct": 100,
    "severity": "severe",
    "telecom": {
+    "cell_up": false,
     "fiber_up": false,
     "mw_up": false,
     "notes": [
@@ -1144,6 +1181,8 @@
     ],
     "powered": false,
     "routing": true,
+    "status": "down",
+    "timing_ok": false,
     "up": false
    },
    "tick": 1,
@@ -1228,6 +1267,7 @@
    "population_without_power_pct": 100,
    "severity": "severe",
    "telecom": {
+    "cell_up": false,
     "fiber_up": false,
     "mw_up": false,
     "notes": [
@@ -1235,6 +1275,8 @@
     ],
     "powered": false,
     "routing": true,
+    "status": "down",
+    "timing_ok": false,
     "up": false
    },
    "tick": 2,
@@ -1319,6 +1361,7 @@
    "population_without_power_pct": 100,
    "severity": "severe",
    "telecom": {
+    "cell_up": false,
     "fiber_up": false,
     "mw_up": false,
     "notes": [
@@ -1326,6 +1369,8 @@
     ],
     "powered": false,
     "routing": true,
+    "status": "down",
+    "timing_ok": false,
     "up": false
    },
    "tick": 3,
@@ -1410,6 +1455,7 @@
    "population_without_power_pct": 100,
    "severity": "severe",
    "telecom": {
+    "cell_up": false,
     "fiber_up": false,
     "mw_up": false,
     "notes": [
@@ -1417,6 +1463,8 @@
     ],
     "powered": false,
     "routing": true,
+    "status": "down",
+    "timing_ok": false,
     "up": false
    },
    "tick": 4,
@@ -1503,6 +1551,7 @@
    "population_without_power_pct": 100,
    "severity": "catastrophic",
    "telecom": {
+    "cell_up": false,
     "fiber_up": false,
     "mw_up": false,
     "notes": [
@@ -1510,6 +1559,8 @@
     ],
     "powered": false,
     "routing": true,
+    "status": "down",
+    "timing_ok": false,
     "up": false
    },
    "tick": 5,
@@ -1596,6 +1647,7 @@
    "population_without_power_pct": 100,
    "severity": "catastrophic",
    "telecom": {
+    "cell_up": false,
     "fiber_up": false,
     "mw_up": false,
     "notes": [
@@ -1603,11 +1655,285 @@
     ],
     "powered": false,
     "routing": true,
+    "status": "down",
+    "timing_ok": false,
     "up": false
    },
    "tick": 6,
    "water_flowing": false,
    "water_pressure": 6.0,
+   "water_quality": "safe"
+  }
+ ],
+ "cell_jam": [
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "cell_up": false,
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [
+     "cellular path(s) down - running on backup bearer"
+    ],
+    "powered": true,
+    "routing": true,
+    "status": "degraded",
+    "timing_ok": true,
+    "up": true
+   },
+   "tick": 0,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "cell_up": false,
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [
+     "cellular path(s) down - running on backup bearer"
+    ],
+    "powered": true,
+    "routing": true,
+    "status": "degraded",
+    "timing_ok": true,
+    "up": true
+   },
+   "tick": 1,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "cell_up": false,
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [
+     "cellular path(s) down - running on backup bearer"
+    ],
+    "powered": true,
+    "routing": true,
+    "status": "degraded",
+    "timing_ok": true,
+    "up": true
+   },
+   "tick": 2,
+   "water_flowing": true,
+   "water_pressure": 60.0,
    "water_quality": "safe"
   }
  ],
@@ -1688,11 +2014,14 @@
    "population_without_power_pct": 0,
    "severity": "severe",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 0,
@@ -1776,11 +2105,14 @@
    "population_without_power_pct": 0,
    "severity": "severe",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 1,
@@ -1864,11 +2196,14 @@
    "population_without_power_pct": 0,
    "severity": "severe",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 2,
@@ -1952,11 +2287,14 @@
    "population_without_power_pct": 0,
    "severity": "severe",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 3,
@@ -2039,13 +2377,16 @@
    "population_without_power_pct": 0,
    "severity": "nominal",
    "telecom": {
+    "cell_up": true,
     "fiber_up": false,
     "mw_up": true,
     "notes": [
-     "fiber path down - running on microwave backup"
+     "fiber path(s) down - running on backup bearer"
     ],
     "powered": true,
     "routing": true,
+    "status": "degraded",
+    "timing_ok": true,
     "up": true
    },
    "tick": 0,
@@ -2126,13 +2467,16 @@
    "population_without_power_pct": 0,
    "severity": "nominal",
    "telecom": {
+    "cell_up": true,
     "fiber_up": false,
     "mw_up": true,
     "notes": [
-     "fiber path down - running on microwave backup"
+     "fiber path(s) down - running on backup bearer"
     ],
     "powered": true,
     "routing": true,
+    "status": "degraded",
+    "timing_ok": true,
     "up": true
    },
    "tick": 1,
@@ -2213,13 +2557,16 @@
    "population_without_power_pct": 0,
    "severity": "nominal",
    "telecom": {
+    "cell_up": true,
     "fiber_up": false,
     "mw_up": true,
     "notes": [
-     "fiber path down - running on microwave backup"
+     "fiber path(s) down - running on backup bearer"
     ],
     "powered": true,
     "routing": true,
+    "status": "degraded",
+    "timing_ok": true,
     "up": true
    },
    "tick": 2,
@@ -2304,11 +2651,14 @@
    "population_without_power_pct": 0,
    "severity": "severe",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 0,
@@ -2391,11 +2741,14 @@
    "population_without_power_pct": 0,
    "severity": "severe",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 1,
@@ -2478,11 +2831,14 @@
    "population_without_power_pct": 0,
    "severity": "severe",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 2,
@@ -2565,16 +2921,291 @@
    "population_without_power_pct": 0,
    "severity": "severe",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 3,
    "water_flowing": true,
    "water_pressure": 33.0,
+   "water_quality": "safe"
+  }
+ ],
+ "gps_spoof": [
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "cell_up": true,
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [
+     "GPS timing spoofed/lost - SCADA time-sync drift"
+    ],
+    "powered": true,
+    "routing": true,
+    "status": "degraded",
+    "timing_ok": false,
+    "up": true
+   },
+   "tick": 0,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "cell_up": true,
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [
+     "GPS timing spoofed/lost - SCADA time-sync drift"
+    ],
+    "powered": true,
+    "routing": true,
+    "status": "degraded",
+    "timing_ok": false,
+    "up": true
+   },
+   "tick": 1,
+   "water_flowing": true,
+   "water_pressure": 60.0,
+   "water_quality": "safe"
+  },
+  {
+   "airport": {
+    "nav_up": true,
+    "notes": [],
+    "powered": true,
+    "radar_up": true,
+    "status": "normal",
+    "tower_up": true
+   },
+   "base": {
+    "breach": false,
+    "comms": true,
+    "fuel_level_pct": 90.0,
+    "gen_fuel_min": 480.0,
+    "notes": [],
+    "on_generator": false,
+    "perimeter_secure": true,
+    "powered": true,
+    "readiness": "full"
+   },
+   "consequence_notes": [],
+   "deficit_mw": 0.0,
+   "demand_mw": 116.0,
+   "districts": [
+    {
+     "critical": true,
+     "id": "downtown",
+     "name": "Downtown / Government",
+     "powered": true,
+     "water": true,
+     "x": 540,
+     "y": 340
+    },
+    {
+     "critical": false,
+     "id": "stadium",
+     "name": "Civic Sports Arena",
+     "powered": true,
+     "water": true,
+     "x": 300,
+     "y": 400
+    },
+    {
+     "critical": false,
+     "id": "mfg",
+     "name": "Industrial / Mfg Park",
+     "powered": true,
+     "water": true,
+     "x": 120,
+     "y": 390
+    },
+    {
+     "critical": false,
+     "id": "residential",
+     "name": "Residential Districts",
+     "powered": true,
+     "water": true,
+     "x": 430,
+     "y": 480
+    }
+   ],
+   "dose_safe": true,
+   "generation_mw": 125.0,
+   "grid_ok": true,
+   "hospital_gen_fuel_min": 240.0,
+   "hospital_on_generator": false,
+   "hospital_powered": true,
+   "hospital_water": true,
+   "lives_at_risk": 0,
+   "o2_ok": true,
+   "population_without_power_pct": 0,
+   "severity": "nominal",
+   "telecom": {
+    "cell_up": true,
+    "fiber_up": true,
+    "mw_up": true,
+    "notes": [
+     "GPS timing spoofed/lost - SCADA time-sync drift"
+    ],
+    "powered": true,
+    "routing": true,
+    "status": "degraded",
+    "timing_ok": false,
+    "up": true
+   },
+   "tick": 2,
+   "water_flowing": true,
+   "water_pressure": 60.0,
    "water_quality": "safe"
   }
  ],
@@ -2656,6 +3287,7 @@
    "population_without_power_pct": 73,
    "severity": "severe",
    "telecom": {
+    "cell_up": false,
     "fiber_up": false,
     "mw_up": false,
     "notes": [
@@ -2663,6 +3295,8 @@
     ],
     "powered": false,
     "routing": true,
+    "status": "down",
+    "timing_ok": false,
     "up": false
    },
    "tick": 0,
@@ -2747,6 +3381,7 @@
    "population_without_power_pct": 73,
    "severity": "severe",
    "telecom": {
+    "cell_up": false,
     "fiber_up": false,
     "mw_up": false,
     "notes": [
@@ -2754,6 +3389,8 @@
     ],
     "powered": false,
     "routing": true,
+    "status": "down",
+    "timing_ok": false,
     "up": false
    },
    "tick": 1,
@@ -2838,6 +3475,7 @@
    "population_without_power_pct": 73,
    "severity": "severe",
    "telecom": {
+    "cell_up": false,
     "fiber_up": false,
     "mw_up": false,
     "notes": [
@@ -2845,6 +3483,8 @@
     ],
     "powered": false,
     "routing": true,
+    "status": "down",
+    "timing_ok": false,
     "up": false
    },
    "tick": 2,
@@ -2929,6 +3569,7 @@
    "population_without_power_pct": 73,
    "severity": "severe",
    "telecom": {
+    "cell_up": false,
     "fiber_up": false,
     "mw_up": false,
     "notes": [
@@ -2936,6 +3577,8 @@
     ],
     "powered": false,
     "routing": true,
+    "status": "down",
+    "timing_ok": false,
     "up": false
    },
    "tick": 3,
@@ -3018,11 +3661,14 @@
    "population_without_power_pct": 0,
    "severity": "nominal",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 0,
@@ -3103,11 +3749,14 @@
    "population_without_power_pct": 0,
    "severity": "nominal",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 1,
@@ -3188,11 +3837,14 @@
    "population_without_power_pct": 0,
    "severity": "nominal",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 2,
@@ -3273,11 +3925,14 @@
    "population_without_power_pct": 0,
    "severity": "nominal",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 3,
@@ -3358,11 +4013,14 @@
    "population_without_power_pct": 0,
    "severity": "nominal",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 4,
@@ -3445,11 +4103,14 @@
    "population_without_power_pct": 0,
    "severity": "degraded",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 5,
@@ -3532,11 +4193,14 @@
    "population_without_power_pct": 0,
    "severity": "degraded",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 6,
@@ -3619,11 +4283,14 @@
    "population_without_power_pct": 0,
    "severity": "degraded",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 7,
@@ -3706,11 +4373,14 @@
    "population_without_power_pct": 0,
    "severity": "degraded",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 8,
@@ -3795,11 +4465,14 @@
    "population_without_power_pct": 0,
    "severity": "degraded",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 0,
@@ -3882,11 +4555,14 @@
    "population_without_power_pct": 0,
    "severity": "degraded",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 1,
@@ -3969,11 +4645,14 @@
    "population_without_power_pct": 0,
    "severity": "degraded",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 2,
@@ -4056,11 +4735,14 @@
    "population_without_power_pct": 0,
    "severity": "nominal",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 0,
@@ -4141,11 +4823,14 @@
    "population_without_power_pct": 0,
    "severity": "nominal",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 1,
@@ -4226,11 +4911,14 @@
    "population_without_power_pct": 0,
    "severity": "nominal",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 2,
@@ -4317,13 +5005,16 @@
    "population_without_power_pct": 0,
    "severity": "severe",
    "telecom": {
+    "cell_up": false,
     "fiber_up": false,
     "mw_up": false,
     "notes": [
-     "both fiber and microwave paths down - operators blind across sectors"
+     "all transport paths (fiber/microwave/cell) down - operators blind across sectors"
     ],
     "powered": true,
     "routing": true,
+    "status": "down",
+    "timing_ok": true,
     "up": false
    },
    "tick": 0,
@@ -4408,13 +5099,16 @@
    "population_without_power_pct": 0,
    "severity": "severe",
    "telecom": {
+    "cell_up": false,
     "fiber_up": false,
     "mw_up": false,
     "notes": [
-     "both fiber and microwave paths down - operators blind across sectors"
+     "all transport paths (fiber/microwave/cell) down - operators blind across sectors"
     ],
     "powered": true,
     "routing": true,
+    "status": "down",
+    "timing_ok": true,
     "up": false
    },
    "tick": 1,
@@ -4499,13 +5193,16 @@
    "population_without_power_pct": 0,
    "severity": "severe",
    "telecom": {
+    "cell_up": false,
     "fiber_up": false,
     "mw_up": false,
     "notes": [
-     "both fiber and microwave paths down - operators blind across sectors"
+     "all transport paths (fiber/microwave/cell) down - operators blind across sectors"
     ],
     "powered": true,
     "routing": true,
+    "status": "down",
+    "timing_ok": true,
     "up": false
    },
    "tick": 2,
@@ -4590,11 +5287,14 @@
    "population_without_power_pct": 0,
    "severity": "severe",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 0,
@@ -4677,11 +5377,14 @@
    "population_without_power_pct": 0,
    "severity": "severe",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 1,
@@ -4764,11 +5467,14 @@
    "population_without_power_pct": 0,
    "severity": "severe",
    "telecom": {
+    "cell_up": true,
     "fiber_up": true,
     "mw_up": true,
     "notes": [],
     "powered": true,
     "routing": true,
+    "status": "up",
+    "timing_ok": true,
     "up": true
    },
    "tick": 2,

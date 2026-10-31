@@ -46,7 +46,8 @@ _ABSENT_BASE = {"present": False, "powered": True, "on_generator": False, "gen_f
 _ABSENT_AIRPORT = {"present": False, "powered": True, "radar_up": True, "nav_up": True,
                    "tower_up": True, "status": "normal", "notes": []}
 _ABSENT_TELECOM = {"present": False, "powered": True, "routing": True, "fiber_up": True,
-                   "mw_up": True, "up": True, "notes": []}
+                   "mw_up": True, "cell_up": True, "timing_ok": True, "up": True,
+                   "status": "up", "notes": []}
 
 TOWN_BASE_DEMAND_MW = 90.0
 WATER_DEMAND_MW = 8.0
@@ -233,7 +234,20 @@ class SimEngine:
                     f"'internet exposed' finding on {name} to mirror that condition.")
         if req == "ot" and not fac["compromised"]:
             return f"{name} OT not yet compromised - gain OT access first."
+        if req == "telecom":
+            if not self._telecom_compromised():
+                return ("No compromised telecom provider. Gain OT control of the "
+                        "telecom carrier first (phishing -> pivot), then pivot into "
+                        "its subscribers.")
+            if fac["kind"] == "telecom":
+                return "Target a subscriber utility, not the telecom provider itself."
+            if not fac.get("telecom_subscriber", True):
+                return f"{name} is not a subscriber of the compromised telecom carrier."
         return None
+
+    def _telecom_compromised(self):
+        return any(f["kind"] == "telecom" and f["compromised"]
+                   for f in self.town["facilities"].values())
 
     def _apply_effect(self, effect, tech, fac, dev, params):
         name = dev["name"]
@@ -246,6 +260,11 @@ class SimEngine:
         if effect == "compromise":
             fac["compromised"] = True
             return f"{tech['name']}: gained control of {fac['name']} OT network."
+        if effect == "provider_pivot":
+            fac["compromised"] = True
+            fac["it_compromised"] = True
+            return (f"{tech['name']}: pivoted through the compromised telecom carrier "
+                    f"into {fac['name']} - OT access gained via trusted provider link.")
         if effect == "shutdown":
             dev["online"] = False
             return f"{tech['name']}: {name} forced offline."
@@ -287,6 +306,9 @@ class SimEngine:
             ("ap_tower", "comms_off"): ("freq_active", 0.0, "tower ATC comms DISABLED"),
             ("tc_fiber", "cut_fiber"): ("link_up", 0.0, "fiber backbone path CUT"),
             ("tc_mw", "jam_microwave"): ("link_up", 0.0, "microwave relay path JAMMED"),
+            ("tc_cell", "jam_cell"): ("link_up", 0.0, "cellular/RF backhaul JAMMED"),
+            ("tc_gps", "spoof_gps"): ("timing_ok", 0.0, "GPS timing SPOOFED - SCADA clock drift"),
+            ("tc_core", "hijack_routing"): ("routing", 0.0, "core routing HIJACKED - transport blackholed"),
         }
         key = (dev["id"], cmd)
         if key in table:

@@ -31,14 +31,18 @@
     {
       "id": "comms_backbone", "name": "Telecom Backbone", "category": "comms",
       "icon": "telecom",
-      "description": "Redundant fiber + microwave transport carrying SCADA/comms to every sector; core router routes both paths.",
+      "description": "Shared carrier: redundant fiber + microwave + cellular transport carrying SCADA/comms to every utility, a core router, and a GPS timing source. As a shared provider, an OT compromise here opens a trusted-relationship pivot (T1199) into every connected utility.",
       "ports": {"in": [{"resource": "power", "role": "grid"}], "out": [{"resource": "comms", "role": "transport"}]},
       "params": [{"name": "demand", "label": "Electrical load", "type": "number", "default": 3.0, "min": 0, "unit": "MW"}],
       "device_roles": {"core": {"type": "PLC", "label": "Core switch/router"},
                         "fiber": {"type": "RTU", "label": "Fiber backbone"},
-                        "mw": {"type": "RTU", "label": "Microwave relay"}},
+                        "mw": {"type": "RTU", "label": "Microwave relay"},
+                        "cell": {"type": "RTU", "label": "Cellular / RF backhaul"},
+                        "gps": {"type": "PLC", "label": "GPS timing"}},
       "modbus": [{"kind": "coil", "label": "fiber path up", "role": "fiber.link_up"},
                  {"kind": "coil", "label": "microwave path up", "role": "mw.link_up"},
+                 {"kind": "coil", "label": "cellular path up", "role": "cell.link_up"},
+                 {"kind": "coil", "label": "GPS timing ok", "role": "gps.timing_ok"},
                  {"kind": "coil", "label": "core routing", "role": "core.routing"}]
     },
     {

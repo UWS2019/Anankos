@@ -15,10 +15,16 @@ from copy import deepcopy
 from pathlib import Path
 
 from . import archetypes as arch_mod
-from .town import _findings
 
 DATA = Path(__file__).parent / "data"
 DEVICE_TYPES = {"IT", "PLC", "RTU", "HMI", "VFD", "ATS"}
+
+
+def _findings():
+    """Default assessment findings on a facility (toggled to mirror ground
+    truth). These change the viable attack path and appear in the report."""
+    return {"internet_exposed": False, "flat_network": False,
+            "default_creds": False, "unpatched": False}
 
 
 def _load(name):
