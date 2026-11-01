@@ -48,5 +48,9 @@ contextBridge.exposeInMainWorld('guardian', {
   aiSettingsSave: (cfg) => ipcRenderer.invoke('guardian:ai-settings-save', cfg),
   aiSend: (report, prompt) => ipcRenderer.invoke('guardian:ai-send', { report, prompt }),
 
+  // Live monitor
+  liveStats: () => ipcRenderer.invoke('guardian:live-stats'),
+  lastReport: () => ipcRenderer.invoke('guardian:last-report'),
+
   platform: process.platform
 });

@@ -15,6 +15,7 @@ const { buildDebriefPrompt } = require('./scanner/debrief');
 const { Scheduler } = require('./scanner/scheduler');
 const { appendHistory, loadHistory, clearHistory, historyToCsv, loadSchedule } = require('./scanner/history');
 const { getHardeningStatus, applyHardening } = require('./scanner/harden');
+const { getLiveStats } = require('./scanner/sysmon');
 const ai = require('./scanner/ai');
 
 let win = null;
@@ -204,4 +205,16 @@ ipcMain.handle('guardian:ai-send', async (event, { report, prompt }) => {
   const cfg = ai.loadSettings(dataDir);
   const text = prompt || require('./scanner/debrief').buildDebriefPrompt(report);
   return ai.sendDebrief(cfg, text);
+});
+
+// ---- Live monitor ----
+ipcMain.handle('guardian:live-stats', async () => {
+  try { return getLiveStats(); } catch (e) { return { error: String((e && e.message) || e) }; }
+});
+ipcMain.handle('guardian:last-report', async () => {
+  try {
+    const p = path.join(dataDir, 'last-report.json');
+    if (!fs.existsSync(p)) return null;
+    return JSON.parse(fs.readFileSync(p, 'utf8'));
+  } catch (_) { return null; }
 });

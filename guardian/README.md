@@ -35,6 +35,13 @@ It also includes:
   Ollama) or **Anthropic**, and it returns the plain-language explanation in-app.
   Your endpoint, model and key are stored **only on this computer** and used only
   when you press *Send*. Requests go **only** to the address you entered.
+- **Live Monitor dashboard** — a premium, real-time view: colored stat tiles
+  (devices, online, open services, alerts, health, last scan), live **CPU and RAM
+  gauges** for this machine with per-core bars and a CPU sparkline, and a
+  **device-presence grid** showing every device with an online/at-risk status
+  dot. The local metrics update every couple of seconds (`src/scanner/sysmon.js`,
+  read-only from the OS); the device grid comes from your latest scan and a
+  one-click *Refresh devices*.
 
 ---
 
@@ -92,6 +99,7 @@ guardian/
         ├── scheduler.js      operator scheduled re-scans
         ├── harden.js         optional one-click hardening of THIS pc (firewall)
         ├── ai.js             optional direct send to a user-configured LLM
+        ├── sysmon.js         live local CPU/RAM/uptime metrics (Live Monitor)
         ├── index.js          orchestrator (emits progress)
         └── cli.js            headless runner (test without the GUI)
 ```

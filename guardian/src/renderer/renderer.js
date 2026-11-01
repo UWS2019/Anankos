@@ -16,7 +16,7 @@ let lastReport = null;
 let scanning = false;
 let detachProgress = null;
 
-const views = ['start', 'scanning', 'results', 'operator', 'error'];
+const views = ['start', 'scanning', 'results', 'operator', 'monitor', 'error'];
 function show(view) {
   views.forEach((v) => $(`view-${v}`).classList.toggle('active', v === view));
 }
@@ -473,6 +473,171 @@ window.guardian.onScheduleEvent((evt) => {
   if (evt.type === 'scan-error') logOp(`Scan error: ${evt.error}`, 'err');
   if (evt.type === 'status') applyScheduleStatus(evt.status);
 });
+
+// =====================================================================
+//  LIVE MONITOR
+// =====================================================================
+let monTimer = null;
+let cpuHistory = [];
+const GAUGE_CIRC = 2 * Math.PI * 50; // r=50
+
+$('btn-monitor').onclick = openMonitor;
+$('btn-mon-back').onclick = closeMonitor;
+$('btn-mon-scan').onclick = monitorScan;
+
+async function openMonitor() {
+  show('monitor');
+  cpuHistory = [];
+  const report = await window.guardian.lastReport();
+  renderStatTiles(report);
+  renderPresence(report);
+  if (monTimer) clearInterval(monTimer);
+  await pollLive();
+  monTimer = setInterval(pollLive, 2000);
+}
+function closeMonitor() {
+  if (monTimer) { clearInterval(monTimer); monTimer = null; }
+  show(lastReport ? 'results' : 'start');
+}
+
+async function pollLive() {
+  const s = await window.guardian.liveStats();
+  if (!s || s.error) return;
+  // Gauges
+  setGauge('gauge-cpu', s.cpu.overall);
+  setGauge('gauge-mem', s.mem.pct);
+  $('cpu-val').textContent = Math.round(s.cpu.overall);
+  $('mem-val').textContent = Math.round(s.mem.pct);
+  $('mon-host').textContent = s.hostname || '';
+  // Cores
+  const cores = $('cpu-cores');
+  if (cores.childNodes.length !== s.cpu.per.length) {
+    cores.innerHTML = '';
+    s.cpu.per.forEach(() => { const c = el('div', 'core'); c.appendChild(el('i')); cores.appendChild(c); });
+  }
+  s.cpu.per.forEach((v, i) => {
+    const bar = cores.childNodes[i] && cores.childNodes[i].firstChild;
+    if (bar) bar.style.height = Math.max(4, v) + '%';
+  });
+  // Rows
+  $('sys-rows').innerHTML = [
+    `<div class="r"><span>Processor</span><b>${esc(shorten(s.cpuModel, 34))}</b></div>`,
+    `<div class="r"><span>Cores</span><b>${s.cores}</b></div>`,
+    `<div class="r"><span>Memory</span><b>${fmtGB(s.mem.used)} / ${fmtGB(s.mem.total)} GB</b></div>`,
+    `<div class="r"><span>Uptime</span><b>${fmtUptime(s.uptime)}</b></div>`
+  ].join('');
+  // Sparkline
+  cpuHistory.push(s.cpu.overall);
+  while (cpuHistory.length > 60) cpuHistory.shift();
+  drawSpark();
+}
+
+function setGauge(id, pct) {
+  const c = $(id);
+  if (!c) return;
+  c.style.strokeDashoffset = GAUGE_CIRC * (1 - Math.max(0, Math.min(100, pct)) / 100);
+  if (id === 'gauge-cpu') {
+    c.style.stroke = pct > 85 ? 'var(--c-red)' : pct > 60 ? 'var(--c-amber)' : 'var(--c-cyan)';
+  }
+}
+
+function drawSpark() {
+  const n = cpuHistory.length;
+  if (n < 2) { $('spark-line').setAttribute('points', ''); return; }
+  const pts = cpuHistory.map((v, i) => {
+    const x = (i / (n - 1)) * 300;
+    const y = 46 - (v / 100) * 42;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  $('spark-line').setAttribute('points', pts);
+}
+
+function shorten(s, n) { s = String(s || ''); return s.length > n ? s.slice(0, n - 1) + '…' : s; }
+function fmtGB(bytes) { return (bytes / 1073741824).toFixed(1); }
+function fmtUptime(sec) {
+  const d = Math.floor(sec / 86400), h = Math.floor((sec % 86400) / 3600), m = Math.floor((sec % 3600) / 60);
+  if (d) return `${d}d ${h}h`;
+  if (h) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+function renderStatTiles(report) {
+  const host = $('stat-tiles');
+  if (!report || !report.ok) {
+    host.innerHTML = `<div class="stat-tile st-slate"><div class="st-top"><div class="st-lbl">No scan yet</div></div><div class="st-num">—</div></div>`;
+    return;
+  }
+  const devs = report.devices || [];
+  const services = devs.reduce((a, d) => a + ((d.ports || []).length), 0);
+  const risky = devs.reduce((a, d) => a + ((d.ports || []).filter((p) => p.risk === 'high' || p.risk === 'medium').length), 0);
+  const alerts = (report.counts.critical || 0) + (report.counts.high || 0);
+  const scoreColor = report.score >= 75 ? 'st-green' : report.score >= 45 ? 'st-amber' : 'st-red';
+  const age = report.generatedAt ? timeAgo(report.generatedAt) : '—';
+  const tiles = [
+    { cls: 'st-cyan', ico: '▣', num: devs.length, lbl: 'Devices' },
+    { cls: 'st-green', ico: '✔', num: devs.length, lbl: 'Online' },
+    { cls: 'st-violet', ico: '⇆', num: services, lbl: 'Open services' },
+    { cls: 'st-red', ico: '⚠', num: alerts, lbl: 'Alerts', click: 'results' },
+    { cls: scoreColor, ico: '♥', num: report.score, lbl: 'Health', click: 'results' },
+    { cls: 'st-slate', ico: '⏱', num: age, lbl: 'Last scan', small: true }
+  ];
+  host.innerHTML = '';
+  tiles.forEach((t) => {
+    const tile = el('div', `stat-tile ${t.cls}${t.click ? ' clickable' : ''}`);
+    tile.innerHTML = `<div class="st-top"><div class="st-lbl">${t.lbl}</div><div class="st-ico">${t.ico}</div></div><div class="st-num" ${t.small ? 'style="font-size:22px"' : ''}>${esc(String(t.num))}</div>`;
+    if (t.click && lastReport) tile.onclick = () => { closeMonitor(); selectSub('fixes'); show('results'); };
+    host.appendChild(tile);
+  });
+}
+
+function renderPresence(report) {
+  const grid = $('presence-grid');
+  const empty = $('presence-empty');
+  grid.innerHTML = '';
+  const devs = (report && report.devices) || [];
+  $('mon-dev-count').textContent = devs.length ? `${devs.length} devices` : '';
+  if (!devs.length) { empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  devs.forEach((d) => {
+    const risky = (d.ports || []).some((p) => p.risk === 'high');
+    const name = d.isGateway ? 'Router' : d.isThisDevice ? 'This computer' : (d.vendor || 'Unknown device');
+    const card = el('div', 'pdev');
+    const chips = [];
+    if (d.isGateway) chips.push('<span class="pd-chip role">ROUTER</span>');
+    if (d.isThisDevice) chips.push('<span class="pd-chip role">THIS PC</span>');
+    (d.ports || []).slice(0, 3).forEach((p) => chips.push(`<span class="pd-chip ${p.risk === 'high' ? 'risk' : ''}">${p.port}</span>`));
+    card.innerHTML = `
+      <div class="pd-top"><span class="pd-dot ${risky ? 'risk' : 'up'}"></span><span class="pd-name">${esc(name)}</span></div>
+      <div class="pd-ip">${esc(d.ip)}</div>
+      <div class="pd-tags">${chips.join('')}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+async function monitorScan() {
+  const btn = $('btn-mon-scan'); const old = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Scanning…';
+  const report = await window.guardian.startScan({ mode: mode });
+  btn.disabled = false; btn.textContent = old;
+  if (report && report.ok) {
+    lastReport = report;
+    renderStatTiles(report);
+    renderPresence(report);
+  }
+}
+
+function timeAgo(iso) {
+  const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s / 60) + 'm ago';
+  if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+  return Math.floor(s / 86400) + 'd ago';
+}
+
+// expose for preview harness
+window.openMonitor = openMonitor;
+window.renderStatTiles = renderStatTiles;
+window.renderPresence = renderPresence;
 
 // ---- Init ----
 window.renderResults = renderResults;

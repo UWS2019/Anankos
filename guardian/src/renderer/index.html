@@ -22,6 +22,7 @@
     </div>
   </div>
   <div class="header-right">
+    <button id="btn-monitor" class="op-nav mon-nav">&#9680; Live Monitor</button>
     <button id="btn-operator" class="op-nav" hidden>Operator Console</button>
     <div class="mode-toggle" role="tablist" aria-label="Scan mode">
       <button id="tab-simple" class="mode-btn active" role="tab" aria-selected="true">Simple</button>
@@ -126,6 +127,51 @@
 
     <div id="panel-devices" class="panel">
       <div id="device-list" class="device-list"></div>
+    </div>
+  </section>
+
+  <!-- ===================== LIVE MONITOR ===================== -->
+  <section id="view-monitor" class="view">
+    <div class="mon-head">
+      <div>
+        <div class="grade mono">Live Monitor</div>
+        <h2 class="op-title">Your network, in real time</h2>
+      </div>
+      <div class="mon-head-right">
+        <span id="mon-pulse" class="mon-live mono"><span class="live-dot"></span> LIVE</span>
+        <button id="btn-mon-scan" class="accent-btn">Refresh devices</button>
+        <button id="btn-mon-back" class="ghost-btn">&larr; Back</button>
+      </div>
+    </div>
+
+    <!-- Colored stat tiles -->
+    <div class="stat-tiles" id="stat-tiles"></div>
+
+    <div class="mon-grid">
+      <!-- This device live gauges -->
+      <div class="glass-card mon-system">
+        <div class="card-title"><span class="ct-ico" style="--g1:#38d9c8;--g2:#1f7a86"></span>This Device <span id="mon-host" class="mono dim"></span></div>
+        <div class="gauges">
+          <div class="gauge">
+            <svg viewBox="0 0 120 120"><circle class="g-bg" cx="60" cy="60" r="50"/><circle class="g-fg" id="gauge-cpu" cx="60" cy="60" r="50"/></svg>
+            <div class="gauge-val"><span id="cpu-val">0</span><small>%</small><div class="gauge-lbl mono">CPU</div></div>
+          </div>
+          <div class="gauge">
+            <svg viewBox="0 0 120 120"><circle class="g-bg" cx="60" cy="60" r="50"/><circle class="g-fg alt" id="gauge-mem" cx="60" cy="60" r="50"/></svg>
+            <div class="gauge-val"><span id="mem-val">0</span><small>%</small><div class="gauge-lbl mono">RAM</div></div>
+          </div>
+        </div>
+        <div class="cores" id="cpu-cores"></div>
+        <div class="sys-rows mono" id="sys-rows"></div>
+        <svg class="spark" id="cpu-spark" viewBox="0 0 300 48" preserveAspectRatio="none"><polyline id="spark-line" points=""/></svg>
+      </div>
+
+      <!-- Device presence grid -->
+      <div class="glass-card mon-presence">
+        <div class="card-title"><span class="ct-ico" style="--g1:#8fbf5a;--g2:#4e5540"></span>Device Presence <span id="mon-dev-count" class="mono dim"></span></div>
+        <div id="presence-grid" class="presence-grid"></div>
+        <div id="presence-empty" class="mon-empty mono">No scan yet &mdash; press <b>Refresh devices</b> to populate this grid.</div>
+      </div>
     </div>
   </section>
 
