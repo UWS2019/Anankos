@@ -1,0 +1,59 @@
+{
+  "name": "anankos-guardian",
+  "productName": "Anankos Guardian",
+  "version": "1.0.0",
+  "description": "Anankos Guardian — a one-click home network security auditor. Scans the devices on your own home router, explains risks in plain English, and walks you through fixing them.",
+  "author": {
+    "name": "Anankos",
+    "email": "support@anankos.example"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "scan:cli": "node src/scanner/cli.js",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
+    "dist:linux": "electron-builder --linux"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.anankos.guardian",
+    "productName": "Anankos Guardian",
+    "copyright": "Copyright © Anankos",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "build/icon.*"
+    ],
+    "win": {
+      "target": ["nsis"],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Anankos Guardian"
+    },
+    "mac": {
+      "target": ["dmg"],
+      "category": "public.app-category.utilities",
+      "icon": "build/icon.png"
+    },
+    "linux": {
+      "target": ["AppImage"],
+      "category": "Utility",
+      "icon": "build/icon.png"
+    }
+  }
+}

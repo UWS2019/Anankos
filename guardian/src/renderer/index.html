@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com 'self'; script-src 'self';">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anankos Guardian</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Top bar -->
+<header class="topbar">
+  <div class="brand">
+    <span class="mark" aria-hidden="true"></span>
+    <div>
+      <div class="brand-name">ANANKOS <span>GUARDIAN</span></div>
+      <div class="brand-sub mono">Home Network Sentinel</div>
+    </div>
+  </div>
+  <div class="mode-toggle" role="tablist" aria-label="Scan mode">
+    <button id="tab-simple" class="mode-btn active" role="tab" aria-selected="true">Simple</button>
+    <button id="tab-expert" class="mode-btn" role="tab" aria-selected="false">Expert</button>
+  </div>
+</header>
+
+<!-- Scope / consent notice -->
+<div class="scope-note mono">
+  <span class="dot"></span>
+  Guardian only inspects devices on <strong id="scope-cidr">your own home network</strong>. It never touches the internet, other networks, or your neighbours. It observes only &mdash; it changes nothing on its own.
+</div>
+
+<main class="stage">
+
+  <!-- ===================== START VIEW ===================== -->
+  <section id="view-start" class="view active">
+    <div class="start-card">
+      <div class="net-chips">
+        <div class="chip"><span class="mono lbl">Your network</span><span id="chip-cidr" class="val">&mdash;</span></div>
+        <div class="chip"><span class="mono lbl">Your router</span><span id="chip-gw" class="val">&mdash;</span></div>
+        <div class="chip"><span class="mono lbl">This device</span><span id="chip-ip" class="val">&mdash;</span></div>
+      </div>
+
+      <h1 class="headline">Check your home network<br>for security problems.</h1>
+      <p class="sub">One click looks at every device connected to your router, finds anything risky, and tells you exactly how to fix it &mdash; in plain language.</p>
+
+      <!-- Expert controls (hidden in simple mode) -->
+      <div id="expert-controls" class="expert-controls" hidden>
+        <div class="field">
+          <label class="mono" for="exp-ports">Ports</label>
+          <input id="exp-ports" type="text" value="1-1024,1883,3389,5900,8080,8443" spellcheck="false">
+        </div>
+        <div class="field">
+          <label class="mono" for="exp-target">Single target (optional)</label>
+          <input id="exp-target" type="text" placeholder="e.g. 192.168.1.1" spellcheck="false">
+        </div>
+        <div class="field">
+          <label class="mono" for="exp-timeout">Timeout (ms)</label>
+          <input id="exp-timeout" type="number" value="1000" min="200" max="5000" step="100">
+        </div>
+      </div>
+
+      <button id="btn-scan" class="scan-btn">
+        <span class="scan-btn-core">Scan My Network</span>
+      </button>
+      <div class="start-foot mono">Takes about a minute &middot; nothing leaves this computer</div>
+    </div>
+  </section>
+
+  <!-- ===================== SCANNING VIEW ===================== -->
+  <section id="view-scanning" class="view">
+    <div class="scan-wrap">
+      <div class="radar">
+        <div class="radar-sweep"></div>
+        <div class="radar-ring r1"></div>
+        <div class="radar-ring r2"></div>
+        <div class="radar-ring r3"></div>
+        <div class="radar-core"></div>
+      </div>
+      <div class="scan-status mono" id="scan-phase">Preparing&hellip;</div>
+      <div class="progress"><div class="progress-bar" id="progress-bar"></div></div>
+      <div class="scan-counts mono" id="scan-counts">&nbsp;</div>
+      <button id="btn-cancel" class="ghost-btn">Cancel</button>
+    </div>
+  </section>
+
+  <!-- ===================== RESULTS VIEW ===================== -->
+  <section id="view-results" class="view">
+    <div class="results-head">
+      <div class="score-ring" id="score-ring">
+        <svg viewBox="0 0 120 120" width="120" height="120">
+          <circle class="ring-bg" cx="60" cy="60" r="52" />
+          <circle class="ring-fg" id="ring-fg" cx="60" cy="60" r="52" />
+        </svg>
+        <div class="score-num"><span id="score-val">0</span><small>/100</small></div>
+      </div>
+      <div class="score-meta">
+        <div class="grade mono" id="grade">&mdash;</div>
+        <h2 id="summary-line">&mdash;</h2>
+        <div class="badges" id="severity-badges"></div>
+        <div class="results-actions">
+          <button id="btn-rescan" class="ghost-btn">Scan again</button>
+          <button id="btn-export" class="ghost-btn">Export report</button>
+          <button id="btn-view-devices" class="ghost-btn">View all devices</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabsub" role="tablist">
+      <button id="sub-fixes" class="subtab active" role="tab">What to fix</button>
+      <button id="sub-devices" class="subtab" role="tab">Devices</button>
+    </div>
+
+    <div id="panel-fixes" class="panel active">
+      <div id="findings" class="findings"></div>
+    </div>
+
+    <div id="panel-devices" class="panel">
+      <div id="device-list" class="device-list"></div>
+    </div>
+  </section>
+
+  <!-- ===================== ERROR VIEW ===================== -->
+  <section id="view-error" class="view">
+    <div class="error-card">
+      <div class="mono err-tag">Scan could not start</div>
+      <p id="error-msg">&mdash;</p>
+      <button id="btn-error-back" class="ghost-btn">Back</button>
+    </div>
+  </section>
+
+</main>
+
+<footer class="appfoot mono">
+  Anankos Guardian &middot; for auditing networks you own or are authorized to assess
+</footer>
+
+<script src="renderer.js"></script>
+</body>
+</html>

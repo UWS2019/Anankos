@@ -1,0 +1,133 @@
+# Anankos Guardian — Home Network Sentinel
+
+A one-click desktop app that audits the security of **your own home network**. It
+finds every device connected to your router, checks each one for risky or
+exposed services, inspects your Wi-Fi encryption, then explains anything it
+finds in plain language and walks you through fixing it.
+
+Built for two kinds of people:
+
+- **Simple mode** — one big *Scan My Network* button. No jargon. You get a
+  Network Health score and a short list of "here's what to fix", each with
+  numbered steps and a button that opens your router's settings page.
+- **Expert mode** — custom port ranges, single-target scans, tunable timeouts,
+  full device/port/service detail, and a one-click JSON export of the raw report.
+
+---
+
+## Scope & intent (please read)
+
+Guardian is a **defensive auditing tool for networks you own or are authorized
+to assess.** By design it only ever looks at devices on the **local subnet of
+the machine it runs on** — i.e. the things behind your own home router. It:
+
+- never scans the internet or any address outside your local network;
+- never attempts passwords, logins, or exploitation — it **observes only**;
+- never changes a setting on its own. Every fix is a *recommendation* with
+  step-by-step instructions that **you** carry out.
+
+Do not point it at networks you do not own or have written permission to test.
+
+---
+
+## How it works (no magic, no external tools)
+
+Everything runs locally in Node — there are **no bundled scanners, no nmap, no
+raw sockets, and no admin privileges required.** The techniques are the same
+ordinary operations any networked app performs:
+
+| Step | What it does | How |
+|------|--------------|-----|
+| Detect network | Finds your IP, subnet and router | `os.networkInterfaces()` + default route |
+| Discover devices | Lists what's online | TCP "ping" sweep + the OS `arp` table (gives MACs → vendor) |
+| Check services | Finds open/risky ports | Plain TCP connect scan of a curated port list |
+| Check Wi-Fi | Reads your encryption type | Built-in OS command (`netsh` / `nmcli` / `airport`) |
+| Analyze | Turns results into advice | A rules engine → findings + a 0–100 health score |
+
+---
+
+## Project layout
+
+```
+guardian/
+├── package.json            app manifest + electron-builder config
+├── build/icon.(svg|png)    app icon
+└── src/
+    ├── main.js             Electron main process (runs the engine)
+    ├── preload.js          secure IPC bridge (window.guardian)
+    ├── renderer/           the UI (branded HTML/CSS/JS, Simple + Expert)
+    └── scanner/            the scan engine (pure Node, UI-independent)
+        ├── netinfo.js        local network + subnet detection
+        ├── discovery.js      host discovery (sweep + ARP)
+        ├── ports.js          TCP connect port scan + catalog
+        ├── wifi.js           Wi-Fi security read
+        ├── oui.js            MAC → vendor lookup
+        ├── checks.js         rules engine (findings + remediation + score)
+        ├── index.js          orchestrator (emits progress)
+        └── cli.js            headless runner (test without the GUI)
+```
+
+The scan engine is deliberately decoupled from Electron, so the exact same code
+powers both the GUI and the CLI.
+
+---
+
+## Run it in development
+
+```bash
+cd guardian
+npm install        # installs electron + electron-builder (needs internet)
+npm start          # launches the desktop app
+```
+
+Try the engine headless, no GUI:
+
+```bash
+npm run scan:cli                         # simple scan, readable summary
+node src/scanner/cli.js --json           # full JSON report
+node src/scanner/cli.js --expert --ports 1-1024
+node src/scanner/cli.js --target 192.168.1.1 --expert --ports 1-1024
+```
+
+> Note: a live scan talks to your LAN, so run it on your real home machine —
+> not inside a locked-down CI/sandbox, where network probing is blocked.
+
+---
+
+## Build the downloadable installers
+
+electron-builder produces a real click-to-install app per platform. Build each
+target **on that OS** (or use a CI matrix):
+
+```bash
+npm run dist:win     # Windows  -> release/Anankos Guardian Setup x.y.z.exe
+npm run dist:mac     # macOS    -> release/Anankos Guardian-x.y.z.dmg
+npm run dist:linux   # Linux    -> release/Anankos Guardian-x.y.z.AppImage
+```
+
+Output lands in `release/`. The Windows build is a one-click NSIS installer that
+adds desktop + Start-menu shortcuts; macOS is a drag-to-Applications DMG; Linux
+is a portable AppImage you mark executable and double-click.
+
+### A note on antivirus / SmartScreen
+
+Any tool that enumerates network devices can trip heuristic antivirus or
+Windows SmartScreen, especially before the installer is **code-signed**. For a
+public release you'll want a code-signing certificate (Windows) and Apple
+notarization (macOS). For personal/internal use the unsigned build runs fine
+once you approve the first-run prompt.
+
+---
+
+## Extending it
+
+- **More device names:** drop a `src/scanner/oui-extra.json` of `"aa:bb:cc":
+  "Vendor"` entries; it's merged automatically.
+- **More / different checks:** add rules in `src/scanner/checks.js` — each finding
+  is just `{ id, severity, title, plain, why, steps[], routerLink }`.
+- **Expert nmap upgrade:** `ports.js` is isolated, so swapping in an
+  nmap-backed scanner for expert mode is a contained change.
+
+---
+
+_Part of the Anankos toolset. For auditing networks you own or are authorized to assess._
