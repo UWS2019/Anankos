@@ -21,9 +21,12 @@
       <div class="brand-sub mono">Home Network Sentinel</div>
     </div>
   </div>
-  <div class="mode-toggle" role="tablist" aria-label="Scan mode">
-    <button id="tab-simple" class="mode-btn active" role="tab" aria-selected="true">Simple</button>
-    <button id="tab-expert" class="mode-btn" role="tab" aria-selected="false">Expert</button>
+  <div class="header-right">
+    <button id="btn-operator" class="op-nav" hidden>Operator Console</button>
+    <div class="mode-toggle" role="tablist" aria-label="Scan mode">
+      <button id="tab-simple" class="mode-btn active" role="tab" aria-selected="true">Simple</button>
+      <button id="tab-expert" class="mode-btn" role="tab" aria-selected="false">Expert</button>
+    </div>
   </div>
 </header>
 
@@ -103,8 +106,10 @@
         <div class="badges" id="severity-badges"></div>
         <div class="results-actions">
           <button id="btn-rescan" class="ghost-btn">Scan again</button>
-          <button id="btn-export" class="ghost-btn">Export report</button>
-          <button id="btn-view-devices" class="ghost-btn">View all devices</button>
+          <button id="btn-debrief" class="accent-btn">AI debrief &#9733;</button>
+          <button id="btn-export-html" class="ghost-btn">Export HTML</button>
+          <button id="btn-export-pdf" class="ghost-btn">Export PDF</button>
+          <button id="btn-export-json" class="ghost-btn">Export JSON</button>
         </div>
       </div>
     </div>
@@ -122,6 +127,101 @@
       <div id="device-list" class="device-list"></div>
     </div>
   </section>
+
+  <!-- ===================== OPERATOR CONSOLE ===================== -->
+  <section id="view-operator" class="view">
+    <div class="op-head">
+      <div>
+        <div class="grade mono">Operator Console</div>
+        <h2 class="op-title">Scheduled re-scans &amp; history</h2>
+      </div>
+      <button id="btn-op-back" class="ghost-btn">&larr; Back</button>
+    </div>
+
+    <div class="op-grid">
+      <!-- Schedule card -->
+      <div class="op-card">
+        <div class="op-card-title mono">Schedule</div>
+        <div class="op-fields">
+          <label class="op-field"><span class="mono">Every</span>
+            <select id="op-interval">
+              <option value="15">15 minutes</option>
+              <option value="30">30 minutes</option>
+              <option value="60" selected>1 hour</option>
+              <option value="180">3 hours</option>
+              <option value="360">6 hours</option>
+              <option value="720">12 hours</option>
+              <option value="1440">24 hours</option>
+            </select>
+          </label>
+          <label class="op-field"><span class="mono">Scan depth</span>
+            <select id="op-mode">
+              <option value="simple" selected>Simple (fast)</option>
+              <option value="expert">Expert (thorough)</option>
+            </select>
+          </label>
+          <label class="op-field op-ports" hidden><span class="mono">Ports (expert)</span>
+            <input id="op-ports" type="text" value="1-1024,3389,5900,8080" spellcheck="false">
+          </label>
+          <label class="op-check"><input type="checkbox" id="op-runstart" checked> <span>Run one scan immediately when started</span></label>
+        </div>
+        <div class="op-status" id="op-status">
+          <span class="mono lbl">Status</span>
+          <span id="op-status-val" class="op-badge off">Stopped</span>
+        </div>
+        <div class="op-status-rows mono" id="op-status-rows"></div>
+        <div class="op-actions">
+          <button id="op-start" class="accent-btn">Start schedule</button>
+          <button id="op-stop" class="ghost-btn" hidden>Stop schedule</button>
+          <button id="op-runnow" class="ghost-btn">Run once now</button>
+        </div>
+      </div>
+
+      <!-- Live log card -->
+      <div class="op-card">
+        <div class="op-card-title mono">Live activity</div>
+        <div id="op-log" class="op-log mono"></div>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="op-history">
+      <div class="op-history-head">
+        <div class="op-card-title mono">Scan history</div>
+        <div class="op-history-actions">
+          <button id="op-history-export" class="ghost-btn sm">Export CSV</button>
+          <button id="op-history-clear" class="ghost-btn sm">Clear</button>
+        </div>
+      </div>
+      <div class="op-table-wrap">
+        <table class="op-table">
+          <thead><tr><th>When</th><th>Trigger</th><th>Score</th><th>Grade</th><th>Crit</th><th>High</th><th>Med</th><th>Devices</th></tr></thead>
+          <tbody id="op-history-rows"></tbody>
+        </table>
+      </div>
+      <div id="op-history-empty" class="op-empty mono">No scans recorded yet.</div>
+    </div>
+  </section>
+
+  <!-- ===================== AI DEBRIEF MODAL ===================== -->
+  <div id="debrief-modal" class="modal" hidden>
+    <div class="modal-box">
+      <div class="modal-head">
+        <div>
+          <div class="grade mono">AI Debrief Prompt</div>
+          <h3>Let any AI explain this in plain language</h3>
+        </div>
+        <button id="debrief-close" class="icon-btn">&times;</button>
+      </div>
+      <p class="modal-note">Copy the text below and paste it into <strong>ChatGPT, Claude, Gemini, or any AI assistant</strong>. It will explain your results in plain language and tell you what to do first.</p>
+      <p class="modal-warn mono"><span class="dot"></span> This text includes your local device addresses. Only paste it somewhere you trust.</p>
+      <textarea id="debrief-text" class="debrief-text" readonly spellcheck="false"></textarea>
+      <div class="modal-actions">
+        <button id="debrief-copy" class="accent-btn">Copy to clipboard</button>
+        <button id="debrief-save" class="ghost-btn">Save as .txt</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ===================== ERROR VIEW ===================== -->
   <section id="view-error" class="view">

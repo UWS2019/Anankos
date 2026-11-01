@@ -16,10 +16,12 @@ let lastReport = null;
 let scanning = false;
 let detachProgress = null;
 
-const views = ['start', 'scanning', 'results', 'error'];
+const views = ['start', 'scanning', 'results', 'operator', 'error'];
 function show(view) {
   views.forEach((v) => $(`view-${v}`).classList.toggle('active', v === view));
 }
+// expose for preview/testing harnesses
+window.show = show;
 
 // ---- Mode toggle ----
 function setMode(m) {
@@ -29,6 +31,7 @@ function setMode(m) {
   $('tab-simple').setAttribute('aria-selected', m === 'simple');
   $('tab-expert').setAttribute('aria-selected', m === 'expert');
   $('expert-controls').hidden = m !== 'expert';
+  $('btn-operator').hidden = m !== 'expert';
 }
 $('tab-simple').onclick = () => setMode('simple');
 $('tab-expert').onclick = () => setMode('expert');
@@ -210,9 +213,8 @@ function renderDevices(r) {
 // ---- Buttons ----
 $('btn-scan').onclick = startScan;
 $('btn-rescan').onclick = () => show('start');
-$('btn-cancel').onclick = () => { show('start'); /* engine finishes in bg; result ignored */ scanning = false; };
+$('btn-cancel').onclick = () => { show('start'); scanning = false; };
 $('btn-error-back').onclick = () => show('start');
-$('btn-view-devices').onclick = () => selectSub('devices');
 $('sub-fixes').onclick = () => selectSub('fixes');
 $('sub-devices').onclick = () => selectSub('devices');
 
@@ -223,17 +225,154 @@ function selectSub(which) {
   $('panel-devices').classList.toggle('active', which === 'devices');
 }
 
-$('btn-export').onclick = async () => {
+// ---- Exports ----
+async function doExport(format, btn) {
   if (!lastReport) return;
-  const path = await window.guardian.saveReport(JSON.stringify(lastReport, null, 2));
-  if (path) {
-    const btn = $('btn-export'); const old = btn.textContent;
-    btn.textContent = 'Saved ✓';
-    setTimeout(() => { btn.textContent = old; }, 1800);
-  }
+  const old = btn.textContent;
+  btn.textContent = 'Saving…';
+  const res = await window.guardian.exportReport(lastReport, format);
+  btn.textContent = (res && !res.error) ? 'Saved ✓' : (res && res.error ? 'Failed' : old);
+  setTimeout(() => { btn.textContent = old; }, 1800);
+}
+$('btn-export-html').onclick = (e) => doExport('html', e.currentTarget);
+$('btn-export-pdf').onclick = (e) => doExport('pdf', e.currentTarget);
+$('btn-export-json').onclick = (e) => doExport('json', e.currentTarget);
+
+// ---- AI debrief modal ----
+async function openDebrief() {
+  if (!lastReport) return;
+  const text = await window.guardian.buildDebrief(lastReport);
+  $('debrief-text').value = text || '';
+  $('debrief-modal').hidden = false;
+}
+function closeDebrief() { $('debrief-modal').hidden = true; }
+$('btn-debrief').onclick = openDebrief;
+$('debrief-close').onclick = closeDebrief;
+$('debrief-modal').addEventListener('click', (e) => { if (e.target.id === 'debrief-modal') closeDebrief(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDebrief(); });
+$('debrief-copy').onclick = async (e) => {
+  await window.guardian.copyText($('debrief-text').value);
+  const b = e.currentTarget; const old = b.textContent;
+  b.textContent = 'Copied ✓';
+  setTimeout(() => { b.textContent = old; }, 1600);
+};
+$('debrief-save').onclick = async () => {
+  // Reuse JSON export path isn't right; save via a Blob download fallback.
+  const blob = new Blob([$('debrief-text').value], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'anankos-guardian-ai-debrief.txt';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 };
 
+// =====================================================================
+//  OPERATOR CONSOLE
+// =====================================================================
+$('btn-operator').onclick = () => { openOperator(); };
+$('btn-op-back').onclick = () => { show(lastReport ? 'results' : 'start'); };
+$('op-mode').onchange = () => { $('op-ports').parentElement.hidden = $('op-mode').value !== 'expert'; };
+
+async function openOperator() {
+  const st = await window.guardian.scheduleStatus();
+  applyScheduleStatus(st);
+  // reflect persisted config into controls
+  if (st.intervalMinutes) $('op-interval').value = String(st.intervalMinutes);
+  if (st.mode) $('op-mode').value = st.mode;
+  $('op-ports').parentElement.hidden = $('op-mode').value !== 'expert';
+  if (st.portSpec) $('op-ports').value = st.portSpec;
+  await refreshHistory();
+  show('operator');
+}
+
+function applyScheduleStatus(st) {
+  const badge = $('op-status-val');
+  if (st.scanning) { badge.textContent = 'Scanning…'; badge.className = 'op-badge scanning'; }
+  else if (st.enabled) { badge.textContent = 'Running'; badge.className = 'op-badge on'; }
+  else { badge.textContent = 'Stopped'; badge.className = 'op-badge off'; }
+  $('op-start').hidden = st.enabled;
+  $('op-stop').hidden = !st.enabled;
+  const rows = [];
+  if (st.enabled) rows.push(`<div>Every <b>${st.intervalMinutes}</b> min &middot; depth <b>${st.mode}</b></div>`);
+  if (st.nextRunAt) rows.push(`<div>Next run: <b>${new Date(st.nextRunAt).toLocaleTimeString()}</b></div>`);
+  if (st.lastRunAt) rows.push(`<div>Last run: <b>${new Date(st.lastRunAt).toLocaleString()}</b></div>`);
+  $('op-status-rows').innerHTML = rows.join('');
+}
+
+$('op-start').onclick = async () => {
+  const cfg = {
+    intervalMinutes: parseInt($('op-interval').value, 10),
+    mode: $('op-mode').value,
+    portSpec: $('op-mode').value === 'expert' ? $('op-ports').value.trim() : null,
+    runOnStart: $('op-runstart').checked
+  };
+  logOp(`Schedule started — every ${cfg.intervalMinutes} min (${cfg.mode})`, 'ok');
+  const st = await window.guardian.scheduleStart(cfg);
+  applyScheduleStatus(st);
+};
+$('op-stop').onclick = async () => {
+  const st = await window.guardian.scheduleStop();
+  applyScheduleStatus(st);
+  logOp('Schedule stopped', 'warn');
+};
+$('op-runnow').onclick = async () => {
+  logOp('Manual run requested…', 'ok');
+  const st = await window.guardian.scheduleRunNow();
+  applyScheduleStatus(st);
+};
+$('op-history-export').onclick = async () => { await window.guardian.historyExport(); };
+$('op-history-clear').onclick = async () => {
+  await window.guardian.historyClear();
+  await refreshHistory();
+  logOp('History cleared', 'warn');
+};
+
+function logOp(msg, kind) {
+  const log = $('op-log');
+  const line = el('div');
+  const t = new Date().toLocaleTimeString();
+  line.innerHTML = `<span class="t">${t}</span> <span class="ev-${kind || 'ok'}">${esc(msg)}</span>`;
+  log.insertBefore(line, log.firstChild);
+  while (log.childNodes.length > 200) log.removeChild(log.lastChild);
+}
+
+async function refreshHistory() {
+  const list = await window.guardian.historyLoad();
+  const rows = $('op-history-rows');
+  rows.innerHTML = '';
+  if (!list || !list.length) {
+    $('op-history-empty').style.display = 'block';
+    return;
+  }
+  $('op-history-empty').style.display = 'none';
+  list.slice().reverse().forEach((e) => {
+    const c = e.counts || {};
+    const col = e.score >= 75 ? 'var(--green)' : e.score >= 45 ? 'var(--amber)' : 'var(--red)';
+    const tr = el('tr');
+    tr.innerHTML = `
+      <td class="mono" style="font-size:11px">${new Date(e.at).toLocaleString()}</td>
+      <td class="mono" style="font-size:10px;color:var(--grey-500)">${esc(e.trigger || '')}</td>
+      <td class="sc" style="color:${col}">${e.score}</td>
+      <td>${esc(e.grade || '')}</td>
+      <td>${c.critical || 0}</td><td>${c.high || 0}</td><td>${c.medium || 0}</td>
+      <td>${e.deviceCount || 0}</td>`;
+    rows.appendChild(tr);
+  });
+}
+
+// Live events from the scheduler (background re-scans).
+window.guardian.onScheduleEvent((evt) => {
+  if (evt.type === 'scan-start') logOp(`${evt.trigger === 'manual' ? 'Manual' : 'Scheduled'} scan started`, 'ok');
+  if (evt.type === 'scan-done') {
+    logOp(`Scan complete — score ${evt.report.score}/100 (${evt.report.grade}), ${evt.report.devices.length} devices`, 'ok');
+    refreshHistory();
+  }
+  if (evt.type === 'scan-error') logOp(`Scan error: ${evt.error}`, 'err');
+  if (evt.type === 'status') applyScheduleStatus(evt.status);
+});
+
 // ---- Init ----
+window.renderResults = renderResults;
 setMode('simple');
 show('start');
 loadNetInfo();

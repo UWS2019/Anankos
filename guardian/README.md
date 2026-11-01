@@ -11,7 +11,21 @@ Built for two kinds of people:
   Network Health score and a short list of "here's what to fix", each with
   numbered steps and a button that opens your router's settings page.
 - **Expert mode** — custom port ranges, single-target scans, tunable timeouts,
-  full device/port/service detail, and a one-click JSON export of the raw report.
+  full device/port/service detail, and report exports.
+
+It also includes:
+
+- **Report export** — save any scan as a polished, self-contained **HTML** or
+  **PDF** report (brand-styled, printable, includes the device list and the AI
+  debrief prompt), or the raw **JSON** for your own tooling.
+- **AI debrief prompt** — one click builds a ready-to-paste prompt containing
+  your findings. Drop it into ChatGPT, Claude, Gemini, or a local model and it
+  explains everything in plain language and tells you what to do first. The app
+  sends nothing itself — you choose where to paste it — and it warns that the
+  text contains your local device addresses.
+- **Operator Console (expert)** — schedule automatic **re-scans** on an interval
+  (15 min → 24 h), with a live activity log, a persistent **scan history** trend
+  table, and CSV export. The schedule is saved and resumes when the app reopens.
 
 ---
 
@@ -63,9 +77,18 @@ guardian/
         ├── wifi.js           Wi-Fi security read
         ├── oui.js            MAC → vendor lookup
         ├── checks.js         rules engine (findings + remediation + score)
+        ├── debrief.js        builds the paste-into-any-LLM debrief prompt
+        ├── report.js         self-contained HTML report (used for HTML + PDF)
+        ├── history.js        scan-history + schedule persistence (JSON/CSV)
+        ├── scheduler.js      operator scheduled re-scans
         ├── index.js          orchestrator (emits progress)
         └── cli.js            headless runner (test without the GUI)
 ```
+
+Scan history, the last full report, and the saved schedule live in Electron's
+per-user `userData` directory (e.g. `%APPDATA%/anankos-guardian` on Windows,
+`~/Library/Application Support/anankos-guardian` on macOS,
+`~/.config/anankos-guardian` on Linux). Nothing is uploaded anywhere.
 
 The scan engine is deliberately decoupled from Electron, so the exact same code
 powers both the GUI and the CLI.
