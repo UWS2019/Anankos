@@ -26,6 +26,15 @@ It also includes:
 - **Operator Console (expert)** — schedule automatic **re-scans** on an interval
   (15 min → 24 h), with a live activity log, a persistent **scan history** trend
   table, and CSV export. The schedule is saved and resumes when the app reopens.
+- **Harden this PC** — optional one-click fixes for **this computer only** (never
+  other devices). v1 detects whether the built-in OS firewall is on and can turn
+  it on for you; if the change needs administrator rights, it hands you the exact
+  command instead. Safe and reversible.
+- **Send debrief to your own AI (optional)** — instead of copy-pasting, point the
+  app at any **OpenAI-compatible** endpoint (OpenAI, OpenRouter, LM Studio,
+  Ollama) or **Anthropic**, and it returns the plain-language explanation in-app.
+  Your endpoint, model and key are stored **only on this computer** and used only
+  when you press *Send*. Requests go **only** to the address you entered.
 
 ---
 
@@ -81,6 +90,8 @@ guardian/
         ├── report.js         self-contained HTML report (used for HTML + PDF)
         ├── history.js        scan-history + schedule persistence (JSON/CSV)
         ├── scheduler.js      operator scheduled re-scans
+        ├── harden.js         optional one-click hardening of THIS pc (firewall)
+        ├── ai.js             optional direct send to a user-configured LLM
         ├── index.js          orchestrator (emits progress)
         └── cli.js            headless runner (test without the GUI)
 ```

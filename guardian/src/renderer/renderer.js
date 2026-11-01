@@ -257,7 +257,6 @@ $('debrief-copy').onclick = async (e) => {
   setTimeout(() => { b.textContent = old; }, 1600);
 };
 $('debrief-save').onclick = async () => {
-  // Reuse JSON export path isn't right; save via a Blob download fallback.
   const blob = new Blob([$('debrief-text').value], { type: 'text/plain' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -265,6 +264,110 @@ $('debrief-save').onclick = async () => {
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 };
+
+// ---- AI settings + direct send ----
+async function loadAiSettings() {
+  const s = await window.guardian.aiSettingsLoad();
+  if (!s) return;
+  $('ai-provider').value = s.provider || 'openai';
+  $('ai-baseurl').value = s.baseUrl || '';
+  $('ai-model').value = s.model || '';
+  $('ai-key-status').textContent = s.hasKey ? '— saved ✓' : '— not set';
+}
+$('debrief-settings-toggle').onclick = async () => {
+  const box = $('ai-settings');
+  box.hidden = !box.hidden;
+  if (!box.hidden) await loadAiSettings();
+};
+$('ai-save').onclick = async (e) => {
+  const cfg = {
+    enabled: true,
+    provider: $('ai-provider').value,
+    baseUrl: $('ai-baseurl').value.trim(),
+    model: $('ai-model').value.trim(),
+    apiKey: $('ai-apikey').value // blank keeps saved key (handled in main)
+  };
+  await window.guardian.aiSettingsSave(cfg);
+  $('ai-apikey').value = '';
+  const b = e.currentTarget; const old = b.textContent;
+  b.textContent = 'Saved ✓'; setTimeout(() => { b.textContent = old; }, 1600);
+  await loadAiSettings();
+};
+$('debrief-send').onclick = async (e) => {
+  const wrap = $('ai-response-wrap'); const out = $('ai-response');
+  wrap.hidden = false;
+  out.className = 'ai-response loading';
+  out.textContent = 'Sending to your AI…';
+  const b = e.currentTarget; b.disabled = true;
+  const res = await window.guardian.aiSend(lastReport, $('debrief-text').value);
+  b.disabled = false;
+  if (res && res.ok) { out.className = 'ai-response'; out.textContent = res.text; }
+  else {
+    out.className = 'ai-response err';
+    out.textContent = (res && res.error) || 'Failed. Open AI settings and check your endpoint, model and key.';
+  }
+};
+
+// ---- Harden this PC ----
+$('btn-harden').onclick = openHarden;
+$('harden-close').onclick = () => { $('harden-modal').hidden = true; };
+$('harden-modal').addEventListener('click', (e) => { if (e.target.id === 'harden-modal') $('harden-modal').hidden = true; });
+
+async function openHarden() {
+  $('harden-modal').hidden = false;
+  const list = $('harden-list');
+  list.innerHTML = '<div class="modal-note">Checking this computer…</div>';
+  const status = await window.guardian.hardenStatus();
+  list.innerHTML = '';
+  if (!status || status.error || !status.actions) {
+    list.innerHTML = `<div class="harden-msg warn">Could not read this computer's security settings${status && status.error ? ': ' + esc(status.error) : ''}.</div>`;
+    return;
+  }
+  status.actions.forEach((a) => list.appendChild(renderHardenItem(a)));
+}
+
+function renderHardenItem(a) {
+  const item = el('div', `harden-item ${a.state}`);
+  const top = el('div', 'harden-top');
+  top.appendChild(el('div', 'harden-title', esc(a.title)));
+  top.appendChild(el('span', 'harden-state', esc(a.stateLabel || a.state)));
+  item.appendChild(top);
+  item.appendChild(el('div', 'harden-plain', esc(a.plain)));
+
+  if (a.state !== 'ok') {
+    const btn = el('button', 'harden-apply', 'Apply this fix');
+    const msg = el('div', 'harden-msg');
+    btn.onclick = async () => {
+      btn.disabled = true; btn.textContent = 'Applying…';
+      const res = await window.guardian.hardenApply(a.id);
+      if (res && res.ok) {
+        item.className = 'harden-item ok';
+        item.querySelector('.harden-state').textContent = 'Fixed ✓';
+        msg.className = 'harden-msg ok'; msg.textContent = res.message || 'Done.';
+        btn.remove();
+      } else {
+        btn.disabled = false; btn.textContent = 'Apply this fix';
+        msg.className = 'harden-msg warn';
+        msg.textContent = (res && res.message) || 'Could not apply automatically.';
+        if (res && (res.manualCommand || a.manualCommand)) {
+          item.appendChild(renderCmd(res.manualCommand || a.manualCommand));
+        }
+      }
+    };
+    item.appendChild(btn);
+    item.appendChild(msg);
+  }
+  return item;
+}
+
+function renderCmd(cmd) {
+  const box = el('div', 'harden-cmd');
+  box.appendChild(el('code', null, esc(cmd)));
+  const copy = el('button', null, 'Copy');
+  copy.onclick = async () => { await window.guardian.copyText(cmd); copy.textContent = 'Copied'; setTimeout(() => { copy.textContent = 'Copy'; }, 1500); };
+  box.appendChild(copy);
+  return box;
+}
 
 // =====================================================================
 //  OPERATOR CONSOLE

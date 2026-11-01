@@ -107,6 +107,7 @@
         <div class="results-actions">
           <button id="btn-rescan" class="ghost-btn">Scan again</button>
           <button id="btn-debrief" class="accent-btn">AI debrief &#9733;</button>
+          <button id="btn-harden" class="ghost-btn">Harden this PC</button>
           <button id="btn-export-html" class="ghost-btn">Export HTML</button>
           <button id="btn-export-pdf" class="ghost-btn">Export PDF</button>
           <button id="btn-export-json" class="ghost-btn">Export JSON</button>
@@ -219,7 +220,54 @@
       <div class="modal-actions">
         <button id="debrief-copy" class="accent-btn">Copy to clipboard</button>
         <button id="debrief-save" class="ghost-btn">Save as .txt</button>
+        <button id="debrief-send" class="ghost-btn">Send to my AI &rarr;</button>
+        <button id="debrief-settings-toggle" class="ghost-btn">AI settings</button>
       </div>
+
+      <!-- AI settings (collapsible) -->
+      <div id="ai-settings" class="ai-settings" hidden>
+        <div class="ai-settings-title mono">Connect your own AI (optional)</div>
+        <p class="ai-settings-note">Works with any OpenAI-compatible endpoint (OpenAI, OpenRouter, LM Studio, Ollama) or Anthropic. Your endpoint and key are stored only on this computer and used only when you press Send.</p>
+        <div class="ai-fields">
+          <label class="op-field"><span class="mono">Provider</span>
+            <select id="ai-provider">
+              <option value="openai">OpenAI-compatible</option>
+              <option value="anthropic">Anthropic</option>
+            </select>
+          </label>
+          <label class="op-field"><span class="mono">Endpoint (base URL)</span>
+            <input id="ai-baseurl" type="text" placeholder="https://api.openai.com/v1" spellcheck="false">
+          </label>
+          <label class="op-field"><span class="mono">Model</span>
+            <input id="ai-model" type="text" placeholder="gpt-4o-mini" spellcheck="false">
+          </label>
+          <label class="op-field"><span class="mono">API key <span id="ai-key-status"></span></span>
+            <input id="ai-apikey" type="password" placeholder="sk-… (leave blank to keep saved key)" spellcheck="false">
+          </label>
+        </div>
+        <button id="ai-save" class="accent-btn">Save AI settings</button>
+      </div>
+
+      <!-- AI response -->
+      <div id="ai-response-wrap" class="ai-response-wrap" hidden>
+        <div class="ai-settings-title mono">AI explanation</div>
+        <div id="ai-response" class="ai-response"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== HARDEN THIS PC MODAL ===================== -->
+  <div id="harden-modal" class="modal" hidden>
+    <div class="modal-box">
+      <div class="modal-head">
+        <div>
+          <div class="grade mono">Harden This Computer</div>
+          <h3>One-click safety fixes for this PC</h3>
+        </div>
+        <button id="harden-close" class="icon-btn">&times;</button>
+      </div>
+      <p class="modal-note">These optional fixes apply only to <strong>this computer</strong> &mdash; never to other devices. They are safe and reversible. Some may ask for administrator rights.</p>
+      <div id="harden-list" class="harden-list"></div>
     </div>
   </div>
 

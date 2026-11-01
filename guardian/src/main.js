@@ -14,6 +14,8 @@ const { buildReportHtml } = require('./scanner/report');
 const { buildDebriefPrompt } = require('./scanner/debrief');
 const { Scheduler } = require('./scanner/scheduler');
 const { appendHistory, loadHistory, clearHistory, historyToCsv, loadSchedule } = require('./scanner/history');
+const { getHardeningStatus, applyHardening } = require('./scanner/harden');
+const ai = require('./scanner/ai');
 
 let win = null;
 let scheduler = null;
@@ -179,4 +181,27 @@ ipcMain.handle('guardian:history-export', async () => {
   if (res.canceled || !res.filePath) return false;
   fs.writeFileSync(res.filePath, historyToCsv(loadHistory(dataDir)));
   return res.filePath;
+});
+
+// ---- Harden this PC ----
+ipcMain.handle('guardian:harden-status', async () => {
+  try { return await getHardeningStatus(); } catch (e) { return { error: String((e && e.message) || e) }; }
+});
+ipcMain.handle('guardian:harden-apply', async (event, actionId) => {
+  try { return await applyHardening(actionId); } catch (e) { return { ok: false, message: String((e && e.message) || e) }; }
+});
+
+// ---- AI debrief: optional direct send ----
+ipcMain.handle('guardian:ai-settings-load', async () => ai.redact(ai.loadSettings(dataDir)));
+ipcMain.handle('guardian:ai-settings-save', async (event, cfg) => {
+  // If the UI sends no key (user left it blank), keep the previously stored one.
+  const prev = ai.loadSettings(dataDir);
+  const merged = Object.assign({}, prev, cfg || {});
+  if (!cfg || !cfg.apiKey) merged.apiKey = prev.apiKey;
+  return ai.saveSettings(dataDir, merged);
+});
+ipcMain.handle('guardian:ai-send', async (event, { report, prompt }) => {
+  const cfg = ai.loadSettings(dataDir);
+  const text = prompt || require('./scanner/debrief').buildDebriefPrompt(report);
+  return ai.sendDebrief(cfg, text);
 });

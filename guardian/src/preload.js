@@ -39,5 +39,14 @@ contextBridge.exposeInMainWorld('guardian', {
   historyClear: () => ipcRenderer.invoke('guardian:history-clear'),
   historyExport: () => ipcRenderer.invoke('guardian:history-export'),
 
+  // Harden this PC
+  hardenStatus: () => ipcRenderer.invoke('guardian:harden-status'),
+  hardenApply: (actionId) => ipcRenderer.invoke('guardian:harden-apply', actionId),
+
+  // AI direct send (optional)
+  aiSettingsLoad: () => ipcRenderer.invoke('guardian:ai-settings-load'),
+  aiSettingsSave: (cfg) => ipcRenderer.invoke('guardian:ai-settings-save', cfg),
+  aiSend: (report, prompt) => ipcRenderer.invoke('guardian:ai-send', { report, prompt }),
+
   platform: process.platform
 });
