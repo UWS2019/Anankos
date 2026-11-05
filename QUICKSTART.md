@@ -18,28 +18,24 @@ First run creates a Python virtual environment and installs two packages
 
 ## 2. A 5-minute test drive
 
-1. **Press ▶ Start** (top bar). The clock advances; T+ counts simulated minutes.
-2. **Run an attack** — in the ATT&CK Console (right), the kill chain is gated:
-   - `T1566 Phishing` on *Plant Business Network* → IT foothold.
-   - `T1210 Exploitation of Remote Services` on the same → pivot to OT.
-   - `T0855 Unauthorized Command Message` on *Main Breaker RTU* → command
-     `open_breaker`. Watch the grid go red and the hospital fall to its
-     generator; let it run and the hospital goes dark → **CATASTROPHIC**.
-3. **Mirror a finding** — in *Assessment / Findings*, pick **Water**, tick
-   **internet exposed**. Now `T0883 Internet Accessible Device` works directly
-   on *Chlorine Dosing PLC*; then `T0836 Modify Parameter` → `dose_ppm` = `15`.
-   The water plant shows a red chemical plume.
-4. **Defend** — in *Blue Team*, **deploy** `D3-SIS` (Safety Instrumented System)
-   and `D3-OAM` (Command Authentication), then repeat the chlorine attack: it's
-   clamped back to safe and the scoreboard logs it. Run the same scenario with
-   defenses off vs on to see the before/after.
-5. **Report** — click **📄 Report** (top bar) for a printable assessment with
-   the attack narrative, ATT&CK coverage, and D3FEND recommendations. Print to
-   PDF from the browser.
-6. **Build a client site** — click **🧩 Builder**. Remove facilities you don't
-   need, drag to reposition, rename, then **Run in Simulator**. Open the
-   dashboard to see the sim running on your custom topology. **Save** it as a
-   JSON "site pack" to reload later.
+1. **Describe a scenario** — in the **Scenario Console** at the top, click a
+   preset chip (e.g. *Telecom supply-chain compromise*) or type your own in
+   plain English, then press **▶ Run Scenario**. The lab compiles it into a
+   MITRE-tagged kill chain and **auto-plays it** on the sand table — watch the
+   narration strip and the city react to **CATASTROPHIC**. (⌘/Ctrl-Enter runs it.)
+2. **Try your own words** — e.g. *"An attacker finds the water plant's dosing
+   controller exposed to the internet and drives the chlorine dose unsafe,"* or
+   *"Cut the fiber, jam the microwave and cellular links, and spoof GPS."* The
+   parser works fully offline; set `ANANKOS_API_KEY` for richer AI parsing.
+3. **Report** — click **📄 Report** (top bar) for a printable assessment with
+   the attack narrative, ATT&CK coverage, and D3FEND recommendations.
+4. **Go manual (optional)** — click **⚙ Advanced** to open the drawer with the
+   ATT&CK console, Blue-Team D3FEND defenses, Findings authoring, and the OT
+   Protocol/Modbus card. Deploy defenses, then re-run a scenario to see the
+   before/after (e.g. segmentation blocks the telecom pivot).
+5. **Build a client site** — click **🧩 Builder**. Add/remove facilities, drag
+   to position, rename, then **Run in Simulator**. **Save** it as a JSON "site
+   pack" to reload later.
 
 ## 3. Drive it with real OT tooling (optional)
 

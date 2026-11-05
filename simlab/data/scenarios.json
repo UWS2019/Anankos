@@ -1,0 +1,29 @@
+{
+  "comment": "Example scenarios for the scenario console. Each 'text' is plain English the NL compiler turns into a playable attack sequence.",
+  "presets": [
+    {
+      "title": "Telecom supply-chain compromise",
+      "text": "A ransomware crew breaches the regional telecom carrier and pivots through its trusted provider links into the power and water utilities, opening the main breaker and poisoning the water supply across the town."
+    },
+    {
+      "title": "Internet-exposed water controller",
+      "text": "An attacker finds the water treatment plant's chlorine dosing controller exposed to the internet with default credentials and drives the chlorine dose to an unsafe level."
+    },
+    {
+      "title": "Grid blackout via phishing",
+      "text": "A phishing email compromises the power plant's business network; the attacker pivots to the OT network and opens the main breaker, collapsing the grid."
+    },
+    {
+      "title": "Coordinated signal attack on telecom",
+      "text": "Adversaries cut the fiber backbone, jam the microwave and cellular backhaul, and spoof GPS timing to blind operators across every sector."
+    },
+    {
+      "title": "Airport radar and ILS takedown",
+      "text": "After breaching the airport network, the attacker stops the surveillance radar and disables the ILS navaids, closing the field to traffic."
+    },
+    {
+      "title": "Defended: provider pivot vs blue team",
+      "text": "With network segmentation, command authentication and traffic analysis deployed, a telecom carrier compromise attempts to pivot into the water utility and poison the supply."
+    }
+  ]
+}

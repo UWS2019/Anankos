@@ -131,7 +131,8 @@ function renderLog() {
   const log = $("log");
   const srcClass = (ev) =>
     ev.source === "attacker" || ev.source === "protocol" ? "attack"
-      : ev.source === "defense" || ev.source === "blue" ? "blue" : "";
+      : ev.source === "defense" || ev.source === "blue" ? "blue"
+        : ev.source === "scenario" ? "scn" : "";
   log.innerHTML = STATE.events.slice().reverse().map((ev) =>
     `<div class="ev ${ev.level} ${srcClass(ev)}">
       <span class="t">T+${String(ev.tick).padStart(3, "0")}</span>
@@ -314,12 +315,46 @@ python -c "from pymodbus.client import ModbusTcpClient as C; c=C('${host}',port=
 modpoll -m tcp -t 3 -r 1 -c 4 -0 ${host}:${p.port} -a 4</pre>`;
 }
 
+// ---- scenario console ------------------------------------------------------
+async function loadPresets() {
+  try {
+    const p = await (await fetch("/api/scenario/presets")).json();
+    $("scn-presets").innerHTML = p.presets.map((s, i) =>
+      `<span class="chip-s" data-i="${i}" title="${s.text.replace(/"/g, "&quot;")}">${s.title}</span>`).join("");
+    $("scn-presets").querySelectorAll("[data-i]").forEach((c) => {
+      c.onclick = () => { $("scn-text").value = p.presets[c.dataset.i].text; $("scn-text").focus(); };
+    });
+  } catch { /* offline */ }
+}
+async function runScenario() {
+  const text = $("scn-text").value.trim();
+  if (!text) return toast("Describe a scenario first.", true);
+  const btn = $("scn-run"); btn.disabled = true; btn.textContent = "… compiling";
+  try {
+    const res = await post("/api/scenario/nl", { text, use_ai: $("scn-ai").checked });
+    if (res.ok) toast(`▶ ${res.title} — ${res.steps} steps (${res.source === "ai" ? "AI" : "on-device"})`);
+    else toast(`✗ ${res.error}`, true);
+  } finally { btn.disabled = false; btn.textContent = "▶ Run Scenario"; }
+}
+function renderScenario() {
+  const sc = STATE.scenario;
+  const strip = $("scn-strip");
+  if (!sc) { strip.style.display = "none"; return; }
+  strip.style.display = "block";
+  $("scn-title").textContent = sc.title;
+  $("scn-src").textContent = sc.source === "ai" ? "AI" : "parser";
+  $("scn-count").textContent = sc.done ? `complete · ${sc.total} steps` : `step ${Math.min(sc.cursor, sc.total)}/${sc.total}`;
+  $("scn-bar").style.width = (sc.total ? Math.round(100 * sc.cursor / sc.total) : 0) + "%";
+  const last = STATE.events.filter((e) => e.source === "scenario" && e.tag === "STEP").slice(-1)[0];
+  $("scn-step").textContent = last ? last.message : (sc.narrative || "");
+}
+
 // ---- main render -----------------------------------------------------------
 function render(snap) {
   const first = STATE === null;
   STATE = snap;
   if (snap.techniques && snap.techniques.length && TECHS.length === 0) TECHS = snap.techniques;
-  renderSandTable(); renderStats(); renderFacilities(); renderLog(); renderAuthoring(); renderDefenses();
+  renderSandTable(); renderStats(); renderFacilities(); renderLog(); renderAuthoring(); renderDefenses(); renderScenario();
   if (first && TECHS.length) populateTechniques();
   $("btn-start").disabled = snap.running; $("btn-pause").disabled = !snap.running;
 }
@@ -343,9 +378,16 @@ $("domain-seg").querySelectorAll("[data-dom]").forEach((b) => {
     populateTechniques();
   };
 });
+// scenario console + advanced drawer
+$("scn-run").onclick = runScenario;
+$("scn-text").addEventListener("keydown", (e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") runScenario(); });
+function openDrawer(on) { $("drawer").classList.toggle("open", on); $("scrim").classList.toggle("open", on); }
+$("btn-advanced").onclick = () => openDrawer(true);
+$("drawer-close").onclick = () => openDrawer(false);
+$("scrim").onclick = () => openDrawer(false);
 
 (async function init() {
   const snap = await (await fetch("/api/state")).json();
   TECHS = (await (await fetch("/api/techniques")).json()).techniques;
-  render(snap); populateTechniques(); renderProtocol(); connect();
+  render(snap); populateTechniques(); renderProtocol(); loadPresets(); connect();
 })();

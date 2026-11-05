@@ -19,7 +19,12 @@ from .engine import SimEngine
 from .modbus import ModbusServer
 from .report import render_html
 from . import catalog
+from . import scenario_nl
 from .catalog_view import render_catalog_html
+
+import json as _json
+from pathlib import Path as _Path
+NL_AI = os.environ.get("ANANKOS_NL_AI", "1") != "0"
 
 WEB = Path(__file__).parent.parent / "web"
 
@@ -155,6 +160,25 @@ async def device_flag(payload: dict):
         payload.get("device_id"), payload.get("flag"), payload.get("value"))
     await hub.broadcast(engine.snapshot())
     return res
+
+
+@app.get("/api/scenario/presets")
+def scenario_presets():
+    data = _json.loads((_Path(__file__).parent / "data" / "scenarios.json").read_text())
+    return {"presets": data["presets"]}
+
+
+@app.post("/api/scenario/nl")
+async def scenario_nl_run(payload: dict):
+    text = (payload.get("text") or "").strip()
+    if not text:
+        return {"ok": False, "error": "describe a scenario first"}
+    use_ai = NL_AI and payload.get("use_ai", True)
+    scn = scenario_nl.compile(text, use_ai=use_ai)
+    res = engine.load_scenario(scn)
+    await hub.broadcast(engine.snapshot())
+    return {"ok": True, **res, "findings": scn.get("findings", []),
+            "defenses": scn.get("defenses", []), "steps_detail": scn.get("steps", [])}
 
 
 @app.get("/api/catalog")

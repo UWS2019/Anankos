@@ -102,9 +102,77 @@ class SimEngine:
         self.milestones = {}
         self.defenses_on = set()
         self.score = {"attempts": 0, "blocked": 0, "detected": 0, "undetected": 0}
+        self.scenario = None
         self.derived = {}
         self._log("system", "SIM", msg, "info")
         self._recompute()
+
+    # -- natural-language scenarios ------------------------------------------
+    def _resolve_device(self, kind, role):
+        """Map a (facility kind, device role) to a concrete device id in the
+        running town. Device ids are '<prefix>_<role>'."""
+        for fid, f in self.town["facilities"].items():
+            if f["kind"] != kind:
+                continue
+            for did in f["devices"]:
+                if did.split("_", 1)[-1] == role:
+                    return did
+            # fall back to the facility IT network if the role is missing
+            for did in f["devices"]:
+                if did.endswith("_it"):
+                    return did
+        return None
+
+    def load_scenario(self, scn):
+        """Load a compiled NL scenario: reset the current site to nominal,
+        apply its findings + defenses, queue its steps for auto-play."""
+        self.load_site(self.site_spec, msg=f"Scenario loaded: {scn.get('title', 'scenario')}.")
+        for key in scn.get("findings", []):
+            for fid, f in self.town["facilities"].items():
+                if key in f["findings"]:
+                    f["findings"][key] = True
+        if scn.get("findings"):
+            self._log("scenario", "SETUP",
+                      "Findings set: " + ", ".join(k.replace("_", " ") for k in scn["findings"]), "warn")
+        for did in scn.get("defenses", []):
+            if did in self.defenses:
+                self.defenses_on.add(did)
+        if scn.get("defenses"):
+            self._log("scenario", "SETUP",
+                      "Defenses deployed: " + ", ".join(scn["defenses"]), "defense")
+        self.scenario = {
+            "title": scn.get("title", "Scenario"), "narrative": scn.get("narrative", ""),
+            "source": scn.get("source", "on-device"), "steps": scn.get("steps", []),
+            "cursor": 0, "total": len(scn.get("steps", [])), "done": not scn.get("steps"),
+        }
+        self._log("scenario", "BRIEF", scn.get("narrative", "") or scn.get("title", ""), "info")
+        self.running = True
+        self._recompute()
+        return {"ok": True, "steps": self.scenario["total"], "title": self.scenario["title"],
+                "source": self.scenario["source"]}
+
+    def _fire_scenario_step(self):
+        sc = self.scenario
+        if not sc or sc["done"] or sc["cursor"] >= len(sc["steps"]):
+            if sc and not sc["done"]:
+                sc["done"] = True
+                self._log("scenario", "BRIEF", "Scenario playthrough complete.", "info")
+            return
+        step = sc["steps"][sc["cursor"]]
+        sc["cursor"] += 1
+        self._log("scenario", "STEP", step.get("text", ""), "attack")
+        if step.get("op") == "execute":
+            did = self._resolve_device(step.get("kind"), step.get("role"))
+            if did:
+                res = self.execute(step.get("technique"), did, step.get("params") or {})
+                if not res.get("ok") and res.get("error"):
+                    self._log("scenario", "STEP", f"(step had no effect: {res['error']})", "info")
+            else:
+                self._log("scenario", "STEP",
+                          f"(no {step.get('kind')} facility in this town to target)", "info")
+        if sc["cursor"] >= len(sc["steps"]):
+            sc["done"] = True
+            self._log("scenario", "BRIEF", "Scenario playthrough complete.", "info")
 
     def _log(self, source, tag, message, level="info", technique=None):
         self.events.append({
@@ -323,6 +391,8 @@ class SimEngine:
     def step(self):
         self.tick += 1
         self._recompute(advance=True)
+        if self.scenario and not self.scenario["done"]:
+            self._fire_scenario_step()
 
     def _v(self, dev, param):
         return dev["state"].get(param)
@@ -617,4 +687,5 @@ class SimEngine:
             "derived": self.derived, "events": self.events[-90:],
             "techniques": list(self.techniques.values()),
             "defenses": defenses, "score": self.score,
+            "scenario": self.scenario,
         }

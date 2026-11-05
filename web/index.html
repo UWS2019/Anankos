@@ -5,25 +5,48 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Anankos Sim Lab</title>
 <link rel="stylesheet" href="/static/styles.css">
+<link rel="stylesheet" href="/static/premium.css">
 </head>
 <body>
-<header>
-  <div class="brand">ANANKOS&nbsp;SIM&nbsp;LAB <small>&nbsp;· Critical Infrastructure Vulnerability Sim Lab</small></div>
-  <div class="clock">T+<span id="clock">000</span> min</div>
+<header class="topbar">
+  <div class="brand">ANANKOS <span class="brand-sub">Critical Infrastructure Vulnerability Sim Lab</span></div>
+  <div class="clock-wrap">T+<span id="clock">000</span><span class="clock-u">min</span></div>
+  <div id="sev" class="sev nominal">Nominal</div>
+  <div class="spacer"></div>
   <div class="btns">
     <button id="btn-start" class="primary">▶ Start</button>
     <button id="btn-pause">⏸ Pause</button>
     <button id="btn-reset" class="danger">⟳ Reset</button>
-    <button id="btn-report" title="Open a printable assessment report">📄 Report</button>
+    <button id="btn-report">📄 Report</button>
     <a class="hdr-link" href="/builder.html" title="Build a client topology">🧩 Builder</a>
+    <button id="btn-advanced" class="ghost">⚙ Advanced</button>
   </div>
-  <div id="sev" class="sev nominal">Nominal</div>
 </header>
 
-<main>
-  <!-- LEFT: the sand-table city + live stats -->
-  <section>
-    <div class="card">
+<main class="stage">
+  <!-- Scenario console: the hero -->
+  <section class="card glass hero">
+    <div class="hero-head">
+      <h2>Scenario Console</h2>
+      <label class="ai-toggle"><input type="checkbox" id="scn-ai" checked> use AI when available</label>
+    </div>
+    <textarea id="scn-text" rows="3" placeholder="Describe a scenario in plain English — e.g. “A ransomware crew breaches the regional telecom carrier and pivots into the power and water utilities, opening the main breaker and poisoning the water supply.”"></textarea>
+    <div class="hero-row">
+      <div id="scn-presets" class="chips"></div>
+      <button id="scn-run" class="run">▶ Run Scenario</button>
+    </div>
+    <div id="scn-strip" class="narr-strip" style="display:none">
+      <div class="narr-top"><span id="scn-title" class="narr-title"></span>
+        <span id="scn-src" class="narr-src"></span>
+        <span id="scn-count" class="narr-count"></span></div>
+      <div class="narr-bar"><div id="scn-bar"></div></div>
+      <div id="scn-step" class="narr-step"></div>
+    </div>
+  </section>
+
+  <div class="grid2">
+    <!-- Sand table -->
+    <section class="card glass">
       <h2>Marin — Sand Table</h2>
       <div class="map-wrap">
         <svg id="sandtable" viewBox="0 0 1040 560" preserveAspectRatio="xMidYMid meet"></svg>
@@ -43,16 +66,26 @@
         <div class="stat"><div class="k">Airport</div><div class="v" id="s-air">—</div></div>
         <div class="stat"><div class="k">Telecom</div><div class="v" id="s-tel">—</div></div>
       </div>
-    </div>
+    </section>
 
-    <div class="card">
-      <h2>Facilities &amp; Simulated Devices</h2>
-      <div id="facilities"></div>
-    </div>
+    <!-- Live feed -->
+    <section class="card glass feedcard">
+      <h2>Live Event Feed</h2>
+      <div id="log"></div>
+    </section>
+  </div>
+
+  <section class="card glass">
+    <h2>Facilities &amp; Simulated Devices</h2>
+    <div id="facilities"></div>
   </section>
+</main>
 
-  <!-- RIGHT: attack console + authoring + event log -->
-  <section>
+<!-- Advanced drawer: the manual consoles -->
+<div id="scrim" class="scrim"></div>
+<aside id="drawer" class="drawer">
+  <div class="drawer-head"><h2>Advanced — Manual Controls</h2><button id="drawer-close" class="ghost">✕</button></div>
+  <div class="drawer-body">
     <div class="card">
       <h2>ATT&amp;CK Console — Red / Consequence</h2>
       <div class="field">
@@ -78,41 +111,23 @@
         <input type="text" id="value" placeholder="value">
       </div>
       <button id="btn-exec" class="primary" style="width:100%">Execute Technique</button>
-      <div class="notice" style="padding-left:0;padding-bottom:0">
-        Simulation only. Techniques mutate in-memory device models and never touch real systems.
-      </div>
     </div>
 
     <div class="card">
       <h2>Blue Team — MITRE D3FEND Defenses</h2>
       <div class="score" id="score"></div>
       <div id="defenses"></div>
-      <div class="notice" style="padding-left:0;padding-bottom:0">
-        Deploy countermeasures to block, detect, or mitigate red actions live. Gaps become recommendations in the report.
-      </div>
     </div>
 
     <div class="card">
       <h2>Assessment / Findings — mirror ground truth</h2>
-      <div class="field">
-        <label>Facility</label>
-        <select id="auth-fac"></select>
-      </div>
-      <div class="field">
-        <label>Findings observed on this facility</label>
-        <div id="findings"></div>
-      </div>
-      <div class="field">
-        <label>Device state authoring</label>
-        <div id="authoring"></div>
-      </div>
+      <div class="field"><label>Facility</label><select id="auth-fac"></select></div>
+      <div class="field"><label>Findings observed</label><div id="findings"></div></div>
+      <div class="field"><label>Device state authoring</label><div id="authoring"></div></div>
       <div class="btns" style="margin-top:4px">
         <button id="btn-export">⬇ Export scenario</button>
         <button id="btn-import">⬆ Import scenario</button>
         <input type="file" id="import-file" accept="application/json" style="display:none">
-      </div>
-      <div class="notice" style="padding-left:0;padding-bottom:0">
-        Set the conditions you found in the field, then run the chain to show the client the outcome.
       </div>
     </div>
 
@@ -120,13 +135,8 @@
       <h2>OT Protocol Endpoint — drive it with real tooling</h2>
       <div id="protocol"></div>
     </div>
-
-    <div class="card">
-      <h2>Event Log &amp; Consequences</h2>
-      <div id="log"></div>
-    </div>
-  </section>
-</main>
+  </div>
+</aside>
 
 <div id="toast" class="toast" style="display:none"></div>
 <script src="/static/city.js"></script>

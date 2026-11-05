@@ -11,6 +11,27 @@ training, tabletop exercises, and resilience assessment.
 
 ---
 
+## Scenario console (plain-English scenarios)
+
+The dashboard is **scenario-first**: describe a situation in normal language —
+*"A ransomware crew breaches the regional telecom carrier and pivots into the
+power and water utilities, opening the main breaker and poisoning the water
+supply"* — press **Run Scenario**, and the lab compiles it into a MITRE-tagged
+kill chain and **auto-plays it on the sand table** with a live narration strip.
+Preset scenarios are one click away. All the manual controls (ATT&CK console,
+blue-team defenses, findings authoring, Modbus card) still exist, tucked into
+the **Advanced** drawer.
+
+Two compile paths (`simlab/scenario_nl.py`):
+- **On-device parser (default, offline):** a deterministic intent parser maps
+  the text to findings, defenses, and an ordered attack sequence. No key, no
+  internet — predictable for internal/air-gapped use.
+- **Optional AI:** if `ANANKOS_API_KEY` (or `ANTHROPIC_API_KEY`) is set and
+  `api.anthropic.com` is reachable, Claude translates free-form prose into the
+  same scenario schema for richer understanding; any failure falls back to the
+  parser. Disable entirely with `ANANKOS_NL_AI=0`; pick the model with
+  `ANANKOS_NL_MODEL`.
+
 ## What's in v1
 
 - **Sand-table city** — a live 2D map of **Marin**. Buildings light up or go
@@ -168,6 +189,7 @@ simlab/
   solver.py       generic graph solver (demand pass + topological evaluation)
   catalog.py      archetype catalog + facility templates: load/validate/instantiate
   catalog_view.py read-only HTML view of the device library (builder palette)
+  scenario_nl.py  natural-language scenario compiler (on-device parser + optional AI)
   modbus.py       dependency-free simulated Modbus/TCP server + register map
   report.py       standalone printable assessment-report renderer
   data/
@@ -182,9 +204,11 @@ tests/
 web/
   index.html      sand-table dashboard
   city.js         sand-table renderer (buildings, roads, responders, zoom/pan)
-  app.js          WebSocket client, ATT&CK console, findings authoring
+  app.js          WebSocket client, scenario console, consoles, findings authoring
   builder.html    drag-and-drop topology builder
   builder.js      builder canvas (palette, placement, auto-wiring, run)
+  premium.css     scenario-first ops-center theme (glass, drawer, console)
+  data/scenarios.json  preset plain-English scenarios
   *.css
 start.bat         one-click Windows launcher
 start.sh          Linux/macOS launcher
