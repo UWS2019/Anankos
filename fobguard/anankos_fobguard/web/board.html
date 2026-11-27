@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lot Security Status</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0b0c0a; --white:#f5f4ef; --muted:#b3b5ae; --green:#8fbf5a; --tan:#c9b48a;
+  --red:#b3261e; --red-deep:#5c0f0b; --amber:#e08a2b; --amber-deep:#3d2608; --slate:#2e312c;
+  --bg:var(--ink); --fg:var(--white); --accent:var(--green);
+  --sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);overflow-x:hidden;transition:background .4s}
+.wrap{min-height:100vh;display:flex;flex-direction:column;padding:clamp(16px,3vw,48px)}
+.top{display:flex;align-items:center;gap:16px;font-size:clamp(14px,1.4vw,22px);color:var(--muted);flex-wrap:wrap}
+.top .brand{letter-spacing:.2em;font-weight:600;color:var(--fg)}
+.top .spacer{flex:1}
+.pill{border:2px solid currentColor;border-radius:999px;padding:4px 14px;font-weight:600}
+main{flex:1;display:grid;align-content:center;gap:clamp(20px,3vw,56px);padding:clamp(16px,2.5vw,36px) 0}
+.lead,.todo{display:flex;flex-direction:column;gap:clamp(10px,1.4vw,24px);min-width:0}
+/* wide screens (wall TV): what's happening on the left, what to do on the right, no scrolling */
+@media (min-width:1100px) and (min-aspect-ratio:4/3){
+  main.has-steps{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:center}
+  main.has-steps h1{font-size:clamp(40px,4.6vw,96px)}
+}
+.icon{width:clamp(64px,7vw,128px);height:clamp(64px,7vw,128px)}
+.label{font-size:clamp(16px,1.8vw,28px);font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+h1{margin:0;font-size:clamp(40px,7vw,120px);line-height:1.02;font-weight:800;letter-spacing:-.02em;max-width:18ch}
+.where{font-size:clamp(22px,3vw,48px);font-weight:600}
+.why{font-size:clamp(18px,2vw,32px);color:var(--muted);max-width:42ch}
+ol{margin:0;padding:0;list-style:none;display:grid;gap:clamp(10px,1.4vw,22px);counter-reset:s;max-width:1100px}
+ol li{counter-increment:s;display:flex;gap:18px;align-items:flex-start;font-size:clamp(20px,2.1vw,38px);font-weight:600;line-height:1.25}
+ol li::before{content:counter(s);flex:none;width:1.6em;height:1.6em;border-radius:50%;background:var(--fg);color:var(--bg);
+  display:grid;place-items:center;font-size:.85em;font-weight:800}
+.act{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:clamp(8px,1vw,16px)}
+.act input{font:600 clamp(18px,1.8vw,28px) var(--sans);padding:14px 18px;border-radius:12px;border:2px solid rgba(255,255,255,.4);
+  background:rgba(0,0,0,.25);color:var(--fg);min-width:0;width:min(360px,100%)}
+.act input::placeholder{color:rgba(255,255,255,.6)}
+button{font:800 clamp(18px,1.8vw,28px) var(--sans);padding:14px 26px;border-radius:12px;border:none;cursor:pointer;
+  background:var(--fg);color:var(--bg)}
+button.ghost{background:transparent;color:var(--fg);border:2px solid rgba(255,255,255,.4);font-weight:600}
+.handled{font-size:clamp(20px,2.2vw,36px);font-weight:600;display:flex;align-items:center;gap:12px}
+.more{font-size:clamp(16px,1.6vw,26px);color:var(--muted)}
+.bottom{display:flex;gap:24px;flex-wrap:wrap;font-size:clamp(14px,1.4vw,22px);color:var(--muted);align-items:center}
+.bottom .ok{color:var(--green)} .bottom .bad{color:var(--amber)}
+.clock{font-variant-numeric:tabular-nums;font-weight:600;color:var(--fg)}
+
+/* states */
+body.clear{--bg:var(--ink);--accent:var(--green)}
+body.check{--bg:var(--amber-deep);--accent:var(--amber)}
+body.problem{--bg:#26241d;--accent:var(--tan)}
+body.unknown{--bg:#3a3c38;--accent:var(--white)}
+body.alert{--bg:var(--red-deep);--accent:#ffb4ab}
+body.alert.fresh .wrap{animation:flash 1.2s ease-in-out infinite}
+@keyframes flash{0%,100%{box-shadow:inset 0 0 0 0 var(--red)}50%{box-shadow:inset 0 0 0 clamp(10px,1.4vw,22px) var(--red)}}
+@media (prefers-reduced-motion: reduce){body.alert.fresh .wrap{animation:none;box-shadow:inset 0 0 0 14px var(--red)}}
+body.clear h1{color:var(--green)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body class="unknown">
+<div class="wrap">
+  <div class="top">
+    <span class="brand">LOT SECURITY</span><span id="site"></span>
+    <span class="spacer"></span>
+    <span class="pill" id="hours" hidden></span>
+    <button class="ghost" id="sound" style="font-size:clamp(14px,1.3vw,20px);padding:8px 14px">Turn on alarm sound</button>
+  </div>
+
+  <main id="main">
+   <div class="lead">
+    <svg class="icon" id="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
+    <div class="label" id="label">Connecting…</div>
+    <h1 id="headline">Checking security status</h1>
+    <div class="where" id="where" hidden></div>
+    <div class="why" id="why"></div>
+   </div>
+   <div class="todo">
+    <ol id="steps"></ol>
+    <div class="act" id="ackrow" hidden>
+      <input id="name" placeholder="Your name" autocomplete="off" maxlength="40">
+      <button id="ack">I'm on it</button>
+    </div>
+    <div class="handled" id="handled" hidden></div>
+    <div class="more" id="more" hidden></div>
+   </div>
+  </main>
+
+  <div class="bottom">
+    <span class="clock" id="clock"></span>
+    <span id="sensors"></span>
+    <span id="updated"></span>
+  </div>
+</div>
+<script>
+const token = new URLSearchParams(location.search).get("token") || "";
+const q = p => p + (token ? (p.includes("?") ? "&" : "?") + "token=" + encodeURIComponent(token) : "");
+const $ = id => document.getElementById(id);
+const ICONS = {
+  clear:   '<circle cx="12" cy="12" r="10"/><path d="m8 12.5 2.5 2.5L16 9.5"/>',
+  check:   '<circle cx="12" cy="12" r="10"/><path d="M12 7v6"/><path d="M12 16.5h.01"/>',
+  alert:   '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  problem: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.5-.5-.5-2.5z"/>',
+  unknown: '<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>',
+};
+const LABEL = {clear: "All clear", check: "Please check", alert: "Security alert", problem: "System problem", unknown: "Status unknown"};
+const started = Date.now();
+let lastOk = 0, cur = null, sound = false, audio, lastBeep = 0;
+
+try { $("name").value = localStorage.getItem("fg-name") || ""; } catch (e) {}
+
+function ago(t){
+  if (!t) return "";
+  const s = Math.max(0, Math.round(Date.now() / 1000 - t));
+  return s < 60 ? "just now" : s < 3600 ? Math.round(s / 60) + " min ago" : Math.round(s / 3600) + " h ago";
+}
+function setState(st, hasSteps){
+  document.body.className = st;
+  $("main").classList.toggle("has-steps", !!hasSteps);
+  $("icon").innerHTML = ICONS[st];
+  $("icon").style.color = "var(--accent)";
+  $("label").textContent = LABEL[st];
+}
+
+function render(b){
+  $("site").textContent = "· " + b.site;
+  $("hours").hidden = false; $("hours").textContent = b.open ? "OPEN" : "CLOSED";
+  const okAll = b.sensors_online === b.sensors_total;
+  $("sensors").innerHTML = `<span class="${okAll ? "ok" : "bad"}">●</span> ${b.sensors_online} of ${b.sensors_total} sensors working`;
+  const c = b.current;
+  cur = c;
+  if (!c){
+    setState("clear");
+    $("headline").textContent = "No problems on the lot";
+    $("where").hidden = true;
+    $("why").textContent = b.open ? "Watching for car theft. Nothing unusual right now."
+                                  : "We're closed. Watching the lot and the key room overnight.";
+    $("steps").innerHTML = ""; $("ackrow").hidden = true; $("handled").hidden = true; $("more").hidden = true;
+    return;
+  }
+  setState(c.state, c.steps.length);
+  document.body.classList.toggle("fresh", c.state === "alert" && !c.acknowledged_by);
+  $("headline").textContent = c.headline;
+  $("where").hidden = !c.where; $("where").textContent = c.where ? "Where: " + c.where.charAt(0).toUpperCase() + c.where.slice(1) : "";
+  $("why").textContent = c.why + (c.since ? `  Started ${ago(c.since)}.` : "");
+  $("steps").innerHTML = c.steps.map(s => `<li>${s.replace(/[&<>]/g, x => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[x]))}</li>`).join("");
+  const handled = !!c.acknowledged_by;
+  $("ackrow").hidden = handled || !c.incident_id;
+  $("handled").hidden = !handled;
+  if (handled) $("handled").textContent = `✓ ${c.acknowledged_by} is handling this (${ago(c.acknowledged_at)})`;
+  $("more").hidden = !b.more; $("more").textContent = b.more ? `+ ${b.more} more alert${b.more > 1 ? "s" : ""} on the manager's dashboard` : "";
+  if (sound && c.state === "alert" && !handled && Date.now() - lastBeep > 10000){ lastBeep = Date.now(); alarm(); }
+}
+
+async function poll(){
+  try{
+    const r = await fetch(q("/api/board"), {cache: "no-store"});
+    if (!r.ok) throw new Error(r.status);
+    render(await r.json());
+    lastOk = Date.now();
+  }catch(e){}
+}
+function watchdog(){
+  // Never leave an old "all clear" on screen: if we can't reach FobGuard, say so.
+  $("clock").textContent = new Date().toLocaleTimeString([], {hour: "numeric", minute: "2-digit"});
+  const age = (Date.now() - (lastOk || started)) / 1000;
+  $("updated").textContent = lastOk ? (age < 5 ? "Live" : `Last update ${Math.round(age)}s ago`) : "";
+  if (age > 12){
+    setState("unknown", true);
+    $("headline").textContent = "This screen lost contact with the security system";
+    $("where").hidden = true; $("why").textContent = "The lot may not be protected right now.";
+    $("steps").innerHTML = "<li>Tell the manager or IT.</li><li>Check that the security computer is switched on and connected.</li>";
+    $("ackrow").hidden = true; $("handled").hidden = true; $("more").hidden = true;
+  }
+}
+
+function alarm(){
+  try{
+    audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+    [0, .35, .7].forEach(d => {
+      const o = audio.createOscillator(), g = audio.createGain();
+      o.type = "square"; o.frequency.value = 880; g.gain.value = .12;
+      o.connect(g).connect(audio.destination); o.start(audio.currentTime + d); o.stop(audio.currentTime + d + .22);
+    });
+  }catch(e){}
+}
+$("sound").onclick = e => { sound = !sound; e.target.textContent = sound ? "Alarm sound on" : "Turn on alarm sound"; if (sound) alarm(); };
+$("ack").onclick = async () => {
+  const who = $("name").value.trim();
+  if (!who){ $("name").focus(); $("name").placeholder = "Type your name first"; return; }
+  try { localStorage.setItem("fg-name", who); } catch (e) {}
+  if (!cur || !cur.incident_id) return;
+  await fetch(q(`/api/incidents/${cur.incident_id}/ack`), {method: "POST", headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({by: who})}).catch(() => {});
+  poll();
+};
+
+// keep a wall-mounted screen awake where the browser allows it
+async function wake(){ try { await navigator.wakeLock.request("screen"); } catch (e) {} }
+document.addEventListener("visibilitychange", () => { if (!document.hidden) wake(); });
+wake();
+
+try{
+  const es = new EventSource(q("/api/events"));
+  ["incident", "detection", "jam"].forEach(k => es.addEventListener(k, poll));
+}catch(e){}
+poll(); watchdog();
+setInterval(poll, 3000); setInterval(watchdog, 1000);
+</script>
+</body>
+</html>

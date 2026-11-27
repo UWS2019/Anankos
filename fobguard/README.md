@@ -26,6 +26,47 @@ a local siren relay.
 
 *Hardware & System tab: antenna switching, live antenna health (a disconnected cable flagged on the key-room sensor), best-antenna sweep result, and the driver/plugin check with one-click install. Sensor data is simulated; the system check is real output from a Debian/Ubuntu host with no receivers plugged in.*
 
+### Staff status board
+
+A full-screen page for a TV in the sales office or a tablet at the front
+desk. It's written for staff who don't know (or need to know) anything about
+radio:
+
+| | |
+|---|---|
+| ![All clear](docs/screenshots/board-1-all-clear.png) | ![Theft alert](docs/screenshots/board-2-theft-alert.png) |
+| ![Please check](docs/screenshots/board-4-check.png) | ![Lost contact](docs/screenshots/board-5-lost-contact.png) |
+
+* **One message at a time:** *All clear*, *Please check*, *Security alert*
+  or *System problem*. It says what's happening, where (in your own words for
+  each zone), and the next three things to do. There's no jargon, and an
+  automated test enforces that.
+* **Safety first:** every theft alert starts with *"Do not go outside or approach
+  anyone"*. Staff are told to use the cameras and call the manager or 911,
+  never to intervene.
+* **"I'm on it":** a staff member taps it with their name. The board then shows
+  who is handling the incident, and the red flashing stops. The action is
+  recorded on the incident.
+* **Never a stale "all clear":** if the screen loses contact with FobGuard for
+  12 seconds, it switches to *Status unknown* and tells staff to call the manager.
+* **Optional alarm chime:** browsers need one tap to allow sound. Keeps the screen awake.
+
+Open `http://<fobguard-host>:8742/board?token=<token>`. To run it on a
+Raspberry Pi or mini-PC behind a TV as a kiosk:
+
+```bash
+chromium-browser --kiosk --noerrdialogs --disable-infobars --autoplay-policy=no-user-gesture-required \
+  "http://fobguard.local:8742/board?token=YOUR_TOKEN"
+```
+
+Name your zones the way staff talk about them in the config:
+
+```toml
+[site.zone_names]
+lot = "the back lot"
+key_storage = "the key room"
+```
+
 ---
 
 ## What it detects

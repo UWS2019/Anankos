@@ -109,7 +109,7 @@ class Engine:
         self.packets_seen = 0
         self._stop = threading.Event()
         self._q: queue.Queue = queue.Queue(maxsize=10000)
-        self.now = time.time()
+        self.now = 0.0          # stream time of the newest block (live: ~wall clock)
         self._lock = threading.RLock()
 
     # -- baseline ------------------------------------------------------------
@@ -207,7 +207,8 @@ class Engine:
         if inc is not None:
             self.emit("incident", inc.to_dict(with_detections=False))
             if alert:
-                self.alerts.dispatch(inc, self.correlator.action_for(inc), self.now)
+                # muting is set in wall-clock time by staff, so compare with the wall clock
+                self.alerts.dispatch(inc, self.correlator.action_for(inc), time.time())
 
     def acknowledge(self, incident_id: int, who: str) -> Incident | None:
         with self._lock:
@@ -240,7 +241,7 @@ class Engine:
             "packets_seen": self.packets_seen,
             "suppressed_until": self.alerts.suppressed_until, "suppress_reason": self.alerts.suppress_reason,
             "incidents": [dict(i.to_dict(with_detections=True), action=self.correlator.action_for(i),
-                               active=(self.now - i.updated) <= self.correlator.window)
+                               active=((self.now or time.time()) - i.updated) <= self.correlator.window)
                           for i in self.correlator.incidents[-50:]][::-1],
         }
 

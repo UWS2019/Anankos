@@ -7,6 +7,11 @@ name = "Example Motors - Main Lot"
 timezone = "America/Chicago"
 holidays = ["2026-12-25", "2027-01-01"]
 
+# How zones are named on the staff status board (http://<host>:8742/board)
+[site.zone_names]
+lot = "the main lot"
+key_storage = "the key room"
+
 [site.business_hours]
 mon = "08:00-20:00"
 tue = "08:00-20:00"

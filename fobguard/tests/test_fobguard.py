@@ -289,3 +289,64 @@ def test_rolljam_after_hours_realerts_when_attack_identified():
     # first "band jammed", then re-alert as "RollJam" even though both are CRITICAL
     assert titles[0] == "Key fob band jammed"
     assert titles[-1] == "RollJam-style capture and replay"
+
+
+# ------------------------------------------------------------- status board
+
+def test_every_attack_pattern_has_plain_wording():
+    from anankos_fobguard.correlator import PATTERNS
+    from anankos_fobguard.plain import PLAIN
+    jargon = ("jam", "rolljam", "rollback", "rssi", "mhz", "fob", "relay", "brute", "replay")
+    for _, title, sev, _ in PATTERNS:
+        if sev >= Severity.MEDIUM:
+            assert title in PLAIN, title
+    for p in PLAIN.values():
+        text = " ".join([p["headline"], p["why"], *p["steps"]]).lower()
+        assert not any(j in text for j in jargon), text
+        if p["state"] == "alert":   # safety: theft alerts always tell staff not to approach
+            assert "do not go outside" in p["steps"][0].lower()
+
+
+def test_board_states():
+    from anankos_fobguard.plain import board
+
+    eng = run_scenario("normal")
+    b = board(eng)
+    assert b["state"] == "clear" and b["current"] is None and b["sensors_online"] == 1
+
+    eng = run_scenario("rolljam", start=CLOSED)
+    eng.cfg.site.zone_names = {"lot": "the back lot"}
+    b = board(eng)
+    assert b["state"] == "alert"
+    assert b["current"]["headline"] == "Someone may be trying to steal a car"
+    assert b["current"]["where"] == "the back lot"
+    assert "the back lot" in b["current"]["steps"][1]
+    eng.acknowledge(b["current"]["incident_id"], "Jordan")
+    assert board(eng)["current"]["acknowledged_by"] == "Jordan"
+
+    eng = run_scenario("normal", start=CLOSED)
+    assert board(eng)["state"] == "check"
+
+    eng = run_scenario("relay", zone="key_storage", start=CLOSED)
+    steps = " ".join(board(eng)["current"]["steps"])
+    assert steps.count("key room") == 1 and "the lot" in steps     # no "key room ... and the key room"
+
+    eng = run_scenario("normal")
+    eng.monitors["m1"].online = False
+    b = board(eng)
+    assert b["state"] == "problem" and b["sensors_online"] == 0
+
+
+def test_board_page_served():
+    from anankos_fobguard.dashboard import Dashboard
+
+    eng = run_scenario("replay")
+    dash = Dashboard(eng, "127.0.0.1", 0, token="tok")
+    dash.start()
+    base = f"http://127.0.0.1:{dash.httpd.server_address[1]}"
+    try:
+        assert b"LOT SECURITY" in urllib.request.urlopen(base + "/board").read()
+        b = json.load(urllib.request.urlopen(base + "/api/board?token=tok"))
+        assert b["state"] == "alert" and b["current"]["headline"] == "A copied car-remote signal was used"
+    finally:
+        dash.stop()

@@ -115,6 +115,7 @@ class SiteConfig:
         "thu": "08:00-20:00", "fri": "08:00-20:00", "sat": "09:00-18:00", "sun": "closed",
     })
     holidays: list[str] = field(default_factory=list)       # YYYY-MM-DD, treated as closed
+    zone_names: dict[str, str] = field(default_factory=dict)  # zone -> words staff use, e.g. "the back lot"
 
     def tz(self):
         if ZoneInfo is None:

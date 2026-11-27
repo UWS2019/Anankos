@@ -21,8 +21,8 @@ from .engine import Engine
 log = logging.getLogger("fobguard.dashboard")
 
 
-def _page() -> bytes:
-    return resources.files("anankos_fobguard").joinpath("web/dashboard.html").read_bytes()
+def _page(name: str = "dashboard.html") -> bytes:
+    return resources.files("anankos_fobguard").joinpath(f"web/{name}").read_bytes()
 
 
 class Dashboard:
@@ -69,6 +69,8 @@ class Dashboard:
                 if path in ("/", "/index.html"):
                     # the page itself is static; API calls carry the token
                     return self._send(200, _page(), "text/html; charset=utf-8")
+                if path in ("/board", "/board/"):
+                    return self._send(200, _page("board.html"), "text/html; charset=utf-8")
                 if not self._authed():
                     return self._json(401, {"error": "unauthorized"})
                 if path == "/api/status":
@@ -77,6 +79,10 @@ class Dashboard:
                     return self._json(200, st)
                 if path == "/api/events":
                     return self._sse()
+                if path == "/api/board":
+                    from .plain import board
+                    with dash.engine._lock:
+                        return self._json(200, board(dash.engine))
                 if path == "/api/hardware":
                     return self._json(200, dash.hardware())
                 if path == "/api/doctor":
