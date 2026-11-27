@@ -100,10 +100,23 @@ class Correlator:
             target.title = title
             target.severity = sev
             min_sev = Severity.parse(self.cfg.alerts.min_severity)
-            alert = sev >= min_sev and (target.alerted_severity is None or sev > target.alerted_severity)
+            rank = self._rank(title)
+            # Re-alert when it gets worse, or when it is identified as a more
+            # specific attack (e.g. "band jammed" -> "RollJam capture and replay").
+            alert = sev >= min_sev and (
+                target.alerted_severity is None or sev > target.alerted_severity
+                or (target.alerted_rank is not None and rank < target.alerted_rank))
             if alert:
                 target.alerted_severity = sev
+                target.alerted_rank = rank
             return target, alert
+
+    @staticmethod
+    def _rank(title: str) -> int:
+        for i, (_, t, _, _) in enumerate(PATTERNS):
+            if t == title:
+                return i
+        return len(PATTERNS)
 
     def action_for(self, inc: Incident) -> str:
         return self.classify(inc)[2]

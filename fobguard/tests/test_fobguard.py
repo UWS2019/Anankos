@@ -281,3 +281,11 @@ def test_rolljam_robust_across_rf_randomness(seed):
     kinds = [d.kind for d in eng.detections]
     assert kinds.count("fob_during_jam") == 2      # both jammed presses seen beside the jammer
     assert eng.correlator.incidents[0].title == "RollJam-style capture and replay"
+
+
+def test_rolljam_after_hours_realerts_when_attack_identified():
+    eng = run_scenario("rolljam", start=CLOSED)
+    titles = [t for _, t in eng.alerts.sent]
+    # first "band jammed", then re-alert as "RollJam" even though both are CRITICAL
+    assert titles[0] == "Key fob band jammed"
+    assert titles[-1] == "RollJam-style capture and replay"

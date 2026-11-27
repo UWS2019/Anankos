@@ -128,6 +128,7 @@ class Incident:
     acknowledged_by: str | None = None
     acknowledged_at: float | None = None
     alerted_severity: Severity | None = None
+    alerted_rank: int | None = None          # PATTERNS index last alerted (lower = more specific)
 
     @property
     def kinds(self) -> set[str]:

@@ -151,7 +151,7 @@ class AlertManager:
             log.info("alert for incident %s suppressed (%s)", inc.id, self.suppress_reason)
             return False
         subject, body = render_text(self.cfg, inc, action)
-        self.sent.append((inc.id, inc.severity.name))
+        self.sent.append((inc.id, inc.title))
         for s in self.sinks:
             if not s.wants(inc):
                 continue

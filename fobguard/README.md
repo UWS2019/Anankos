@@ -13,6 +13,15 @@ a local siren relay.
 > any signal. Jamming is illegal in the US (47 U.S.C. §333) and most other
 > jurisdictions. FobGuard is built to *detect* it.
 
+![RollJam attack detected after hours](docs/screenshots/2-rolljam-critical.png)
+
+| | |
+|---|---|
+| ![All clear](docs/screenshots/1-all-clear.png) | ![Code scanning](docs/screenshots/3-code-scanning.png) |
+| Normal traffic: frames decoded, no alerts | Brute-force code scanner detected |
+| ![Phone view](docs/screenshots/4-phone-relay.png) | ![Terminal alerts](docs/screenshots/5-terminal-alert.png) |
+| Phone view: stored key answering after hours | Console alerts escalating as the attack is identified |
+
 ---
 
 ## What it detects
