@@ -1,0 +1,120 @@
+# Anankos FobGuard configuration
+# Copy to /etc/anankos-fobguard/config.toml and edit for the site.
+# Secrets can come from the environment: url = "${FOBGUARD_SLACK_WEBHOOK}"
+
+[site]
+name = "Example Motors - Main Lot"
+timezone = "America/Chicago"
+holidays = ["2026-12-25", "2027-01-01"]
+
+[site.business_hours]
+mon = "08:00-20:00"
+tue = "08:00-20:00"
+wed = "08:00-20:00"
+thu = "08:00-20:00"
+fri = "08:00-20:00"
+sat = "09:00-18:00"
+sun = "closed"
+
+# One receiver per band. Tune ~250 kHz off the fob frequency so the RTL-SDR
+# DC spike doesn't sit on top of the signals we care about.
+# North America: 315 MHz (most Asian/US makes incl. Kia/Hyundai/Toyota/GM/Ford)
+# and 433.92 MHz (many EU-sourced vehicles, aftermarket remotes).
+# EU: 433.92 and 868.3 MHz.
+
+[[monitor]]
+name = "lot-315"
+source = "rtlsdr"
+device = "0"              # index, or the dongle's serial (set with rtl_eeprom -s)
+center_freq = 315.25e6
+sample_rate = 1.024e6
+gain = 40
+zone = "lot"
+
+[[monitor]]
+name = "lot-433"
+source = "rtlsdr"
+device = "1"
+center_freq = 434.17e6
+sample_rate = 1.024e6
+gain = 40
+zone = "lot"
+# 433.05-434.79 MHz is shared with amateur radio and LPD walkie-talkies.
+# If a known legitimate long transmission keeps tripping the jam detector,
+# exclude it here:  ignore_ranges_mhz = [[434.40, 434.45]]
+
+# Optional: a sensor right next to key storage. After hours, any strong
+# fob transmission here means a stored key is answering (relay attack).
+# [[monitor]]
+# name = "keyroom-315"
+# source = "rtlsdr"
+# device = "KEYROOM315"
+# center_freq = 315.25e6
+# sample_rate = 1.024e6
+# gain = 20
+# zone = "key_storage"
+
+# Optional: 125 kHz LF wake-up detection with an LF-capable receiver
+# (e.g. Airspy HF+ via SoapySDR, or an upconverter) and a loop antenna.
+# [[monitor]]
+# name = "keyroom-lf"
+# source = "soapy"
+# device = "driver=airspyhf"
+# center_freq = 0.225e6
+# sample_rate = 0.768e6
+# gain = "auto"
+# zone = "key_storage"
+# role = "lf"
+
+[detection]
+burst_threshold_db = 12.0
+jam_threshold_db = 8.0
+jam_min_seconds = 2.0
+press_window_seconds = 2.0
+replay_similarity = 0.95
+bruteforce_window_seconds = 60
+bruteforce_distinct_codes = 25
+key_storage_rssi_dbfs = -30.0    # tune with `fobguard calibrate` next to the key cabinet
+history_hours = 24
+
+[alerts]
+min_severity = "medium"
+incident_window_seconds = 180
+
+[[alerts.sink]]
+type = "console"
+
+# [[alerts.sink]]
+# type = "webhook"
+# format = "slack"                     # slack | teams | json
+# url = "${FOBGUARD_SLACK_WEBHOOK}"
+# min_severity = "high"
+
+# [[alerts.sink]]
+# type = "email"
+# host = "smtp.example.com"
+# port = 587
+# from = "fobguard@example.com"
+# to = ["manager@example.com", "security@example.com"]
+# username = "fobguard@example.com"
+# password = "${FOBGUARD_SMTP_PASSWORD}"
+# min_severity = "high"
+
+# [[alerts.sink]]
+# type = "command"                     # e.g. drive a siren/strobe relay
+# command = "/usr/local/bin/lot-siren --seconds 20"
+# min_severity = "critical"
+
+[dashboard]
+enabled = true
+bind = "0.0.0.0"       # reachable from the showroom LAN; use 127.0.0.1 for local only
+port = 8742
+token = "${FOBGUARD_DASHBOARD_TOKEN}"
+
+[storage]
+path = "/var/lib/anankos-fobguard/fobguard.db"
+baseline_path = "/var/lib/anankos-fobguard/baseline.json"
+
+[allowlist]
+# Fingerprints of known fixed-code devices that should never alert.
+fingerprints = []

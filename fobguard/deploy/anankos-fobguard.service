@@ -1,0 +1,27 @@
+[Unit]
+Description=Anankos FobGuard - passive key fob attack detection
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=fobguard
+Group=plugdev
+EnvironmentFile=-/etc/anankos-fobguard/env
+ExecStart=/opt/anankos-fobguard/venv/bin/fobguard run --config /etc/anankos-fobguard/config.toml
+Restart=always
+RestartSec=5
+# Hardening
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ReadWritePaths=/var/lib/anankos-fobguard
+StateDirectory=anankos-fobguard
+DeviceAllow=char-usb_device rw
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+
+[Install]
+WantedBy=multi-user.target

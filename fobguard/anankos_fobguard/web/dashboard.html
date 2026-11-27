@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anankos FobGuard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0b0c0a; --g900:#161815; --g800:#1f221e; --g700:#2e312c; --g500:#6b6e68; --g400:#8a8d86; --g300:#b3b5ae;
+  --paper:#efeee8; --white:#f5f4ef; --green:#8fbf5a; --olive:#4e5540; --tan:#c9b48a;
+  --crit:#d64545; --high:#e08a2b; --med:#c9b48a; --low:#8fbf5a; --info:#8a8d86;
+  --bg:var(--ink); --card:var(--g900); --line:var(--g700); --text:var(--white); --muted:var(--g400);
+  --sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){ --bg:var(--paper); --card:#fff; --line:#d9d7cf; --text:#161815; --muted:#5c5f58; }
+}
+:root[data-theme="light"]{ --bg:var(--paper); --card:#fff; --line:#d9d7cf; --text:#161815; --muted:#5c5f58; }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 var(--sans)}
+header{display:flex;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.brand{font-family:var(--mono);letter-spacing:.18em;font-weight:500;font-size:13px}
+.brand b{color:var(--green);font-weight:500}
+.site{color:var(--muted)}
+.spacer{flex:1}
+.pill{font-family:var(--mono);font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--line)}
+.pill.ok{color:var(--green);border-color:var(--olive)}
+.pill.alarm{background:var(--crit);color:#fff;border-color:var(--crit);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.6}}
+main{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:16px;padding:16px 20px;max-width:1400px;margin:0 auto}
+@media (max-width:900px){main{grid-template-columns:1fr;padding:16px}}
+section{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px 16px;min-width:0}
+h2{font:500 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+.sensors{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.sensor{border:1px solid var(--line);border-radius:4px;padding:10px}
+.sensor .n{font-weight:600}
+.sensor .m{font:12px var(--mono);color:var(--muted)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:6px}
+.dot.off{background:var(--crit)} .dot.jam{background:var(--high)}
+.inc{border-left:4px solid var(--info);padding:10px 12px;margin-bottom:10px;background:color-mix(in srgb,var(--card) 92%,var(--text))}
+.inc.critical{border-color:var(--crit)} .inc.high{border-color:var(--high)} .inc.medium{border-color:var(--med)} .inc.low{border-color:var(--low)}
+.inc .t{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.inc .title{font-weight:600;font-size:15px}
+.sev{font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.08em}
+.sev.critical{color:var(--crit)} .sev.high{color:var(--high)} .sev.medium{color:var(--med)} .sev.low{color:var(--low)}
+.inc .act{margin:6px 0;color:var(--text)}
+.inc ul{margin:6px 0 0;padding-left:18px;color:var(--muted);font-size:13px}
+.inc .meta{font:12px var(--mono);color:var(--muted)}
+button{font:500 12px var(--sans);background:transparent;color:var(--text);border:1px solid var(--line);border-radius:4px;padding:6px 10px;cursor:pointer}
+button:hover{border-color:var(--green)}
+button.primary{background:var(--green);color:#111;border-color:var(--green)}
+.feed{font:12px var(--mono);max-height:420px;overflow:auto;margin:0;padding:0;list-style:none}
+.feed li{padding:3px 0;border-bottom:1px solid var(--line);color:var(--muted);overflow-wrap:anywhere}
+.feed li.det{color:var(--text)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+input,select{font:13px var(--sans);background:transparent;color:var(--text);border:1px solid var(--line);border-radius:4px;padding:6px 8px}
+.empty{color:var(--muted);padding:8px 0}
+.stack{display:grid;gap:16px;align-content:start;min-width:0}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">ANANKOS <b>FOBGUARD</b></div>
+  <div class="site" id="site">-</div>
+  <div class="spacer"></div>
+  <span class="pill" id="hours">-</span>
+  <span class="pill ok" id="state">MONITORING</span>
+  <button id="sound" title="Audible alarm for critical incidents">Sound: off</button>
+</header>
+<main>
+  <div class="stack">
+    <section>
+      <h2>Incidents</h2>
+      <div id="incidents"><div class="empty">No incidents. The lot looks normal.</div></div>
+    </section>
+  </div>
+  <div class="stack">
+    <section>
+      <h2>Sensors</h2>
+      <div class="sensors" id="sensors"></div>
+    </section>
+    <section>
+      <h2>Mute non-critical alerts</h2>
+      <div class="row">
+        <select id="mins"><option value="15">15 min</option><option value="30">30 min</option><option value="60">1 hour</option><option value="0">Unmute</option></select>
+        <input id="reason" placeholder="Reason (e.g. after-hours delivery)" style="flex:1;min-width:140px">
+        <button id="mute">Apply</button>
+      </div>
+      <div class="meta" id="muted" style="margin-top:6px;font:12px var(--mono);color:var(--muted)"></div>
+    </section>
+    <section>
+      <h2>Live RF activity</h2>
+      <ul class="feed" id="feed"></ul>
+    </section>
+  </div>
+</main>
+<script>
+const token = new URLSearchParams(location.search).get("token") || "";
+const q = p => p + (token ? (p.includes("?") ? "&" : "?") + "token=" + encodeURIComponent(token) : "");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = t => new Date(t * 1000).toLocaleTimeString();
+let sound = false, lastCritical = 0, audio;
+
+function beep(){
+  try{
+    audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+    const o = audio.createOscillator(), g = audio.createGain();
+    o.type = "square"; o.frequency.value = 880; g.gain.value = 0.08;
+    o.connect(g).connect(audio.destination); o.start(); o.stop(audio.currentTime + 0.6);
+  }catch(e){}
+}
+
+function render(st){
+  document.getElementById("site").textContent = st.site;
+  const h = document.getElementById("hours");
+  h.textContent = st.open ? "OPEN" : "CLOSED";
+  const active = st.incidents.filter(i => i.active && !i.acknowledged_by);
+  const crit = active.some(i => i.severity === "critical" || i.severity === "high");
+  const s = document.getElementById("state");
+  s.textContent = crit ? "THEFT ALERT" : (active.length ? "ATTENTION" : "MONITORING");
+  s.className = "pill " + (crit ? "alarm" : "ok");
+  const newest = Math.max(0, ...active.filter(i => i.severity === "critical").map(i => i.updated));
+  if (sound && newest > lastCritical){ beep(); setTimeout(beep, 800); }
+  lastCritical = Math.max(lastCritical, newest);
+
+  document.getElementById("sensors").innerHTML = st.monitors.map(m => `
+    <div class="sensor">
+      <div class="n"><span class="dot ${!m.online ? "off" : m.jam_active ? "jam" : ""}"></span>${esc(m.name)}</div>
+      <div class="m">${esc(m.zone)} · ${m.role.toUpperCase()} · ${m.center_mhz.toFixed(3)} MHz</div>
+      <div class="m">${!m.online ? "OFFLINE " + esc(m.error) : m.jam_active ? "JAMMING DETECTED" : "floor " + (m.noise_floor_db ?? "-") + " dB"}</div>
+      <div class="m">${m.packets} frames decoded</div>
+    </div>`).join("") || '<div class="empty">No sensors configured.</div>';
+
+  const inc = st.incidents.filter(i => i.severity !== "info");
+  document.getElementById("incidents").innerHTML = inc.length ? inc.map(i => `
+    <div class="inc ${i.severity}">
+      <div class="t"><span class="sev ${i.severity}">${i.severity}</span><span class="title">${esc(i.title)}</span>
+        <span class="meta">#${i.id} · ${esc(i.zone)} · ${fmt(i.opened)}${i.active ? " · ACTIVE" : ""}</span></div>
+      ${i.action ? `<div class="act">${esc(i.action)}</div>` : ""}
+      <ul>${i.detections.slice(-5).map(d => `<li>${fmt(d.t)} ${esc(d.message)}</li>`).join("")}</ul>
+      <div class="row" style="margin-top:8px">
+        ${i.acknowledged_by ? `<span class="meta">Acknowledged by ${esc(i.acknowledged_by)} at ${fmt(i.acknowledged_at)}</span>`
+          : `<input placeholder="Your name" id="who${i.id}" style="width:140px"><button class="primary" data-ack="${i.id}">Acknowledge</button>`}
+      </div>
+    </div>`).join("") : '<div class="empty">No incidents. The lot looks normal.</div>';
+
+  const mu = document.getElementById("muted");
+  mu.textContent = st.suppressed_until * 1000 > Date.now()
+    ? `Muted until ${fmt(st.suppressed_until)}${st.suppress_reason ? " - " + st.suppress_reason : ""}. Critical alerts still sound.` : "";
+}
+
+async function refresh(){
+  try{ const r = await fetch(q("/api/status")); if (r.ok) render(await r.json()); }catch(e){}
+}
+
+document.addEventListener("click", async e => {
+  const id = e.target.dataset && e.target.dataset.ack;
+  if (id){
+    const who = (document.getElementById("who" + id) || {}).value || "staff";
+    await fetch(q(`/api/incidents/${id}/ack`), {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({by: who})});
+    refresh();
+  }
+});
+document.getElementById("mute").onclick = async () => {
+  await fetch(q("/api/suppress"), {method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({minutes: +document.getElementById("mins").value, reason: document.getElementById("reason").value})});
+  refresh();
+};
+document.getElementById("sound").onclick = e => { sound = !sound; e.target.textContent = "Sound: " + (sound ? "on" : "off"); if (sound) beep(); };
+
+const feed = document.getElementById("feed");
+function addFeed(html, cls){
+  const li = document.createElement("li"); li.className = cls || ""; li.innerHTML = html;
+  feed.prepend(li); while (feed.children.length > 200) feed.lastChild.remove();
+}
+const es = new EventSource(q("/api/events"));
+es.addEventListener("packet", e => { const p = JSON.parse(e.data);
+  addFeed(`${fmt(p.t)} ${esc(p.monitor)} ${p.freq_mhz.toFixed(3)}MHz ${esc(p.modulation)} ${p.length}sym ${p.rssi_dbfs}dBFS ${esc(p.fingerprint)}`); });
+es.addEventListener("detection", e => { const d = JSON.parse(e.data);
+  addFeed(`${fmt(d.t)} <b>${esc(d.kind)}</b> [${esc(d.severity)}] ${esc(d.message)}`, "det"); refresh(); });
+es.addEventListener("incident", refresh);
+es.addEventListener("jam", refresh);
+refresh(); setInterval(refresh, 5000);
+</script>
+</body>
+</html>

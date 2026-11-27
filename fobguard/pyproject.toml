@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "anankos-fobguard"
+version = "0.1.0"
+description = "Anankos FobGuard - passive SDR monitoring that detects key fob jamming, replay, relay and code-scanning attacks at vehicle dealerships."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Proprietary" }
+authors = [{ name = "Anankos" }]
+dependencies = [
+    "numpy>=1.24",
+    "tomli>=2.0; python_version < '3.11'",
+]
+
+[project.optional-dependencies]
+rtlsdr = ["pyrtlsdr>=0.3"]
+test = ["pytest>=7"]
+
+[project.scripts]
+fobguard = "anankos_fobguard.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["anankos_fobguard*"]
+
+[tool.setuptools.package-data]
+anankos_fobguard = ["web/*.html", "default_config.toml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
