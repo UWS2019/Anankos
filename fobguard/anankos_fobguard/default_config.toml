@@ -66,6 +66,30 @@ zone = "lot"
 # zone = "key_storage"
 # role = "lf"
 
+# ---------------------------------------------------------------------------
+# Antennas staff can switch between from the dashboard (Hardware & System tab).
+# Antennas are passive, so FobGuard can't read which one is attached. Describe
+# them here; the dashboard switches by name and then measures performance.
+# A switch is a receiver port (multi-port SDRs: SDRplay "Antenna A/B/C",
+# LimeSDR "LNAH/LNAL/LNAW"), an external RF switch command, or both.
+# Commands run without a shell and only from this file, never from the web.
+# The first antenna listed for a monitor is its default.
+
+# [[antenna]]
+# name = "Roof ground-plane (315)"
+# monitor = "lot-315"
+# port = "RX"
+# band_mhz = [300, 330]
+# location = "Showroom roof, NE corner"
+#
+# [[antenna]]
+# name = "Back-lot mast via RF switch"
+# monitor = "lot-315"
+# port = "RX"
+# switch_command = "/usr/local/bin/usbrelay RFSW_1=1"   # e.g. USB relay driving a coax switch
+# bias_tee = true                                         # powers a mast-head LNA (RTL-SDR Blog V3/V4)
+# band_mhz = [300, 330]
+
 [detection]
 burst_threshold_db = 12.0
 jam_threshold_db = 8.0

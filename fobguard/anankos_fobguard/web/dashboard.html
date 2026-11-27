@@ -58,18 +58,43 @@ button.primary{background:var(--green);color:#111;border-color:var(--green)}
 input,select{font:13px var(--sans);background:transparent;color:var(--text);border:1px solid var(--line);border-radius:4px;padding:6px 8px}
 .empty{color:var(--muted);padding:8px 0}
 .stack{display:grid;gap:16px;align-content:start;min-width:0}
+nav.tabs{display:flex;gap:4px}
+nav.tabs button{border-color:transparent;color:var(--muted)}
+nav.tabs button.on{color:var(--text);border-color:var(--line)}
+[hidden]{display:none!important}
+.wide{grid-template-columns:1fr}
+.mon{border:1px solid var(--line);border-radius:4px;padding:12px;margin-bottom:12px}
+.mon h3{margin:0 0 4px;font-size:15px}
+.kv{font:12px var(--mono);color:var(--muted)}
+.verdict{margin-top:8px;padding:8px 10px;border-radius:4px;border:1px solid var(--line);font-size:13px}
+.verdict.ok{border-color:var(--olive)} .verdict.warn{border-color:var(--high)} .verdict.bad{border-color:var(--crit)}
+.verdict b{font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-right:6px}
+.verdict.ok b{color:var(--green)} .verdict.warn b{color:var(--high)} .verdict.bad b{color:var(--crit)} .verdict.info b{color:var(--muted)}
+.metrics{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;margin-top:8px}
+.metric{font:12px var(--mono);color:var(--muted)} .metric span{display:block;color:var(--text);font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:break-word}
+td.kv{overflow-wrap:anywhere}
+td:nth-child(2){min-width:9em}
+select{max-width:100%;min-width:0}
+th{font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.st{font:500 11px var(--mono);text-transform:uppercase;white-space:nowrap}
+.st.ok{color:var(--green)} .st.missing{color:var(--crit)} .st.warn{color:var(--high)} .st.manual{color:var(--tan)} .st.skip{color:var(--muted)}
+.note{font-size:13px;color:var(--muted);margin:8px 0 0}
+.scroll{overflow-x:auto}
 </style>
 </head>
 <body>
 <header>
   <div class="brand">ANANKOS <b>FOBGUARD</b></div>
   <div class="site" id="site">-</div>
+  <nav class="tabs"><button class="on" data-tab="live">Live</button><button data-tab="hw">Hardware &amp; System</button></nav>
   <div class="spacer"></div>
   <span class="pill" id="hours">-</span>
   <span class="pill ok" id="state">MONITORING</span>
   <button id="sound" title="Audible alarm for critical incidents">Sound: off</button>
 </header>
-<main>
+<main id="live">
   <div class="stack">
     <section>
       <h2>Incidents</h2>
@@ -95,6 +120,30 @@ input,select{font:13px var(--sans);background:transparent;color:var(--text);bord
       <ul class="feed" id="feed"></ul>
     </section>
   </div>
+</main>
+<main id="hw" class="wide" hidden>
+  <section>
+    <h2>Sensors &amp; antennas</h2>
+    <p class="note" style="margin:0 0 12px">Antennas have no electronic ID, so FobGuard can't read which one is attached. It shows the
+      receiver and port in use and the antenna profile staff selected, and it <em>measures</em> how well that antenna is working.</p>
+    <div class="row" style="margin-bottom:10px"><input id="hwwho" placeholder="Your name (for the audit log)" style="width:240px"></div>
+    <div id="mons"></div>
+  </section>
+  <section>
+    <h2>Receivers plugged in</h2>
+    <div class="scroll"><table><thead><tr><th>Model</th><th>Serial</th><th>Driver</th><th>Antenna ports</th><th>USB access</th></tr></thead>
+    <tbody id="devs"></tbody></table></div>
+  </section>
+  <section>
+    <h2>System health: drivers, plugins, permissions</h2>
+    <div class="row" style="margin-bottom:10px">
+      <button id="recheck">Re-check</button>
+      <button class="primary" id="installAll">Install missing items</button>
+      <span class="kv" id="pm"></span>
+    </div>
+    <div class="scroll"><table><thead><tr><th>Status</th><th>Item</th><th>Details</th></tr></thead><tbody id="checks"></tbody></table></div>
+    <p class="note" id="fixmsg"></p>
+  </section>
 </main>
 <script>
 const token = new URLSearchParams(location.search).get("token") || "";
@@ -170,6 +219,102 @@ document.getElementById("mute").onclick = async () => {
 };
 document.getElementById("sound").onclick = e => { sound = !sound; e.target.textContent = "Sound: " + (sound ? "on" : "off"); if (sound) beep(); };
 
+// ---- tabs
+document.querySelectorAll("nav.tabs button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("nav.tabs button").forEach(x => x.classList.toggle("on", x === b));
+  document.getElementById("live").hidden = b.dataset.tab !== "live";
+  document.getElementById("hw").hidden = b.dataset.tab !== "hw";
+  if (b.dataset.tab === "hw"){ loadHardware(); loadDoctor(); }
+});
+const post = (u, body) => fetch(q(u), {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body || {})})
+  .then(async r => { const j = await r.json(); if (!r.ok) throw new Error(j.error || r.statusText); return j; });
+const who = () => (document.getElementById("hwwho") || {}).value || "staff";
+const fmtv = v => v === null || v === undefined ? "-" : v;
+
+function renderMon(name, m){
+  const c = m.check || {};
+  const want = (window._antsel || {})[name] ?? m.active;
+  const opts = m.options.map(o => `<option value="${esc(o.id)}" ${o.id === want ? "selected" : ""} ${o.band_ok ? "" : "disabled"}>
+     ${esc(o.label)}${o.port ? " · " + esc(o.port) : ""}${o.bias_tee ? " · powered" : ""}${o.band_ok ? "" : " (wrong band)"}</option>`).join("");
+  const sw = m.sweep;
+  const sweepTxt = sw ? (sw.running ? `Sweep running: antenna ${sw.step} of ${sw.of} (${esc(sw.current)})`
+     : sw.result ? `Last sweep: best was <b>${esc(sw.result.best)}</b>${sw.result.applied ? " (applied)" : ""}. ` +
+       sw.result.ranking.map(r => `${esc(r.antenna)}: ${r.signals} signals, SNR ${fmtv(r.snr_db)} dB`).join(" · ") : "") : "";
+  return `<div class="mon">
+    <h3>${esc(name)}</h3>
+    <div class="kv">Antenna in use: ${esc(m.label)} · receiver port ${esc(m.receiver_port || "-")} · bias tee ${m.bias_tee ? "on" : "off"}${m.warming ? " · re-learning RF" : ""}</div>
+    ${m.control_error ? `<div class="verdict bad"><b>error</b>${esc(m.control_error)}</div>` : ""}
+    <div class="row" style="margin-top:10px">
+      <select data-mon="${esc(name)}" class="antsel">${opts || "<option>No switchable antennas</option>"}</select>
+      <button data-act="apply" data-mon="${esc(name)}" ${m.options.length < 2 ? "disabled" : ""}>Switch antenna</button>
+      <button data-act="check" data-mon="${esc(name)}">Check antenna</button>
+      <button data-act="sweep" data-mon="${esc(name)}" ${m.options.filter(o => o.band_ok).length < 2 ? "disabled" : ""}
+        title="Tries each antenna for 60s and keeps the one that hears the most">Find best antenna</button>
+    </div>
+    <div class="verdict ${esc(c.level || "info")}"><b>${esc((c.verdict || "").replace(/_/g, " "))}</b>${esc(c.message || "")}</div>
+    <div class="metrics">
+      <div class="metric">signals/min<span>${fmtv(c.signals_per_min)}</span></div>
+      <div class="metric">median RSSI<span>${fmtv(c.median_rssi_dbfs)} dBFS</span></div>
+      <div class="metric">noise floor<span>${fmtv(c.noise_floor_db)} dB</span></div>
+      <div class="metric">reference floor<span>${fmtv(c.reference_floor_db)} dB</span></div>
+      <div class="metric">clipping<span>${fmtv(c.clipped_pct)}%</span></div>
+      <div class="metric">measured<span>${fmtv(c.measured_s)} s</span></div>
+    </div>
+    ${sweepTxt ? `<p class="note">${sweepTxt}</p>` : ""}
+  </div>`;
+}
+
+async function loadHardware(){
+  try{
+    const r = await fetch(q("/api/hardware")); if (!r.ok) return; const h = await r.json();
+    document.getElementById("mons").innerHTML = Object.entries(h.monitors).map(([n, m]) => renderMon(n, m)).join("");
+    document.getElementById("devs").innerHTML = h.devices.length ? h.devices.map(d => `<tr><td>${esc(d.model)}</td>
+      <td class="kv">${esc(d.serial || "-")}</td><td class="kv">${esc(d.driver)}</td><td class="kv">${esc(d.ports.join(", ") || "-")}</td>
+      <td class="st ${d.accessible === false ? "missing" : "ok"}">${d.accessible === false ? "denied" : d.accessible ? "ok" : "-"}</td></tr>`).join("")
+      : `<tr><td colspan="5" class="kv">No supported receivers detected on USB.</td></tr>`;
+  }catch(e){}
+}
+
+async function loadDoctor(refresh){
+  const r = await fetch(q("/api/doctor" + (refresh ? "?refresh=1" : ""))); if (!r.ok) return; const d = await r.json();
+  document.getElementById("pm").textContent = "package manager: " + (d.package_manager || "none") + (d.helper ? " · install helper ready" : " · install helper not set up");
+  document.getElementById("checks").innerHTML = d.checks.map(c => `<tr><td class="st ${c.status}">${c.status}</td>
+    <td>${esc(c.title)}${c.required ? "" : ' <span class="kv">(optional)</span>'}</td>
+    <td class="kv">${esc(c.detail)}${c.fixable ? `<br><span style="color:var(--green)">Fix: ${esc(c.fix.description)}</span>` : ""}</td></tr>`).join("");
+  const n = d.checks.filter(c => c.fixable && (c.status === "missing" || c.status === "warn")).length;
+  const btn = document.getElementById("installAll"); btn.disabled = !n; btn.textContent = n ? `Install missing items (${n})` : "Nothing to install";
+  if (d.last_fix) document.getElementById("fixmsg").textContent = `Last install (${fmt(d.last_fix.finished)}, by ${d.last_fix.requested_by}): ` +
+      d.last_fix.results.map(x => `${x.ok ? "✓" : "✗"} ${x.id}`).join("  ");
+  window._checks = d.checks;
+}
+
+document.getElementById("recheck").onclick = () => loadDoctor(true);
+document.getElementById("installAll").onclick = async () => {
+  const ids = (window._checks || []).filter(c => c.fixable && (c.status === "missing" || c.status === "warn")).map(c => c.id);
+  const r = await post("/api/doctor/fix", {ids, by: who()}).catch(e => ({message: e.message}));
+  document.getElementById("fixmsg").textContent = r.message + (r.command ? "  Command: " + r.command : "");
+  if (r.queued) setTimeout(() => loadDoctor(true), 15000);
+};
+document.getElementById("mons").addEventListener("change", e => {
+  if (e.target.classList.contains("antsel")) (window._antsel = window._antsel || {})[e.target.dataset.mon] = e.target.value;
+});
+document.getElementById("mons").addEventListener("click", async e => {
+  const b = e.target.closest("button[data-act]"); if (!b) return;
+  const mon = b.dataset.mon, sel = document.querySelector(`select.antsel[data-mon="${CSS.escape(mon)}"]`);
+  b.disabled = true;
+  try{
+    if (b.dataset.act === "apply"){
+      await post(`/api/monitors/${encodeURIComponent(mon)}/antenna`, {option: sel.value, by: who()});
+      delete (window._antsel || {})[mon];
+    }
+    if (b.dataset.act === "check") await post(`/api/monitors/${encodeURIComponent(mon)}/antenna/check`, {});
+    if (b.dataset.act === "sweep" && confirm("Try every antenna on " + mon + " (about 1 minute each)? Coverage on this sensor may dip during the sweep."))
+      await post(`/api/monitors/${encodeURIComponent(mon)}/antenna/sweep`, {dwell_s: 60, apply: true, by: who()});
+  }catch(err){ alert(err.message); }
+  loadHardware();
+});
+setInterval(() => { if (!document.getElementById("hw").hidden) loadHardware(); }, 5000);
+
 const feed = document.getElementById("feed");
 function addFeed(html, cls){
   const li = document.createElement("li"); li.className = cls || ""; li.innerHTML = html;
@@ -182,6 +327,7 @@ es.addEventListener("detection", e => { const d = JSON.parse(e.data);
   addFeed(`${fmt(d.t)} <b>${esc(d.kind)}</b> [${esc(d.severity)}] ${esc(d.message)}`, "det"); refresh(); });
 es.addEventListener("incident", refresh);
 es.addEventListener("jam", refresh);
+es.addEventListener("sweep", loadHardware);
 refresh(); setInterval(refresh, 5000);
 </script>
 </body>

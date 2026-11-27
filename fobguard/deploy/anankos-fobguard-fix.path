@@ -1,0 +1,9 @@
+[Unit]
+Description=Anankos FobGuard - watch for dashboard install requests
+
+[Path]
+PathModified=/var/lib/anankos-fobguard/fix-request.json
+Unit=anankos-fobguard-fix.service
+
+[Install]
+WantedBy=multi-user.target

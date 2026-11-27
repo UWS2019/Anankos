@@ -28,7 +28,8 @@ usermod -aG plugdev fobguard
 install -d -o fobguard -g fobguard -m 0750 /var/lib/anankos-fobguard
 
 echo "==> application"
-python3 -m venv "$PREFIX/venv"
+# --system-site-packages: lets FobGuard use apt-installed SoapySDR bindings and plugins
+python3 -m venv --system-site-packages "$PREFIX/venv"
 "$PREFIX/venv/bin/pip" install -q --upgrade pip
 "$PREFIX/venv/bin/pip" install -q "$SRC[rtlsdr]"
 ln -sf "$PREFIX/venv/bin/fobguard" /usr/local/bin/fobguard
@@ -47,12 +48,18 @@ if [[ ! -f "$ETC/env" ]]; then
 fi
 
 install -m 0644 "$SRC/deploy/anankos-fobguard.service" /etc/systemd/system/
+install -m 0644 "$SRC/deploy/anankos-fobguard-fix.service" /etc/systemd/system/
+install -m 0644 "$SRC/deploy/anankos-fobguard-fix.path" /etc/systemd/system/
 systemctl daemon-reload
+systemctl enable --now anankos-fobguard-fix.path
+
+echo "==> drivers & plugins for the receivers in config / plugged in"
+FOBGUARD_SERVICE_USER=fobguard "$PREFIX/venv/bin/fobguard" doctor --config "$ETC/config.toml" --fix --yes || true
 
 cat <<MSG
 
 Installed. Next steps:
-  1. Plug in the receivers and run:   fobguard devices
+  1. Plug in the receivers and run:   sudo fobguard doctor --fix   (installs any drivers they need)
   2. Edit $ETC/config.toml (site name, hours, timezone, one [[monitor]] per receiver)
   3. Calibrate for 30 min in normal conditions:
        sudo -u fobguard fobguard calibrate -c $ETC/config.toml --minutes 30

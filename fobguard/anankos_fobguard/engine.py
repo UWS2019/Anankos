@@ -80,6 +80,7 @@ class MonitorState:
     saturated_since: float | None = None
     stream_recent: list = None  # type: ignore[assignment]
     max_rssi: float = -200.0
+    source: object = None
 
 
 class Engine:
@@ -101,6 +102,9 @@ class Engine:
                 st.dsp.import_floor(fl)
             self.monitors[m.name] = st
         self.listeners: list[Callable[[str, dict], None]] = []
+        from .antenna import AntennaManager
+        state = Path(cfg.storage_path).parent / "antenna-state.json" if store is not None else None
+        self.antennas = AntennaManager(self, str(state) if state else None)
         self.detections: list[Detection] = []
         self.packets_seen = 0
         self._stop = threading.Event()
@@ -135,8 +139,10 @@ class Engine:
             self.now = max(self.now, t0)
             for j in jams:
                 self._handle_jam(j)
+            rssis: list[float] = []
             for b in bursts:
                 pkts = burst_to_packets(b, st.cfg, st.dsp.fc, st.dsp.fs, self.cfg.detection.min_frame_symbols)
+                rssis += [p.rssi_dbfs for p in pkts]
                 if b.continuous:
                     pkts = self._dedupe_stream(st, pkts)
                 for p in pkts:
@@ -146,6 +152,7 @@ class Engine:
                     # not a fob pressed under jamming
                     self._handle_packet(p, b.during_jam and not b.continuous)
             self._check_saturation(st, t0)
+        self.antennas.record(st, t0, iq.size / st.dsp.fs, sum(1 for b in bursts if not b.continuous), rssis)
 
     def _dedupe_stream(self, st: MonitorState, pkts: list[Packet]) -> list[Packet]:
         """Overlapping stream windows see the same frame twice; keep the first."""
@@ -226,6 +233,7 @@ class Engine:
                 "noise_floor_db": None if s.noise_floor_db != s.noise_floor_db else round(s.noise_floor_db, 1),
                 "jam_active": s.jam_active, "bursts": s.bursts, "packets": st.packets,
                 "last_block_age_s": round(now - st.last_t, 1) if st.last_t else None,
+                "antenna": self.antennas.snapshot(st.cfg.name),
             })
         return {
             "site": self.cfg.site.name, "open": self.cfg.site.is_open(now), "monitors": mons,
@@ -243,8 +251,11 @@ class Engine:
             for t0, iq in src:
                 yield t0, name, iq
 
-        iters = [tagged(name, open_source(st.cfg, start_time=start_time))
-                 for name, st in self.monitors.items()]
+        iters = []
+        for name, st in self.monitors.items():
+            st.source = open_source(st.cfg, start_time=start_time)
+            self.antennas.on_source_opened(st)
+            iters.append(tagged(name, st.source))
         for t0, name, iq in heapq.merge(*iters, key=lambda x: x[0]):
             self.handle_block(name, t0, iq)
         self.flush()
@@ -259,6 +270,8 @@ class Engine:
         while not self._stop.is_set():
             try:
                 src = open_source(st.cfg, throttle=throttle)
+                st.source = src
+                self.antennas.on_source_opened(st)
                 st.online, st.error = True, ""
                 backoff = 2.0
                 for t0, iq in src:

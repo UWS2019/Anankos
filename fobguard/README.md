@@ -22,6 +22,10 @@ a local siren relay.
 | ![Phone view](docs/screenshots/4-phone-relay.png) | ![Terminal alerts](docs/screenshots/5-terminal-alert.png) |
 | Phone view: stored key answering after hours | Console alerts escalating as the attack is identified |
 
+![Hardware & System tab](docs/screenshots/6-hardware-antennas.png)
+
+*Hardware & System tab: antenna switching, live antenna health (a disconnected cable flagged on the key-room sensor), best-antenna sweep result, and the driver/plugin check with one-click install. Sensor data is simulated; the system check is real output from a Debian/Ubuntu host with no receivers plugged in.*
+
 ---
 
 ## What it detects
@@ -119,6 +123,63 @@ The dashboard is at `http://<host>:8742/?token=<token from /etc/anankos-fobguard
 It shows live incidents with what-to-do instructions, sensor health, an
 acknowledge button, an audible alarm, and a "mute non-critical alerts" control
 for after-hours deliveries. Critical alerts are never muted.
+
+### Drivers and plugins: `fobguard doctor`
+
+```bash
+fobguard doctor                 # check everything; nothing is changed
+sudo fobguard doctor --fix      # install what's missing (asks first; --yes to skip)
+fobguard doctor --fix --dry-run # show the exact commands it would run
+```
+
+The doctor works out what this site needs from the config and from the
+receivers actually plugged in. It then checks:
+
+* Python and NumPy.
+* The RTL-SDR library and bindings.
+* The SoapySDR bindings, plus the right plugin for each receiver (Airspy,
+  Airspy HF+, HackRF, LimeSDR, USRP, Pluto).
+* The TV-tuner kernel driver that steals RTL-SDR dongles.
+* USB permissions and the udev rule.
+* Clock sync (evidence timestamps), storage, and dashboard protection.
+
+Missing items are **searched for in this OS's own package manager** (apt,
+dnf, pacman, Homebrew) or pip, and installed. If the package index is
+empty, it is refreshed first. The doctor also detects version clashes: for
+example, `pyrtlsdr` 0.4+ won't load against the stock Debian/Ubuntu
+`librtlsdr`, so it installs the compatible 0.3.x instead.
+
+Only items on a built-in allowlist can ever be installed, and no shell is
+involved. Proprietary vendor drivers (the SDRplay API) are listed as manual
+steps.
+
+On the dashboard, **Hardware & System → Install missing items** does the
+same thing. The web service has no root rights. It only drops a request
+naming check IDs. A root helper (`anankos-fobguard-fix.path`) re-runs the
+checks itself, installs allowlisted fixes for checks that still fail, and
+restarts FobGuard.
+
+### Antennas
+
+Antennas are passive, so **no software can identify which antenna is
+attached**. FobGuard identifies the *receiver* (model, serial, driver, antenna
+ports) and lets you describe your antennas as `[[antenna]]` profiles. The
+**Hardware & System** tab then offers four controls:
+
+* **Switch antenna:** changes the receiver port (multi-port SDRs) and/or drives an
+  external RF switch, and powers active antennas through the bias tee. FobGuard
+  re-learns the noise floor so the change never looks like jamming. Every switch is
+  audit-logged with the staff member's name.
+* **Check antenna:** measures the antenna in place: signals per minute, RSSI,
+  noise floor against the calibrated reference, and clipping. It flags *probably
+  disconnected*, *weak compared with another antenna*, *wrong band* or *overloaded*.
+* **Find best antenna:** tries each option for about a minute and keeps the one
+  that hears the most distinct signals with the best margin over the noise.
+* **Bands:** an antenna whose `band_mhz` doesn't cover the sensor's frequency
+  can't be selected by mistake.
+
+A single-port RTL-SDR needs an external coax switch to change antennas
+remotely. Otherwise it's one antenna per receiver, which is cheap at about $40 each.
 
 ### Calibration
 

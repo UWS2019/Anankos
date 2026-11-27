@@ -17,6 +17,9 @@ from . import __version__
 from .config import AlertConfig, Config, MonitorConfig, SinkConfig, load_config
 
 
+DEFAULT_CONFIG = "/etc/anankos-fobguard/config.toml"
+
+
 def _setup_logging(verbose: int) -> None:
     level = logging.WARNING - 10 * verbose
     logging.basicConfig(level=max(logging.DEBUG, level),
@@ -42,7 +45,8 @@ def _start_dashboard(cfg: Config, engine):
     if cfg.dashboard.bind not in ("127.0.0.1", "localhost", "::1") and not cfg.dashboard.token:
         logging.getLogger("fobguard").warning(
             "dashboard is exposed on %s without a token; set [dashboard] token", cfg.dashboard.bind)
-    d = Dashboard(engine, cfg.dashboard.bind, cfg.dashboard.port, cfg.dashboard.token)
+    d = Dashboard(engine, cfg.dashboard.bind, cfg.dashboard.port, cfg.dashboard.token,
+                  config_path=getattr(cfg, "_path", None))
     d.start()
     print(f"Dashboard: http://{cfg.dashboard.bind}:{cfg.dashboard.port}/", file=sys.stderr)
     return d
@@ -198,6 +202,56 @@ def cmd_devices(a) -> int:
     return 0
 
 
+def cmd_doctor(a) -> int:
+    from .doctor import Doctor, run_request
+
+    cfg = None
+    if a.config and Path(a.config).exists():
+        cfg = load_config(a.config)
+    elif a.config != DEFAULT_CONFIG:
+        print(f"config {a.config} not found", file=sys.stderr)
+        return 2
+    if a.request:
+        out = run_request(cfg, a.request)
+        print(json.dumps(out, indent=2) if a.json else
+              "\n".join(f"{'OK  ' if r['ok'] else 'FAIL'} {r['id']}: {r['message']}" for r in out.get("results", [])))
+        return 0
+    doc = Doctor(cfg)
+    checks = doc.checks()
+    if a.json and not a.fix:
+        print(json.dumps({"devices": [d.to_dict() for d in doc.devices],
+                          "checks": [c.to_dict() for c in checks]}, indent=2))
+        return 0
+    icon = {"ok": "  ok  ", "missing": "MISSING", "warn": " warn ", "manual": "MANUAL", "skip": " skip "}
+    print(f"Anankos FobGuard system check  (package manager: {doc.pm.key or 'none found'})\n")
+    for c in checks:
+        print(f" [{icon[c.status]}] {c.title}")
+        if c.detail:
+            print(f"           {c.detail}")
+    fixable = [c for c in checks if c.fix and c.fix.kind != "manual" and c.status in ("missing", "warn")]
+    if not fixable:
+        print("\nNothing to install." if all(c.status in ("ok", "skip") or not c.required for c in checks)
+              else "\nRemaining items need manual action (see above).")
+        return 0 if all(c.status != "missing" for c in checks) else 1
+    print("\nCan fix automatically:")
+    for c in fixable:
+        print(f"  - {c.title}: {c.fix.description}" + ("  [needs sudo]" if c.fix.needs_root else ""))
+    if not a.fix:
+        print("\nRun again with --fix to install (sudo fobguard doctor --fix for system packages).")
+        return 1
+    if not a.yes and not a.dry_run:
+        if input("\nProceed? [y/N] ").strip().lower() not in ("y", "yes"):
+            return 1
+    results = doc.apply(log=print, dry_run=a.dry_run)
+    if a.dry_run:
+        for r in results:
+            for cmd in r.get("commands", []):
+                print("   would run:", " ".join(cmd))
+    bad = [r for r in results if not r["ok"]]
+    print(f"\n{len(results) - len(bad)} fixed, {len(bad)} failed.")
+    return 1 if bad else 0
+
+
 def cmd_init_config(a) -> int:
     dst = Path(a.path)
     if dst.exists() and not a.force:
@@ -257,6 +311,15 @@ def build_parser() -> argparse.ArgumentParser:
 
     d = sub.add_parser("devices", help="list RTL-SDR receivers")
     d.set_defaults(fn=cmd_devices)
+
+    dr = sub.add_parser("doctor", help="check drivers/plugins/permissions and install what's missing")
+    dr.add_argument("-c", "--config", default=DEFAULT_CONFIG)
+    dr.add_argument("--fix", action="store_true", help="install missing items (allowlisted packages only)")
+    dr.add_argument("-y", "--yes", action="store_true", help="don't ask for confirmation")
+    dr.add_argument("--dry-run", action="store_true", help="show what would be run")
+    dr.add_argument("--json", action="store_true")
+    dr.add_argument("--request", metavar="STATE_DIR", help=argparse.SUPPRESS)  # root helper entry point
+    dr.set_defaults(fn=cmd_doctor)
 
     i = sub.add_parser("init-config", help="write a starter config file")
     i.add_argument("path", nargs="?", default="config.toml")

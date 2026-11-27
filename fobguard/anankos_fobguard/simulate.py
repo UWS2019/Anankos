@@ -163,9 +163,31 @@ class Scenario:
         return x
 
     def blocks(self, block_size: int = 131072):
-        x = self.render()
-        for i in range(0, x.size - block_size + 1, block_size):
-            yield self.start_time + i / self.fs, x[i:i + block_size]
+        """Render lazily, block by block, so long scenarios use little memory."""
+        n = int(self.duration_s * self.fs)
+        rng = self.rng
+        k = max(1, int(self.fs / 5e3))
+        jam_phase = {id(j): 0.0 for j in self.jams}
+        for s0 in range(0, n - block_size + 1, block_size):
+            s1 = s0 + block_size
+            x = (self.noise_amp * (rng.standard_normal(block_size) + 1j * rng.standard_normal(block_size))
+                 / np.sqrt(2)).astype(np.complex64)
+            for j in self.jams:
+                a, b = max(s0, int(j.start * self.fs)), min(s1, int(j.end * self.fs))
+                if a >= b:
+                    continue
+                fm = np.convolve(rng.standard_normal(b - a + k), np.ones(k) / k, mode="same")[k // 2: k // 2 + b - a]
+                fm = fm / (np.std(fm) + 1e-9) * j.bw_hz / 4
+                ph = jam_phase[id(j)] + 2 * np.pi * np.cumsum(j.f_off + fm) / self.fs
+                jam_phase[id(j)] = float(ph[-1])
+                x[a - s0:b - s0] += (j.amp * np.exp(1j * ph)).astype(np.complex64)
+            for e in self.emissions:
+                e0 = int(e.t * self.fs)
+                e1 = e0 + e.iq.size
+                a, b = max(s0, e0), min(s1, e1)
+                if a < b:
+                    x[a - s0:b - s0] += e.iq[a - e0:b - e0]
+            yield self.start_time + s0 / self.fs, x
 
 
 # ---------------------------------------------------------------------------
@@ -235,6 +257,23 @@ def scenario_relay(start_time: float = 0.0, fs: float = 1.024e6, seed: int = 7) 
     return s
 
 
+def scenario_ambient(start_time: float = 0.0, fs: float = 1.024e6, seed: int = 7,
+                     duration_s: float = 300.0) -> Scenario:
+    """Long, quiet lot: occasional fob presses and a periodic sensor every
+    ~8 s. Used for antenna checks and best-antenna sweeps."""
+    s = Scenario("ambient", duration_s, fs=fs, start_time=start_time, seed=seed)
+    t = 6.0
+    i = 0
+    while t < duration_s - 1:
+        s.fixed_device(t, 0x3C3C3, f_off=-150e3, amp=0.03)    # e.g. a weather/TPMS-like sensor
+        if i % 3 == 1:
+            s.fob_press(t + 3.0, amp=0.15)
+        t += 8.0
+        i += 1
+    s.truth.append("no alerts")
+    return s
+
+
 SCENARIOS = {
     "normal": scenario_normal,
     "rolljam": scenario_rolljam,
@@ -242,4 +281,5 @@ SCENARIOS = {
     "rollback": scenario_rollback,
     "bruteforce": scenario_bruteforce,
     "relay": scenario_relay,
+    "ambient": scenario_ambient,
 }

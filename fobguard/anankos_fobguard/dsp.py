@@ -283,6 +283,7 @@ class SpectrumMonitor:
         self.level_ref: np.ndarray | None = None      # slow p90 level, for jammed bins
         self._raw_since: float | None = None
         self._core_freq: float | None = None     # offset of the sustained emitter
+        self._warm_until: float = 0.0
         self.stats = MonitorStats()
         self._t_start: float | None = None
         self._frame_cursor = 0          # global frame index of next block start
@@ -302,10 +303,37 @@ class SpectrumMonitor:
             self.floor = arr
             self._preloaded = True
 
+    def rewarm(self, t: float | None = None) -> None:
+        """Re-learn the RF environment (after an antenna/gain change). Jam and
+        burst detection pause for ``warmup_s`` while the floor re-settles.
+        With ``t=None`` the pause is anchored to the next sample block, so it
+        always follows the stream's own clock."""
+        self._rewarm_next = t is None
+        self._warm_until = (t + self.warmup_s) if t is not None else float("inf")
+        self._preloaded = False
+        self.duty_ema[:] = 0
+        self.level_ref = None
+        self._pending = None
+        self._jam_event = None
+        self._jam_since = None
+        self._raw_since = None
+        self._core_freq = None
+        self.stats.jam_active = False
+
+    @property
+    def warming(self) -> bool:
+        t = self.stats.last_block_t
+        initial = self._t_start is not None and (t - self._t_start) < self.warmup_s \
+            and not getattr(self, "_preloaded", False)
+        return initial or t < self._warm_until
+
     # -- main entry --------------------------------------------------------
     def process(self, iq: np.ndarray, t0: float) -> tuple[list[Burst], list[JamEvent]]:
         if self._t_start is None:
             self._t_start = t0
+        if getattr(self, "_rewarm_next", False):
+            self._rewarm_next = False
+            self._warm_until = t0 + self.warmup_s
         nframes = iq.size // self.nfft
         if nframes == 0:
             return [], []
@@ -324,7 +352,8 @@ class SpectrumMonitor:
         pw = (pw + np.roll(pw, 1, axis=1) + np.roll(pw, -1, axis=1)) / 3
         pdb = 10 * np.log10(pw + EPS).astype(np.float32)
 
-        warm = (t0 - self._t_start) < self.warmup_s and not getattr(self, "_preloaded", False)
+        warm = ((t0 - self._t_start) < self.warmup_s and not getattr(self, "_preloaded", False)) \
+            or t0 < self._warm_until
         blk_floor = np.median(pdb, axis=0)
         if self.floor is None:
             self.floor = blk_floor.astype(np.float32)

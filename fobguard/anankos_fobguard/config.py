@@ -41,6 +41,30 @@ class MonitorConfig:
 
 
 @dataclass
+class AntennaConfig:
+    """A physical antenna the staff can switch a monitor to.
+
+    Selection happens by *name* from the dashboard; the port / switch command
+    come only from this file, so the web UI can never run arbitrary commands.
+    """
+    name: str
+    monitor: str
+    port: str | None = None                # receiver antenna port (Soapy port name, "RX" for RTL-SDR)
+    switch_command: str | None = None      # external RF switch, e.g. "usbrelay ANT_1=1" (no shell)
+    bias_tee: bool = False                 # power an active antenna / LNA over the coax
+    band_mhz: list[float] = field(default_factory=list)   # [low, high] the antenna is designed for
+    gain_dbi: float | None = None
+    location: str = ""
+    notes: str = ""
+
+    def covers(self, freq_hz: float) -> bool:
+        if len(self.band_mhz) != 2:
+            return True
+        lo, hi = sorted(self.band_mhz)
+        return lo * 1e6 <= freq_hz <= hi * 1e6
+
+
+@dataclass
 class DetectionConfig:
     nfft: int = 512
     burst_threshold_db: float = 12.0
@@ -124,6 +148,7 @@ class SiteConfig:
 class Config:
     site: SiteConfig = field(default_factory=SiteConfig)
     monitors: list[MonitorConfig] = field(default_factory=list)
+    antennas: list[AntennaConfig] = field(default_factory=list)
     detection: DetectionConfig = field(default_factory=DetectionConfig)
     alerts: AlertConfig = field(default_factory=AlertConfig)
     dashboard: DashboardConfig = field(default_factory=DashboardConfig)
@@ -162,6 +187,7 @@ def load_config(path: str | os.PathLike) -> Config:
     if site:
         cfg.site = _build(SiteConfig, site)
     cfg.monitors = [_build(MonitorConfig, m) for m in raw.get("monitor", [])]
+    cfg.antennas = [_build(AntennaConfig, a) for a in raw.get("antenna", [])]
     if "detection" in raw:
         cfg.detection = _build(DetectionConfig, raw["detection"])
     if "alerts" in raw:
@@ -176,9 +202,17 @@ def load_config(path: str | os.PathLike) -> Config:
     cfg.storage_path = storage.get("path", cfg.storage_path)
     cfg.baseline_path = storage.get("baseline_path", cfg.baseline_path)
     cfg.allowlist_fingerprints = list(raw.get("allowlist", {}).get("fingerprints", []))
+    cfg._path = str(path)  # type: ignore[attr-defined]
     names = [m.name for m in cfg.monitors]
     if len(names) != len(set(names)):
         raise ValueError("monitor names must be unique")
+    for a in cfg.antennas:
+        if a.monitor not in names:
+            raise ValueError(f"antenna {a.name!r}: unknown monitor {a.monitor!r}")
+        if not a.port and not a.switch_command:
+            raise ValueError(f"antenna {a.name!r}: needs a port and/or a switch_command")
+    if len({(a.monitor, a.name) for a in cfg.antennas}) != len(cfg.antennas):
+        raise ValueError("antenna names must be unique per monitor")
     for m in cfg.monitors:
         if m.role not in ("uhf", "lf"):
             raise ValueError(f"monitor {m.name}: role must be 'uhf' or 'lf'")

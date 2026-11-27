@@ -1,0 +1,12 @@
+[Unit]
+Description=Anankos FobGuard - install missing drivers/plugins requested from the dashboard
+# Runs as root, but only ever installs items from FobGuard's built-in allowlist
+# for checks that it re-verifies as failing. The request file only names check IDs.
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/etc/anankos-fobguard/env
+Environment=FOBGUARD_SERVICE_USER=fobguard
+ExecStart=/opt/anankos-fobguard/venv/bin/fobguard doctor --config /etc/anankos-fobguard/config.toml --request /var/lib/anankos-fobguard
+ExecStartPost=/bin/sh -c 'chown fobguard:fobguard /var/lib/anankos-fobguard/fix-result.json 2>/dev/null; systemctl try-restart anankos-fobguard.service'
+TimeoutStartSec=20min

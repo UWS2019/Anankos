@@ -25,8 +25,63 @@ class SourceError(RuntimeError):
     pass
 
 
-class RtlSdrSource:
+class Controllable:
+    """Thread-safe control channel: the dashboard requests a change, the
+    reader thread applies it between sample blocks (never mid-read)."""
+
+    def _init_control(self) -> None:
+        import threading
+
+        self._ctl_lock = threading.Lock()
+        self._pending: dict = {}
+        self.antenna: str = ""
+        self.bias_tee: bool = False
+        self.control_error: str = ""
+
+    def antenna_ports(self) -> list[str]:
+        return [self.antenna] if self.antenna else []
+
+    def supports_bias_tee(self) -> bool:
+        return False
+
+    def request(self, **settings) -> None:
+        with self._ctl_lock:
+            self._pending.update({k: v for k, v in settings.items() if v is not None})
+
+    def _apply_pending(self) -> None:
+        with self._ctl_lock:
+            pend, self._pending = self._pending, {}
+        if not pend:
+            return
+        try:
+            self._apply(pend)
+            self.control_error = ""
+        except Exception as e:      # a bad control request must never stop monitoring
+            self.control_error = str(e)
+
+    def _apply(self, pend: dict) -> None:
+        if "antenna" in pend and pend["antenna"] != self.antenna:
+            if pend["antenna"] not in self.antenna_ports():
+                raise SourceError(f"antenna port {pend['antenna']!r} not available")
+            self._set_antenna(pend["antenna"])
+            self.antenna = pend["antenna"]
+        if "bias_tee" in pend and bool(pend["bias_tee"]) != self.bias_tee:
+            if not self.supports_bias_tee():
+                raise SourceError("this receiver has no software-controlled bias tee")
+            self._set_bias_tee(bool(pend["bias_tee"]))
+            self.bias_tee = bool(pend["bias_tee"])
+
+    def _set_antenna(self, name: str) -> None:  # pragma: no cover - overridden
+        pass
+
+    def _set_bias_tee(self, on: bool) -> None:  # pragma: no cover - overridden
+        pass
+
+
+class RtlSdrSource(Controllable):
     def __init__(self, cfg: MonitorConfig):
+        self._init_control()
+        self.antenna = "RX"                 # RTL2832U dongles have a single RF input
         try:
             from rtlsdr import RtlSdr  # type: ignore
         except ImportError as e:  # pragma: no cover - hardware path
@@ -49,6 +104,7 @@ class RtlSdrSource:
         t_start = time.time()
         try:
             while True:
+                self._apply_pending()
                 iq = np.asarray(self.sdr.read_samples(self.block), dtype=np.complex64)
                 yield t_start + n / self.fs, iq
                 n += iq.size
@@ -59,9 +115,19 @@ class RtlSdrSource:
         finally:
             self.sdr.close()
 
+    def antenna_ports(self) -> list[str]:
+        return ["RX"]
 
-class SoapySource:
+    def supports_bias_tee(self) -> bool:     # RTL-SDR Blog V3/V4
+        return hasattr(self.sdr, "set_bias_tee")
+
+    def _set_bias_tee(self, on: bool) -> None:  # pragma: no cover - hardware
+        self.sdr.set_bias_tee(on)
+
+
+class SoapySource(Controllable):
     def __init__(self, cfg: MonitorConfig):
+        self._init_control()
         try:
             import SoapySDR  # type: ignore
             from SoapySDR import SOAPY_SDR_CF32, SOAPY_SDR_RX  # type: ignore
@@ -78,6 +144,33 @@ class SoapySource:
         self.stream = self.dev.setupStream(SOAPY_SDR_RX, SOAPY_SDR_CF32)
         self.block = cfg.block_size
         self.fs = float(cfg.sample_rate)
+        self._rx = SOAPY_SDR_RX
+        try:
+            self.antenna = self.dev.getAntenna(SOAPY_SDR_RX, 0)
+        except Exception:  # pragma: no cover
+            self.antenna = ""
+
+    def antenna_ports(self) -> list[str]:  # pragma: no cover - hardware
+        try:
+            return list(self.dev.listAntennas(self._rx, 0))
+        except Exception:
+            return [self.antenna] if self.antenna else []
+
+    def _bias_key(self) -> str | None:  # pragma: no cover - hardware
+        try:
+            keys = {a.key for a in self.dev.getSettingInfo()}
+        except Exception:
+            return None
+        return next((k for k in ("biastee", "bias_tx", "biasT_ctrl", "bias") if k in keys), None)
+
+    def supports_bias_tee(self) -> bool:  # pragma: no cover - hardware
+        return self._bias_key() is not None
+
+    def _set_antenna(self, name: str) -> None:  # pragma: no cover - hardware
+        self.dev.setAntenna(self._rx, 0, name)
+
+    def _set_bias_tee(self, on: bool) -> None:  # pragma: no cover - hardware
+        self.dev.writeSetting(self._bias_key(), "true" if on else "false")
 
     def __iter__(self):  # pragma: no cover - hardware
         self.dev.activateStream(self.stream)
@@ -86,6 +179,7 @@ class SoapySource:
         t_start = time.time()
         try:
             while True:
+                self._apply_pending()
                 got = 0
                 while got < self.block:
                     sr = self.dev.readStream(self.stream, [buf[got:]], self.block - got, timeoutUs=1_000_000)
@@ -99,8 +193,10 @@ class SoapySource:
             self.dev.closeStream(self.stream)
 
 
-class FileSource:
+class FileSource(Controllable):
     def __init__(self, cfg: MonitorConfig, throttle: bool = False):
+        self._init_control()
+        self.antenna = "Recording"
         self.path = Path(cfg.device)
         if not self.path.exists():
             raise SourceError(f"recording not found: {self.path}")
@@ -149,8 +245,16 @@ class FileSource:
                     time.sleep(iq.size / self.fs)
 
 
-class SimSource:
+class SimSource(Controllable):
+    """Simulated receiver with three simulated antennas, so antenna switching,
+    checks and the best-antenna sweep can be demonstrated without hardware."""
+
+    # name -> (signal scale, noise scale)
+    PORTS = {"Whip (sim)": (1.0, 1.0), "Weak (sim)": (0.1, 1.0), "Disconnected (sim)": (0.0, 0.5)}
+
     def __init__(self, cfg: MonitorConfig, start_time: float | None = None, throttle: bool = False):
+        self._init_control()
+        self.antenna = "Whip (sim)"
         from .simulate import SCENARIOS
 
         if cfg.scenario not in SCENARIOS:
@@ -163,8 +267,21 @@ class SimSource:
         self.fs = cfg.sample_rate
         self.throttle = throttle
 
+    def antenna_ports(self) -> list[str]:
+        return list(self.PORTS)
+
+    def supports_bias_tee(self) -> bool:
+        return True
+
     def __iter__(self):
+        rng = np.random.default_rng(1)
+        na = self.scenario.noise_amp
         for t0, iq in self.scenario.blocks(self.block):
+            self._apply_pending()
+            sig, noise = self.PORTS[self.antenna]
+            if (sig, noise) != (1.0, 1.0):
+                fresh = (rng.standard_normal(iq.size) + 1j * rng.standard_normal(iq.size)) * (na / np.sqrt(2))
+                iq = (sig * iq + noise * fresh).astype(np.complex64)
             yield t0, iq
             if self.throttle:
                 time.sleep(iq.size / self.fs)
